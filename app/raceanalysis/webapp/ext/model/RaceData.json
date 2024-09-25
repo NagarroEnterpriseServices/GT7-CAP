@@ -1,0 +1,108 @@
+{
+    "raceData": [
+        {
+            "key": "vel",
+            "text": "Velocity"
+        },
+        {
+            "key": "rot",
+            "text": "Rotation"
+        },
+        {
+            "key": "rel",
+            "text": "Relative Orientation to North"
+        },
+        {
+            "key": "ang",
+            "text": "Angular Velocity"
+        },
+        {
+            "key": "eng",
+            "text": "Engine RPM"
+        },
+        {
+            "key": "gas",
+            "text": "Gas Level"
+        },
+        {
+            "key": "gac",
+            "text": "Gas Capacity"
+        },
+        {
+            "key": "met",
+            "text": "Meters Per Second"
+        },
+        {
+            "key": "dis",
+            "text": "Distance"
+        },
+        {
+            "key": "tur",
+            "text": "Turbo Boost"
+        },
+        {
+            "key": "oilp",
+            "text": "Oil Pressure"
+        },
+        {
+            "key": "wat",
+            "text": "Water Temperature"
+        },
+        {
+            "key": "oilt",
+            "text": "Oil Temperature"
+        },
+        {
+            "key": "lap",
+            "text": "Current Lap Time"
+        },
+        {
+            "key": "ger",
+            "text": "Current Gear"
+        },
+        {
+            "key": "sug",
+            "text": "Suggested Gear"
+        },
+        {
+            "key": "tho",
+            "text": "Throttle"
+        },
+        {
+            "key": "bra",
+            "text": "Brake"
+        },
+        {
+            "key": "roa",
+            "text": "Road Plane"
+        },
+        {
+            "key": "roaD",
+            "text": "Road Plane Distance"
+        },
+        {
+            "key": "tirT",
+            "text": "Tire Surface Temperature"
+        },
+        {
+            "key": "whe",
+            "text": "Wheel Revolutions Per Second"
+        },
+        {
+            "key": "clu",
+            "text": "Clutch Pedal"
+        },
+        {
+            "key": "cluE",
+            "text": "Clutch Engagement"
+        },
+        {
+            "key": "rpm",
+            "text": "RPM From Clutch To Gearbox"
+        },
+        {
+            "key": "tra",
+            "text": "Transmission Top Speed"
+        }
+    ]
+}

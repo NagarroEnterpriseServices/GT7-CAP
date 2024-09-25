@@ -1,0 +1,166 @@
+<core:FragmentDefinition xmlns:filterbar="sap.ui.comp.filterbar" xmlns:f2="sap.f" xmlns:core="sap.ui.core" xmlns:card="sap.f.cards" xmlns="sap.m" xmlns:l="sap.ui.layout" xmlns:f="sap.ui.layout.form" xmlns:macros="sap.fe.macros" xmlns:mvc="sap.ui.core.mvc">
+        <VBox alignItems="Center" width="100%" >
+        <f2:GridContainer snapToRow="true" allowDenseFill="true">
+            <f2:layout>
+                <f2:GridContainerSettings rowSize="90px" columnSize="90px" gap="10px" />
+            </f2:layout>
+            <f2:layoutXS>
+                <f2:GridContainerSettings rowSize="70px" columnSize="70px" gap="8px" />
+            </f2:layoutXS>
+            <f2:items>
+                <f2:Card >
+                    <f2:layoutData>
+                        <f2:GridContainerItemLayoutData rows="2" columns="1000" />
+                    </f2:layoutData>
+                    <f2:header>
+                        <card:Header title="Session of the {createdAt}" subtitle="Car: {car/name}" iconSrc="sap-icon://car-rental"/>
+                    </f2:header>
+                    <f2:content>
+                        <HBox width="100%" height="100%" justifyContent="SpaceBetween">
+                        <HBox width="100%" height="80px" class="sapUiSmallMargin" justifyContent="Start">
+                            <Image id="trackSplashImageImage" src="{path: 'trackUrl'}" height="100%"/>
+                            <VBox height="100%" class="sapUiSmallMarginBegin" justifyContent="SpaceAround">
+                            <Text text="Best Lap: {bestLap} in {bestLapTime}"></Text>
+                            <Text text="Total Laps: {lapsInRace}"></Text>
+                            <Text text="Maximum speed attained {calculatedMaxSpeed}km/h"></Text>
+                            </VBox>
+                        </HBox>
+                            <Button class="sapUiSmallMargin" text="Regenerate Metrics" press=".onGenerateMetricsPress"></Button>
+                        </HBox>
+                    </f2:content>
+                </f2:Card>
+                <f2:Card>
+                    <f2:layoutData>
+                        <f2:GridContainerItemLayoutData rows="4" columns="10" />
+                    </f2:layoutData>
+                    <f2:content>
+                        <macros:Chart id="ChartSpeed" contextPath="/Sessions/Speed" metaPath="@com.sap.vocabularies.UI.v1.Chart#chartSectionSpeed" personalization="Item" selectionMode="Multiple"/>
+                    </f2:content>
+                </f2:Card>
+                <f2:Card>
+                    <f2:layoutData>
+                        <f2:GridContainerItemLayoutData rows="5" columns="5" />
+                    </f2:layoutData>
+                    <f2:header>
+                        <card:Header title="Plot data on track" subtitle="{lapsInRace} laps" iconSrc="sap-icon://developer-settings"/>
+                    </f2:header>
+                    <f2:content>
+                        <VBox justifyContent="SpaceBetween" width="100%">
+                            <HBox justifyContent="SpaceAround" alignItems="Center">
+                                <HBox alignItems="Center">
+                                    <Text text="Lap number" textAlign="Center"/>
+                                    <Select id="lapSelect" name="Lap number" class="sapUiSmallMargin" width="60px" change=".onTrackGraphPress">
+                                        <core:Item key="1" text="1"></core:Item>
+                                        <core:Item key="2" text="2"></core:Item>
+                                        <core:Item key="3" text="3"></core:Item>
+                                        <core:Item key="4" text="4"></core:Item>
+                                    </Select>
+                                </HBox>
+                                <HBox alignItems="Center">
+                                    <Text text="Data to plot:" textAlign="Center"/>
+                                    <Select id="racedataSelect" name="Data Type" class="sapUiSmallMargin" width="100px" change=".onTrackGraphPress">
+                                        <core:Item key="velocity" text="Velocity"></core:Item>
+                                        <core:Item key="angularVelocity" text="Angular Velocity"></core:Item>
+                                        <core:Item key="tireSurfaceTemperature" text="Tire Surface Temperature"></core:Item>
+                                        <core:Item key="engineRPM" text="Engine RPM"></core:Item>
+                                        <core:Item key="gasLevel" text="Gas Level"></core:Item>
+                                        <core:Item key="metersPerSecond" text="Meters Per Second"></core:Item>
+                                        <core:Item key="distance" text="Distance"></core:Item>
+                                        <core:Item key="turboBoost" text="Turbo Boost"></core:Item>
+                                        <core:Item key="oilPressure" text="Oil Pressure"></core:Item>
+                                        <core:Item key="oilTemperature" text="Oil Temperature"></core:Item>
+                                        <core:Item key="waterTemperature" text="Water Temperature"></core:Item>
+                                        <core:Item key="currentGear" text="Current Gear"></core:Item>
+                                        <core:Item key="suggestedGear" text="Suggested Gear"></core:Item>
+                                        <core:Item key="throttle" text="Throttle"></core:Item>
+                                        <core:Item key="brake" text="Brake"></core:Item>
+                                    </Select>
+                                </HBox>
+                                <!-- <Button text="Go" press=".onTrackGraphPress"></Button> -->
+                            </HBox>
+                                <Image id="trackImage" src="{path: 'trackUrl'}" width="100%"/>
+                        </VBox>
+                    </f2:content>
+                </f2:Card>
+                <f2:Card>
+                    <f2:header>
+                        <card:Header title="Time taken per lap" subtitle="{lapsInRace} laps"  iconSrc="sap-icon://fob-watch"/>
+                    </f2:header>
+                    <f2:layoutData>
+                        <f2:GridContainerItemLayoutData rows="3" columns="4"/>
+                    </f2:layoutData>
+                    <f2:content>
+                        <macros:Table 
+                            id="LapTimesTable"
+                            metaPath="Laps/@com.sap.vocabularies.UI.v1.LineItem#LapTimes"
+                            type="GridTable"
+                            selectionMode="Single"
+
+                            readOnly="true"
+                            enableAutoColumnWidth="true"
+                            headerVisible="false"
+                            isSearchable="false" />
+                    </f2:content>
+                </f2:Card>
+                <f2:Card>
+                    <f2:header>
+                        <card:Header title="Trajectory differences" subtitle="Fastest lap in Green" iconSrc="sap-icon://map"/>
+                    </f2:header>
+                    <f2:layoutData>
+                        <f2:GridContainerItemLayoutData rows="4" columns="4" />
+                    </f2:layoutData>
+                    <f2:content>
+                    <VBox  class="sapUiSmallMargin" width="100%" height="100%">
+                        <Image id="trackTrajectoryImage" src="{path: 'trackUrl'}" width="100%"/>
+                    </VBox>
+                    </f2:content>
+                </f2:Card>
+                <f2:Card>
+                    <f2:header>
+                        <card:Header title="Peak and average speed per lap" subtitle="{lapsInRace} laps" iconSrc="sap-icon://performance"/>
+                    </f2:header>
+                    <f2:layoutData>
+                        <f2:GridContainerItemLayoutData rows="3" columns="4" />
+                    </f2:layoutData>
+                    <f2:content>
+                        <macros:Table 
+                             id="LapSpeedsTable"
+                            metaPath="Laps/@com.sap.vocabularies.UI.v1.LineItem#LapSpeeds"
+                            type="GridTable"
+                            selectionMode="Single"
+
+                            readOnly="true"
+                            enableAutoColumnWidth="true"
+                            headerVisible="false"
+                            isSearchable="false"/>
+                    </f2:content>
+                </f2:Card>
+                <f2:Card>
+                    <f2:header>
+                        <card:Header title="Gear difference per lap" subtitle="Difference between suggested gear and actual gear" iconSrc="sap-icon://action-settings"/>
+                    </f2:header>
+                    <f2:layoutData>
+                        <f2:GridContainerItemLayoutData rows="4" columns="5" />
+                    </f2:layoutData>
+                    <f2:content>
+                        <VBox class="sapUiSmallMargin" justifyContent="SpaceBetween" width="100%" height="100%">
+                            <macros:Chart id="ChartGears" contextPath="/Sessions/Gear" metaPath="@com.sap.vocabularies.UI.v1.Chart#chartSectionGears" personalization="Item" selectionMode="Multiple"/>
+                        </VBox>
+                    </f2:content>
+                </f2:Card>
+                <!-- card to shox the total breakig time -->
+                <f2:Card>
+                    <f2:header>
+                        <card:Header title="Total breaking time" subtitle="{lapsInRace} laps" iconSrc="sap-icon://message-warning"/>
+                    </f2:header>
+                    <f2:layoutData>
+                        <f2:GridContainerItemLayoutData minRows="1" columns="2" />
+                    </f2:layoutData>
+                    <f2:content>
+                        <NumericContent value="32.54" scale="s" withMargin="false"/>
+                    </f2:content>
+                </f2:Card>
+            </f2:items>
+        </f2:GridContainer>
+        </VBox>
+</core:FragmentDefinition>
