@@ -15,7 +15,7 @@ const { sqlite, otlp, simulation, simulationSession } = cds.env?.services
 //const environment = process.env.NODE_ENV || 'development';
 const _in_sqlite = cds.env.env  === 'sqlite'
 const _in_development = !_in_sqlite
-const bindPort: number = 33338
+const bindPort: number = 33340
 const receivePort: number = 33339
 const psIp: string = process.env.PLAYSTATION_IP
 
@@ -187,8 +187,10 @@ module.exports = class SIPGT7Service extends Service {
         )
         message.currentLapTime = this.lapCounter.getLapTime()
 
+        
         // calculate currentLapTime2 from timeOfDayProgression
         message.currentLapTime2 = message.timeOfDayProgression - this.startTimeOfDayProgression
+        console.log('currentLapTime', message.currentLapTime, 'currentLapTime2', message.currentLapTime2)
 
         // calculate distance ontrack
         message.distance = this.distance += message.metersPerSecond / 60
