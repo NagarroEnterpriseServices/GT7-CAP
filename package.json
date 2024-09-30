@@ -15,6 +15,7 @@
     "@opentelemetry/exporter-metrics-otlp-grpc": "^0.51.1",
     "@opentelemetry/exporter-trace-otlp-grpc": "^0.51.1",
     "@sap/cds-dk": ">=7.6",
+    "@sap/hana-client": "^2.22.27",
     "@sap/xssec": "^3.6.1",
     "binary-parser": "^2.2.1",
     "express": "^4",
