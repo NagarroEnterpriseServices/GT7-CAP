@@ -74,7 +74,7 @@ export async function generateFioriMetrics(sessionID: string) {
                 count = 1
                 lastLap = sip.lapCount
             }
-            if (sip.currentLapTime2 >= sampleMS * count) {
+            if (sip.currentLapTime >= sampleMS * count) {
                 await writePacket(sessionID, sip, metrics)
                 count++
             }
@@ -95,14 +95,14 @@ async function writeLaps(sessionID: string, sips: [SimulatorInterfacePacket]) {
             laps.push({
                 session_ID: sessionID,
                 lap: sip.lapCount,
-                time: sip.currentLapTime2,
+                time: sip.currentLapTime,
                 maxSpeed: sip.metersPerSecond * 3.6,
                 avgSpeed: 0,
                 best: false
             })
             speeds = [sip.metersPerSecond * 3.6]
         } else {
-            laps[laps.length - 1].time = sip.currentLapTime2
+            laps[laps.length - 1].time = sip.currentLapTime
             laps[laps.length - 1].maxSpeed = Math.max(laps[laps.length - 1].maxSpeed, sip.metersPerSecond  * 3.6)
             speeds.push(sip.metersPerSecond * 3.6)
         }
@@ -124,7 +124,7 @@ async function writePacket(sessionID: string, sip: SimulatorInterfacePacket, met
         session_ID: sessionID,
         packetId: sip.packetId,
         lapCount: sip.lapCount,
-        currentLapTime: sip.currentLapTime2,
+        currentLapTime: sip.currentLapTime,
         measure: 0,
         value: 0
     }

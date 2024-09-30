@@ -149,7 +149,7 @@
                     title="Lap Time" backgroundDesign="Transparent" layout="ResponsiveGridLayout"
                     singleContainerFullSize="true" labelSpanM="4" breakpointM="100">
                     <Label text="Curr" textAlign="Right"/>
-                    <Text text="{ path: 'ws>/sip/currentLapTime2', formatter: '.formatter.time' }"
+                    <Text text="{ path: 'ws>/sip/currentLapTime', formatter: '.formatter.time' }"
                         textAlign="Right" wrapping="false"/>                        
                     <Label text="Last" textAlign="Right"/>
                     <Text text="{ path: 'ws>/sip/lastLapTime', formatter: '.formatter.time' }"

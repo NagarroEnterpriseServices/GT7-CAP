@@ -190,7 +190,6 @@ module.exports = class SIPGT7Service extends Service {
         
         // calculate currentLapTime2 from timeOfDayProgression
         message.currentLapTime2 = message.timeOfDayProgression - this.startTimeOfDayProgression
-        console.log('currentLapTime', message.currentLapTime, 'currentLapTime2', message.currentLapTime2)
 
         // calculate distance ontrack
         message.distance = this.distance += message.metersPerSecond / 60
