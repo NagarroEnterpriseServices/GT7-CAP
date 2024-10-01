@@ -15,9 +15,13 @@ RUN npm install
 # Expose the default port for CAP applications (4004)
 EXPOSE 4004
 
-# expose UDP port 33340 and 33339
+# expose UDP port 33340 and 33339 for GTSport
 EXPOSE 33340/udp
 EXPOSE 33339/udp
+
+# expose UDP port 33740 and 33739 for GT7
+# EXPOSE 33740/udp
+# EXPOSE 33739/udp
 
 # Command to run the CAP application
 CMD ["npm", "start"]

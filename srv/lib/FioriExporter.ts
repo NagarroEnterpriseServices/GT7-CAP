@@ -45,7 +45,7 @@ export async function generateFioriMetrics(sessionID: string) {
     const sips: [SimulatorInterfacePacket] = await SELECT
         .from(SimulatorInterfacePackets)
         .where({ session_ID: sessionID })
-        .columns(["packetId", "lapCount", "metersPerSecond", "brake", "throttle", "currentLapTime", "currentLapTime2"])
+        .columns(["packetId", "lapCount", "metersPerSecond", "brake", "throttle", "currentLapTime", "currentLapTime2", "lapsInRace"])
         .orderBy("packetId")
 
     const metrics: Metrics = {
@@ -111,6 +111,11 @@ async function writeLaps(sessionID: string, sips: [SimulatorInterfacePacket]) {
     // get best lap
     const bestLapTime = Math.min(...laps.map(lap => lap.time))
     laps.forEach(lap => lap.best = lap.time === bestLapTime)
+
+    if (sips[0].lapsInRace < laps.length) {
+        laps.pop()
+    }
+
 
     // insert laps
     for (let lap of laps) {
