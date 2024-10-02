@@ -24,7 +24,7 @@
   "devDependencies": {
     "@cap-js/cds-typer": ">=0.1",
     "@sap/eslint-plugin-ui5-jsdocs": "^2.0.5",
-    "@sap/ux-specification": "^1.124.0",
+    "@sap/ux-specification": "^1.124.2",
     "@sapui5/ts-types": "^1.92.2",
     "@types/node": "*",
     "@types/ws": "^8.5.10",

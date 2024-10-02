@@ -82,6 +82,15 @@
         "sap.fe.core": {}
       }
     },
+    "extends": {
+			"extensions": {
+				"sap.ui.controllerExtensions": {
+					"sap.fe.templates.ListReport.ListReportController": {
+						"controllerName": "raceanalysis.ext.controller.SessionList"
+					}
+				}
+			}
+		},
     "contentDensities": {
       "compact": true,
       "cozy": true

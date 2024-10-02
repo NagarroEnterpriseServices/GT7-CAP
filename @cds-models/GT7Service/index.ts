@@ -13,14 +13,13 @@ const SessionMetric_measure = {
 type SessionMetric_measure = 1 | 2 | 3 | 4
 
 /**
-* Aspect for entities with canonical universal IDs
-* 
-* See https://cap.cloud.sap/docs/cds/common#aspect-cuid
+* Common.ValueList (ValueHelps)
 */
 export function _SessionAspect<TBase extends new (...args: any[]) => object>(Base: TBase) {
   return class Session extends Base {
         ID?: string;
         createdAt?: __.CdsTimestamp | null;
+        driver?: string | null;
         car?: __.Association.to<Car> | null;
         car_ID?: number | null;
         lapsInRace?: number | null;
@@ -39,6 +38,7 @@ export function _SessionAspect<TBase extends new (...args: any[]) => object>(Bas
         Throttle?: __.Composition.of.many<SessionMetrics>;
         Gear?: __.Composition.of.many<SessionMetrics>;
       static readonly actions: {
+        assignDriver: { (sessionID: string | null, driver: string | null): boolean, __parameters: {sessionID: string | null, driver: string | null}, __returns: boolean, kind: 'action'}
         generateFioriMetrics: { (): boolean, __parameters: Record<never, never>, __returns: boolean, kind: 'function'}
         getLapTimes: { (): Array<_.LapTime>, __parameters: Record<never, never>, __returns: Array<_.LapTime>, kind: 'function'}
         getCompareLaps: { (): Array<_.LapTime>, __parameters: Record<never, never>, __returns: Array<_.LapTime>, kind: 'function'}

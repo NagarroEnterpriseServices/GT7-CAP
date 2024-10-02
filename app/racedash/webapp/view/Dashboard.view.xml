@@ -11,11 +11,11 @@
                 <ToolbarSpacer/>
                 <Title class="title" titleStyle="H4" text="{ws>/sip/carName}"/>
                 <ToolbarSpacer/>
-                <Button type="{= ${ws>/recording} ? 'Negative' : 'Emphasized'}"
+                <!-- <Button type="{= ${ws>/recording} ? 'Negative' : 'Emphasized'}"
                     visible="{ws>/connected}"
                     icon="{= ${ws>/recording} ? 'sap-icon://stop' : 'sap-icon://record'}" 
                     text="{= ${ws>/recording} ? 'Stop' : 'Record'}" 
-                    press=".handleRecord"/>
+                    press=".handleRecord"/> -->
             </Toolbar>
         </customHeader>
         <HBox class="sapUiTinyMarginBeginEnd" renderType="Bare">                  

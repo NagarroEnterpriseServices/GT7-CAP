@@ -42,23 +42,24 @@ annotate service.Sessions with @(UI.LineItem: [
     },
     {
         $Type: 'UI.DataField',
+        Label: 'Driver',
+        Value: driver,
+        ![@UI.Importance]: #High
+    },
+    {
+        $Type: 'UI.DataField',
         Label: 'Car',
         Value: car.name,
     },
     {
         $Type: 'UI.DataField',
-        Label: 'Laps',
-        Value: lapsInRace,
-    },
-    {
-        $Type: 'UI.DataField',
-        Label: 'Best Lap',
-        Value: bestLap,
-    },
-    {
-        $Type: 'UI.DataField',
         Label: 'Best Lap Time',
         Value: bestLapTime,
+    },
+    {
+        $Type: 'UI.DataField',
+        Label: 'Laps',
+        Value: lapsInRace,
     },
     {
         $Type: 'UI.DataField',

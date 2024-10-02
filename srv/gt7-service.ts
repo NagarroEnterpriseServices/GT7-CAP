@@ -36,6 +36,14 @@ module.exports = class GT7Service extends ApplicationService {
             return await getCompareLaps(sessionID)
         })
 
+        this.on("assignDriver", Session, async (req) => {
+            const { sessionID, driver } = req.data;
+            console.log("assignDriver", sessionID, driver)
+            await cds.run(UPDATE(Session).set({ driver: driver }).where({ ID: sessionID }));
+            
+            return { driver: driver };
+        })
+
         // http://localhost:4004/odata/v4/gt7/Sessions(52983d4d-bea3-4d5a-9867-b35639167df1)/GT7Service.getLapSVG()
         // https://gt-engine.com/gt7/tracks/track-maps.html
         this.on("getLapSVG", Session, async (req) => {

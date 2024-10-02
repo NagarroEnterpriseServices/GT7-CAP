@@ -20,6 +20,8 @@ service GT7Service {
                     '_it/Brake'
                 ]}
             )
+
+            action   assignDriver(sessionID : UUID, driver : String) returns Boolean;
             function   generateFioriMetrics() returns Boolean;
             //action   playSimulation();
             function getLapTimes()    returns array of LapTime;

@@ -10,6 +10,8 @@ import ODataModel from "sap/ui/model/odata/v4/ODataModel";
 import Context from "sap/ui/model/odata/v4/Context";
 import MessageBox from "sap/m/MessageBox";
 import ODataContextBinding from "sap/ui/model/odata/v4/ODataContextBinding";
+import GridContainerItemLayoutData from "sap/f/GridContainerItemLayoutData";
+import GridContainer from "sap/f/GridContainer";
 
 /**
  * @namespace raceanalysis.ext.view
@@ -29,6 +31,40 @@ export default class SessionObjectPage extends Controller {
     }
 
     private async loadLapData(): Promise<void> {
+        const lapSelect = this.byId("lapSelect") as Select;
+        const lapsTimesLayout = this.byId("lapTimesLayout") as GridContainerItemLayoutData;
+        const speedPerLapLayout = this.byId("speedPerLapLayout") as GridContainerItemLayoutData;
+        const grid = this.byId("gridContainer") as GridContainer;
+    
+        let url = window.location.href + "/Laps";
+        url = url.substring(url.indexOf("/Sessions"));
+        url = window.location.origin + "/odata/v4/gt7" + url;
+        
+        const res = await fetch(url);
+
+        if (!res.ok) {
+            return;
+        }
+        const data = await res.json();
+        
+        // load select entries
+        lapSelect.removeAllItems();
+        for (const lap of data.value) {
+            const item = new Item({
+                key: lap.lap.toString(),
+                text: lap.lap.toString()
+            });
+            lapSelect.addItem(item);
+        }
+        
+        // set layout rows based on nb laps
+        lapsTimesLayout.setMinRows(data.value.length / 2);
+        speedPerLapLayout.setMinRows(data.value.length / 2);
+
+        grid.rerender();
+    }
+
+    private async loadLapSVG(): Promise<void> {
         await new Promise(resolve => setTimeout(resolve, 1000));
 
         const trackMap = this.byId("trackTrajectoryImage") as Image;
@@ -73,7 +109,6 @@ export default class SessionObjectPage extends Controller {
     //
     //  }
 
-
     onTrackGraphPress(oEvent: any): void {
         const selectedLap = this.byId("lapSelect") as Select;
         const selectedData = this.byId("racedataSelect") as Select;
@@ -99,6 +134,7 @@ export default class SessionObjectPage extends Controller {
         }).then(response => {
             if (response.ok) {
                 this.loadLapData();
+                this.loadLapSVG();
                 // MessageToast.show("Metrics generated successfully");
             } else {
                 // MessageToast.show("Failed to generate metrics");

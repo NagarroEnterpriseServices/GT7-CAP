@@ -1,0 +1,10 @@
+<mvc:View
+    controllerName="raceanalysis.ext.view.SessionsListPage"
+    xmlns="sap.m"
+    xmlns:mvc="sap.ui.core.mvc"
+    displayBlock="true">
+    <Shell>
+        <App
+            id="app"/>
+    </Shell>
+</mvc:View>

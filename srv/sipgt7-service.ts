@@ -159,6 +159,8 @@ module.exports = class SIPGT7Service extends Service {
 
     async onMessage(message: any, wsSrv: cds.Service, otlpSrv: cds.Service) {
         // use UDP headbeat as a gauge of liveness
+        this.recording = true
+
         if (this.packetCount++ >= 200) {
             this.sendHeartbeat()
             this.packetCount = 0 // reset loop
@@ -192,7 +194,9 @@ module.exports = class SIPGT7Service extends Service {
         message.currentLapTime2 = message.timeOfDayProgression - this.startTimeOfDayProgression
 
         // calculate distance ontrack
-        message.distance = this.distance += message.metersPerSecond / 60
+        if (!((message.flags & SimulatorFlags.Paused) === SimulatorFlags.Paused)){
+            message.distance = this.distance += message.metersPerSecond / 60
+        }
 
         if (sqlite && this.recording && this.sessionId) {
             //const flags = message.flags as SimulatorFlags

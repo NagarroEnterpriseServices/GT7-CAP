@@ -25,6 +25,7 @@ type Wheel {
 entity Sessions : cuid {
     //createdAt : Timestamp @cds.on.insert: $now;
     createdAt          : Timestamp;
+    driver             : String(200);
     car                : Association to Cars;
     lapsInRace         : Int16;
     bestLap            : Int16;

@@ -50,6 +50,7 @@ Object.defineProperty(Wheel, 'is_singular', { value: true })
 export function _SessionAspect<TBase extends new (...args: any[]) => object>(Base: TBase) {
   return class Session extends Base {
         createdAt?: __.CdsTimestamp | null;
+        driver?: string | null;
         car?: __.Association.to<Car> | null;
         car_ID?: number | null;
         lapsInRace?: number | null;
@@ -200,7 +201,7 @@ Object.defineProperty(CarGroups, 'name', { value: 'gt7.CarGroups' })
 
 export function _CountryAspect<TBase extends new (...args: any[]) => object>(Base: TBase) {
   return class Country extends Base {
-        ID?: number | null;
+        ID?: number;
         name?: string | null;
         code?: string | null;
       static readonly actions: Record<never, never>
@@ -214,7 +215,7 @@ Object.defineProperty(Countries, 'name', { value: 'gt7.Countries' })
 
 export function _CourseBasAspect<TBase extends new (...args: any[]) => object>(Base: TBase) {
   return class CourseBas extends Base {
-        ID?: number | null;
+        ID?: number;
         name?: string | null;
         logoName?: string | null;
       static readonly actions: Record<never, never>
