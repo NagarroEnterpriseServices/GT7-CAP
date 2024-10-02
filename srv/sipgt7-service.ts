@@ -159,7 +159,12 @@ module.exports = class SIPGT7Service extends Service {
 
     async onMessage(message: any, wsSrv: cds.Service, otlpSrv: cds.Service) {
         // use UDP headbeat as a gauge of liveness
-        this.recording = true
+
+
+        // record if is in race (lapsInRace > 0) and if not in post-race (lapCount <= lapsInRace)
+        if (message.lapsInRace !== 0 && message.lapCount <= message.lapsInRace) {
+            this.recording = true
+        }
 
         if (this.packetCount++ >= 200) {
             this.sendHeartbeat()
@@ -170,6 +175,7 @@ module.exports = class SIPGT7Service extends Service {
         if (this.recording && !this.sessionId) {
             // start new session
             this.sessionId = cds.utils.uuid()
+            this.lastLapRecorded = false
             logSession(this.sessionId, message)
         }
 
@@ -217,6 +223,7 @@ module.exports = class SIPGT7Service extends Service {
                                 await updateSession(this.sessionId, true, message)
                                 this.lastLapRecorded = true
                                 this.recording = false
+                                this.sessionId = null
                                 wsSrv.emit("STOPRECORDING")
                             }
                         }
