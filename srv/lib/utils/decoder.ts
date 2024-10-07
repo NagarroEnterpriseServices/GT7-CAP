@@ -4,8 +4,9 @@ import { Salsa20 } from "./salsa20";
 export const decrypt: (data: Buffer) => Buffer = (data: Buffer) => {
     const encoder: TextEncoder = new TextEncoder();
     const key: Uint8Array = encoder.encode(
-        // "Simulator Interface Packet GT7 ver 0.0" // GT7
-        "Simulator Interface Packet ver 0.0" // GTSport
+        process.env.GT_VERSION == 'GT7' ?
+        "Simulator Interface Packet GT7 ver 0.0" :
+        "Simulator Interface Packet ver 0.0"
     ); // 32 bytes key
 
     const nonce1: number = data.readInt32LE(64);

@@ -15,8 +15,10 @@ const { sqlite, otlp, simulation, simulationSession } = cds.env?.services
 //const environment = process.env.NODE_ENV || 'development';
 const _in_sqlite = cds.env.env  === 'sqlite'
 const _in_development = !_in_sqlite
-const bindPort: number = 33340
-const receivePort: number = 33339
+const bindPort: number =    process.env.GT_VERSION == 'GTS' ? 33340 :
+                            process.env.GT_VERSION == 'GT7' ? 33740 : 33340;
+const receivePort: number = process.env.GT_VERSION == 'GTS' ? 33339 :
+                            process.env.GT_VERSION == 'GT7' ? 33739 : 33339;
 const psIp: string = process.env.PLAYSTATION_IP
 
 module.exports = class SIPGT7Service extends Service {
@@ -64,7 +66,7 @@ module.exports = class SIPGT7Service extends Service {
         socket.on('listening', () => {
             const address = this.socket.address()
             this.isUdpSocketReady = true
-            LOG._info && LOG.info(`SIP GT7 server listening on UDP ${address.address}:${address.port} for IP ${psIp}`)
+            LOG._info && LOG.info(`SIP ${process.env.GT_VERSION} server listening on UDP ${address.address}:${address.port} for IP ${psIp}`)
             this.sendHeartbeat()
         })
 
