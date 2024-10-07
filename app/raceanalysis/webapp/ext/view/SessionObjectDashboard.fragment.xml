@@ -13,7 +13,7 @@
                         <f2:GridContainerItemLayoutData rows="2" columns="1000" />
                     </f2:layoutData>
                     <f2:header>
-                        <card:Header title="Session of the {createdAt}" subtitle="Car: {car/name}" iconSrc="sap-icon://car-rental"/>
+                        <card:Header title="Session of the {createdAt}" subtitle="Car: {car/name}  Driver: {driver}" iconSrc="sap-icon://car-rental"/>
                     </f2:header>
                     <f2:content>
                         <HBox width="100%" height="100%" justifyContent="SpaceBetween">
@@ -132,31 +132,7 @@
                             isSearchable="false"/>
                     </f2:content>
                 </f2:Card>
-                <f2:Card>
-                    <f2:header>
-                        <card:Header title="Gear difference per lap" subtitle="Difference between suggested gear and actual gear" iconSrc="sap-icon://action-settings"/>
-                    </f2:header>
-                    <f2:layoutData>
-                        <f2:GridContainerItemLayoutData rows="4" columns="5" />
-                    </f2:layoutData>
-                    <f2:content>
-                        <VBox class="sapUiSmallMargin" justifyContent="SpaceBetween" width="100%" height="100%">
-                            <macros:Chart id="ChartGears" contextPath="/Sessions/Gear" metaPath="@com.sap.vocabularies.UI.v1.Chart#chartSectionGears" personalization="Item" selectionMode="Multiple"/>
-                        </VBox>
-                    </f2:content>
-                </f2:Card>
-                <!-- card to shox the total breakig time -->
-                <f2:Card>
-                    <f2:header>
-                        <card:Header title="Total breaking time" subtitle="{lapsInRace} laps" iconSrc="sap-icon://message-warning"/>
-                    </f2:header>
-                    <f2:layoutData>
-                        <f2:GridContainerItemLayoutData minRows="1" columns="2" />
-                    </f2:layoutData>
-                    <f2:content>
-                        <NumericContent value="32.54" scale="s" withMargin="false"/>
-                    </f2:content>
-                </f2:Card>
+                <!-- add a Throttle-Breaking-Coasting diagram -->
             </f2:items>
         </f2:GridContainer>
         </VBox>
