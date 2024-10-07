@@ -5,6 +5,11 @@ FROM node:lts
 # Set the working directory
 WORKDIR /usr/src/app
 
+# install nano and iproute2
+RUN apt-get update && apt-get install -y nano iproute2
+
+
+
 # Copy the application files to the container
 COPY . .
 
@@ -24,4 +29,4 @@ EXPOSE 33339/udp
 # EXPOSE 33739/udp
 
 # Command to run the CAP application
-CMD ["npm", "start"]
+CMD ["npm", "run", "start:sqlite"]

@@ -38,6 +38,7 @@
     "watch": "npx cds-ts watch --open launchpad.html?sap-ui-xx-viewCache=false --livereload false",
     "watch:sqlite": "npx cds-ts watch --profile sqlite --open launchpad.html?sap-ui-xx-viewCache=false --livereload false",
     "start": "cds-ts serve",
+    "start:sqlite": "cds-ts serve --profile sqlite",
     "watch-raceanalysis": "cds-ts watch --open raceanalysis/index.html?sap-ui-xx-viewCache=false --livereload false",
     "db:create": "cds deploy srv --to sqlite",
     "db:upgrade": "cds deploy --profile sqlite",
@@ -59,27 +60,6 @@
             "database": "db.sqlite"
           },
           "schema_evolution": "auto"
-        }
-      },
-      "telemetry": {
-        "[sqlite]": {
-          "kind": "to-cloud-logging"
-        },
-        "tracing": null,
-        "metrics": {
-          "exporter": {
-            "module": "./srv/lib/MyMetricExporter",
-            "class": "MyConsoleMetricExporter",
-            "[sqlite]": {
-              "class": "MyOTLPMetricExporter"
-            }
-          },
-          "config": {
-            "__comment__1": "60 frames per second (1000 / 60 = 16.67)",
-            "__comment__2": "CL seems to allow 6000 metrics per minute -> exportIntervalMillis >= metrics * 10",
-            "exportIntervalMillis": 30
-          },
-          "_db_pool": false
         }
       }
     },

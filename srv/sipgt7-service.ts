@@ -164,7 +164,7 @@ module.exports = class SIPGT7Service extends Service {
 
 
         // record if is in race (lapsInRace > 0) and if not in post-race (lapCount <= lapsInRace)
-        if (message.lapsInRace !== 0 && message.lapCount <= message.lapsInRace) {
+        if (message.lapsInRace > 0 && message.lapCount <= message.lapsInRace) {
             this.recording = true
         }
 
