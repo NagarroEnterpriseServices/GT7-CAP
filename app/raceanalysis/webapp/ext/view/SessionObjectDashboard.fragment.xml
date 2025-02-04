@@ -75,7 +75,7 @@
                                 </HBox>
                                 <!-- <Button text="Go" press=".onTrackGraphPress"></Button> -->
                             </HBox>
-                                <Image id="trackImage" src="{path: 'trackUrl'}" width="auto" height="auto"/>
+                                <Image id="trackImage" class="dataTrackImage" src="{path: 'trackUrl'}" width="auto" height="auto"/>
                         </VBox>
                     </f2:content>
                 </f2:Card>
@@ -108,7 +108,7 @@
                     </f2:layoutData>
                     <f2:content>
                     <VBox  class="sapUiSmallMargin" width="100%" height="100%">
-                        <Image id="trackTrajectoryImage" src="{path: 'trackUrl'}" width="auto" height="auto" />
+                        <Image id="trackTrajectoryImage" class="trajectoryTrackImage" src="{path: 'trackUrl?lap=0'}" width="auto" height="auto" />
                     </VBox>
                     </f2:content>
                 </f2:Card>

@@ -65,7 +65,7 @@ export default class SessionObjectPage extends Controller {
     }
 
     private async loadLapSVG(): Promise<void> {
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await new Promise(resolve => setTimeout(resolve, 35000));
 
         const trackMap = this.byId("trackTrajectoryImage") as Image;
 

@@ -129,7 +129,7 @@ async function writePacket(sessionID: string, sip: SimulatorInterfacePacket, met
         session_ID: sessionID,
         packetId: sip.packetId,
         lapCount: sip.lapCount,
-        currentLapTime: sip.currentLapTime,
+        currentLapTime: sip.currentLapTime2,
         measure: 0,
         value: 0
     }

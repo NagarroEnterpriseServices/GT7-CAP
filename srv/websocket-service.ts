@@ -50,16 +50,16 @@ module.exports = class WebSocketService extends Service {
             //ws.send(JSON.stringify(getCloudEvent("sip", simulatorData)))
         })
 
-        this.on("STOPRECORDING", async () => {
-            LOG._info && LOG.info("on STOPRECORDING")
-            wss.clients.forEach(function each(client) {
-                if (client.readyState === WebSocket.OPEN) {
-                    client.send(JSON.stringify(getCloudEvent("recording", {
-                        "recording": false
-                    })))
-                }
-            })
-        })
+        // this.on("STOPRECORDING", async () => {
+        //     LOG._info && LOG.info("on STOPRECORDING")
+        //     wss.clients.forEach(function each(client) {
+        //         if (client.readyState === WebSocket.OPEN) {
+        //             client.send(JSON.stringify(getCloudEvent("recording", {
+        //                 "recording": false
+        //             })))
+        //         }
+        //     })
+        // })
 
         wss.on("connection", (ws: WebSocket) => {
             //ws.id = req.headers.get("sec-websocket-key") 
@@ -67,30 +67,30 @@ module.exports = class WebSocketService extends Service {
             // send one test dataset mockdata for offline testing
             //const mockData = simulatorMockData
             const mockData = getMockData()
-            mockData.recording = recording
+            // mockData.recording = recording
             mockData.connections = wss.clients.size
             ws.send(JSON.stringify(getCloudEvent("sip", mockData)))
 
-            ws.on("message", async function message(data) {
-                //@ts-ignore
-                const event = JSON.parse(data)
-                switch (event.type) {
-                    case "racedash.event.recording":
-                        recording = event?.data?.recording
-                        LOG._debug && LOG.debug("racedash.event.recording", recording)
-                        const sipgt7Srv = await cds.connect.to('SIPGT7Service')
-                        sipgt7Srv.emit("Recording", { recording: recording })
-                        // broadcast to all clients
-                        wss.clients.forEach(function each(client) {
-                            if (client.readyState === WebSocket.OPEN) {
-                                client.send(JSON.stringify(getCloudEvent("recording", {
-                                    "recording": recording
-                                })))
-                            }
-                        })
-                        break
-                }
-            })
+            // ws.on("message", async function message(data) {
+            //     //@ts-ignore
+            //     const event = JSON.parse(data)
+            //     switch (event.type) {
+            //         case "racedash.event.recording":
+            //             recording = event?.data?.recording
+            //             LOG._debug && LOG.debug("racedash.event.recording", recording)
+            //             const sipgt7Srv = await cds.connect.to('SIPGT7Service')
+            //             sipgt7Srv.emit("Recording", { recording: recording })
+            //             // broadcast to all clients
+            //             wss.clients.forEach(function each(client) {
+            //                 if (client.readyState === WebSocket.OPEN) {
+            //                     client.send(JSON.stringify(getCloudEvent("recording", {
+            //                         "recording": recording
+            //                     })))
+            //                 }
+            //             })
+            //             break
+            //     }
+            // })
         })
 
         //return await super.init()

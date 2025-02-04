@@ -1,3 +1,13 @@
 #application-RaceAnalysis-display .sapFAvatarImageCover {
     background-size: auto;
 }
+
+.dataTrackImage{
+    max-width: 485px;
+    max-height: 350px;
+}
+
+.trajectoryTrackImage{
+    max-width: 355px;
+    max-height: 290px;
+}

@@ -2,7 +2,7 @@
 
 <img src="doc/raceCAP.svg" height="64" style="float:right;margin:0 0 1rem 3rem">
 
-Race with CAP suite to analyse Gran Turismo 7 on Sony PlayStation®5.
+Race with CAP suite to analyse Gran Turismo / Sport on Sony PlayStation®5.
 
 This demo was build for the [re&gt;≡CAP 2024](https://recap-conf.dev/) (June 4, 2024) presentation in St. Leon-Rot, DE.
 
@@ -10,7 +10,7 @@ This projects depends on the findings in the thread [GT7 is compatible with moti
 
 <img src="doc/raceCAP-overview.svg" width="100%" style="background:white;max-width:720px;padding:1rem;"><br>
 
-There is an unofficial GT7 API in which the telemetry data of a race is transmitted 60 times per second via a UDP socket on ports 33740 (bind) and 33739 (receiver).
+There is an unofficial GT7/Sport API in which the telemetry data of a race is transmitted 60 times per second via a UDP socket on ports 33740 (bind) and 33739 (receiver).
 
 This data forms the basis for displaying the SIM Race Telemetry data in real time in a SAPUI5 based dashboard (optimized for landscape phone view) and for starting/stopping the recording of the racing session.
 
@@ -29,6 +29,7 @@ The included car data is taken from ddm999 [gt7info](https://github.com/ddm999/g
 - Realtime Use with own Playstation 5
   - Copy file `.env.example` to `.env` and change the `PLAYSTATION_IP="192.168.0.1"`
   - Change `packages.json`section `cds/services/simulation=true` to false
+  - **/!\ Warning** : this program's host machine need to run on the same network as the console. (net and subnet)
 
 ### Usage
 
@@ -37,15 +38,6 @@ The included car data is taken from ddm999 [gt7info](https://github.com/ddm999/g
   - (watch:sqlite uses profile sqlite to persistently save races into db.sqlite)
 - The Launchpad automatically opens in a new browser tab:
   - `http://localhost:4004/launchpad.html?sap-ui-xx-viewCache=false`
-
-## Launchpad
-
-Central entry point to the applications based on the great [cds-launchpad-plugin
-](https://www.npmjs.com/package/cds-launchpad-plugin) by Geert-Jan Klaps.
-
-Currently it is not possible to control app tile order on launchpad, therefore the tiles are not ordered reflecting the usage flow like Race Dash first.
-
-<img src="doc/raceCAP-launchpad.png" width="100%" style="max-width:720px;"><br>
 
 ### Race Dash
 
@@ -62,14 +54,6 @@ SAP Fiori Elements app to analyze race sessions after flight.
 You can select you race session and compare a lap against the best lap.
 
 <img src="doc/raceCAP-SAP-Fiori-Elements.png" width="100%" style="max-width:720px;">
-
-### SAP Cloud Logging
-
-This part was only demonstrated at reCAP and is not part of this repo!
-
-It shows an example implementation and the possibilities of the [SAP Cloud Logging](https://discovery-center.cloud.sap/serviceCatalog/cloud-logging?service_plan) service for BTP triggered by the CAP [@cap-js/telemetry](https://github.com/cap-js/telemetry#readme) plugin.
-
-<img src="doc/raceCAP-SAP-Cloud-Logging.png" width="100%" style="max-width:720px;">
 
 ### GT7 Info
 

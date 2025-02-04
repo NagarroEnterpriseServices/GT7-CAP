@@ -39,11 +39,10 @@ module.exports = class SIPGT7Service extends Service {
 
         // cross service dependencies
         const wsSrv = await cds.connect.to('WebSocketService')
-        const otlpSrv = await cds.connect.to('OTLPService')
 
         // web socket message to control recording
         this.on("Recording", async (msg) => {
-            this.onRecording(msg.data as Recording, wsSrv, otlpSrv)
+            this.onRecording(msg.data as Recording, wsSrv)
         })
 
         socket.on('message', (data: Buffer, rinfo: RemoteInfo) => {
@@ -57,8 +56,7 @@ module.exports = class SIPGT7Service extends Service {
                     LOG._error && LOG.error('on packet:', "Magic error!", magic)
                 } else {
                     const message = gt7parser.parse(packet) as SimulatorInterfacePacket
-                    //this.onMessage(data, socket, wsSrv, otlpSrv)
-                    this.onMessage(message, wsSrv, otlpSrv)
+                    this.onMessage(message, wsSrv)
                 }
             }
         })
@@ -101,7 +99,7 @@ module.exports = class SIPGT7Service extends Service {
                         RearRight: dbSip.tireSurfaceTemperature_rr
                     }
                     //dbSip.flags = SimulatorFlags.CarOnTrack | SimulatorFlags.ASMActive
-                    this.onMessage(dbSip, wsSrv, otlpSrv)
+                    this.onMessage(dbSip, wsSrv)
                 }
             }, 17) // 60/sec = 16,67ms 
         } else {
@@ -122,7 +120,7 @@ module.exports = class SIPGT7Service extends Service {
         })
     }
 
-    async onRecording(data: Recording, wsSrv: cds.Service, otlpSrv: cds.Service) {
+    async onRecording(data: Recording, wsSrv: cds.Service) {
         // change recording flag
         this.recording = data.recording
         if (this.recording) {
@@ -130,41 +128,16 @@ module.exports = class SIPGT7Service extends Service {
             this.sessionId = null
             this.lastLapRecorded = false
         }        
-        /*
-        if (this.recording) {
-            // start recording
-            if (test && !_in_sqlite) {
-                const demoSessionId = cds.utils.uuid()
-                const simulatorMockData = getMockData()
-                //const carName = await getCarName(simulatorMockData.carCode) // test readCarName
-                //LOG._info && LOG.info('getCarCode', await getCarName(simulatorMockData.carCode))
-                await logSession(demoSessionId, simulatorMockData)
-                await logSimulatorInterfacePacket(demoSessionId, simulatorMockData)
-                await updateSession(demoSessionId, true, simulatorMockData)
-                setTimeout(function () {
-                    // simulate 2 sec end of race
-                    wsSrv.emit("STOPRECORDING")
-                }, 2000)
-            }
-        } else {
-            // stop recording                
-            this.sessionId = null
-        }
-        */
-
-        if (otlp) {
-            otlpSrv.emit('recording', {
-                recording: this.recording
-            })
-        }
     }
 
-    async onMessage(message: any, wsSrv: cds.Service, otlpSrv: cds.Service) {
+    async onMessage(message: any, wsSrv: cds.Service) {
         // use UDP headbeat as a gauge of liveness
 
 
-        // record if is in race (lapsInRace > 0) and if not in post-race (lapCount <= lapsInRace)
-        if (message.lapsInRace > 0 && message.lapCount <= message.lapsInRace) {
+        // record if is in race (lapsInRace > 0) and if not in post-race (lapCount <= lapsInRace) and not in replay 
+        if (message.lapsInRace > 0 && message.lapCount <= message.lapsInRace && !this.recording && message.lapCount > 0) {
+            console.log('recording')
+            console.log(message)
             this.recording = true
         }
 
@@ -177,6 +150,7 @@ module.exports = class SIPGT7Service extends Service {
         if (this.recording && !this.sessionId) {
             // start new session
             this.sessionId = cds.utils.uuid()
+            console.log('new session', this.sessionId)
             this.lastLapRecorded = false
             logSession(this.sessionId, message)
         }
@@ -202,7 +176,7 @@ module.exports = class SIPGT7Service extends Service {
         message.currentLapTime2 = message.timeOfDayProgression - this.startTimeOfDayProgression
 
         // calculate distance ontrack
-        if (!((message.flags & SimulatorFlags.Paused) === SimulatorFlags.Paused)){
+        if (((message.flags & SimulatorFlags.Paused) !== SimulatorFlags.Paused)){
             message.distance = this.distance += message.metersPerSecond / 60
         }
 
@@ -215,9 +189,6 @@ module.exports = class SIPGT7Service extends Service {
                             // check if post race (lapCount > lapsInRace)
                             if (message.lapCount <= message.lapsInRace) {
                                 await logSimulatorInterfacePacket(this.sessionId, message)
-                                if (otlp) {
-                                    otlpSrv.emit('packet', message)
-                                }
                             } else if (!this.lastLapRecorded) {
                                 // record one sip after last lap to get lastLapTime
                                 await logSimulatorInterfacePacket(this.sessionId, message)
@@ -227,21 +198,13 @@ module.exports = class SIPGT7Service extends Service {
                                 this.recording = false
                                 this.sessionId = null
                                 wsSrv.emit("STOPRECORDING")
+                                console.log('stop recording')
                             }
                         }
                     }
                 }
             }
         }
-
-        // handle otlp (if enabled)
-        /*
-        if (otlp) {
-            otlpSrv.emit('packet', message)
-        }
-        */
-
-        // broadcast all event data for WebSocketService
         wsSrv.emit("SIPGT7", message)
     }
 }
