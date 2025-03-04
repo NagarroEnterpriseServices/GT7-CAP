@@ -82,17 +82,6 @@
           "schema_evolution": "auto"
         }
       },
-      "btp_service": {
-        "kind": "odata",
-        "model": "srv/external/btp-service",
-        "csrf": true,
-        "credentials": {
-          "url": "https://c6b9a2cf-c3ca-491d-9fba-5e33e656aace.abap.eu10.hana.ondemand.com/sap/opu/odata4/sap/zapi_sessions2_o4/srvd_a2x/sap/zapi_sessions2_o4/0001",
-          "authentication": "BasicAuthentication",
-          "username": "BTPCAPGT7",
-          "password": "vijkZCxkiaCEsbXRcsdoJiTRjQMvbrCXi%2tWaFP"
-        }
-      },
       "sac_service": {
         "kind": "odata",
         "model": "srv/external/sac-service",

@@ -49,29 +49,35 @@
         <edmx:Include Namespace="com.sap.vocabularies.Hierarchy.v1" Alias="SAP__hierarchy"/>
     </edmx:Reference>
     <edmx:DataServices>
-        <Schema Namespace="com.sap.gateway.srvd_a2x.zapi_sessions2_o4.v0001" Alias="SAP__self">
+        <Schema Namespace="com.sap.gateway.srvd_a2x.zapi_sessionsv3_o4.v0001" Alias="SAP__self">
             <Annotation Term="SAP__core.SchemaVersion" String="1.0.0"/>
-            <EntityType Name="ZC_SESSIONS2Type">
+            <EntityType Name="ZC_SESSIONSV3Type">
                 <Key>
-                    <PropertyRef Name="Sessionid"/>
-                    <PropertyRef Name="Racesecond"/>
+                    <PropertyRef Name="Internalid"/>
                 </Key>
+                <Property Name="Internalid" Type="Edm.Guid" Nullable="false"/>
                 <Property Name="Sessionid" Type="Edm.String" Nullable="false" MaxLength="36"/>
                 <Property Name="Racesecond" Type="Edm.Int64" Nullable="false"/>
-                <Property Name="Speedinkmh" Type="Edm.Decimal" Nullable="false" Precision="3" Scale="2"/>
+                <Property Name="Sessiontimestamp" Type="Edm.String" Nullable="false" MaxLength="40"/>
+                <Property Name="Sessiondate" Type="Edm.Date"/>
+                <Property Name="Sessiontime" Type="Edm.TimeOfDay" Nullable="false"/>
+                <Property Name="Drivername" Type="Edm.String" Nullable="false" MaxLength="30"/>
+                <Property Name="Car" Type="Edm.Int32" Nullable="false"/>
+                <Property Name="Lapcount" Type="Edm.Int16" Nullable="false"/>
+                <Property Name="Racetimeinms" Type="Edm.Int64" Nullable="false"/>
+                <Property Name="Speedinkmh" Type="Edm.Decimal" Nullable="false" Precision="18" Scale="3"/>
                 <Property Name="Gear" Type="Edm.Byte" Nullable="false"/>
-                <Property Name="Distanceinkmh" Type="Edm.Decimal" Nullable="false" Precision="3" Scale="2"/>
+                <Property Name="Distanceinkmh" Type="Edm.Decimal" Nullable="false" Precision="18" Scale="5"/>
                 <Property Name="Laptimeinms" Type="Edm.Int64" Nullable="false"/>
                 <Property Name="Raceposition" Type="Edm.Byte" Nullable="false"/>
-                <Property Name="Throttlepressureinpercent" Type="Edm.Decimal" Nullable="false" Precision="3" Scale="2"/>
-                <Property Name="Breakpressureinpercent" Type="Edm.Decimal" Nullable="false" Precision="3" Scale="2"/>
-                <Property Name="Clutchdisengageinpercent" Type="Edm.Decimal" Nullable="false" Precision="3" Scale="2"/>
-                <Property Name="Offtrackinpercent" Type="Edm.Decimal" Nullable="false" Precision="3" Scale="2"/>
-                <Property Name="Handbreakinpercent" Type="Edm.Decimal" Nullable="false" Precision="3" Scale="2"/>
-                <Property Name="Asminpercent" Type="Edm.Decimal" Nullable="false" Precision="3" Scale="2"/>
-                <Property Name="Tcsinpercent" Type="Edm.Decimal" Nullable="false" Precision="3" Scale="2"/>
-                <Property Name="Racetimeinms" Type="Edm.Int64" Nullable="false"/>
-                <Property Name="SAP__Messages" Type="Collection(com.sap.gateway.srvd_a2x.zapi_sessions2_o4.v0001.SAP__Message)" Nullable="false"/>
+                <Property Name="Throttlepressureinpercent" Type="Edm.Decimal" Nullable="false" Precision="11" Scale="6"/>
+                <Property Name="Breakpressureinpercent" Type="Edm.Decimal" Nullable="false" Precision="11" Scale="6"/>
+                <Property Name="Clutchdisengageinpercent" Type="Edm.Decimal" Nullable="false" Precision="11" Scale="6"/>
+                <Property Name="Offtrackinpercent" Type="Edm.Decimal" Nullable="false" Precision="11" Scale="6"/>
+                <Property Name="Handbreakinpercent" Type="Edm.Decimal" Nullable="false" Precision="11" Scale="6"/>
+                <Property Name="Asminpercent" Type="Edm.Decimal" Nullable="false" Precision="11" Scale="6"/>
+                <Property Name="Tcsinpercent" Type="Edm.Decimal" Nullable="false" Precision="11" Scale="6"/>
+                <Property Name="SAP__Messages" Type="Collection(com.sap.gateway.srvd_a2x.zapi_sessionsv3_o4.v0001.SAP__Message)" Nullable="false"/>
             </EntityType>
             <ComplexType Name="SAP__Message">
                 <Property Name="code" Type="Edm.String" Nullable="false"/>
@@ -83,32 +89,21 @@
                 <Property Name="longtextUrl" Type="Edm.String"/>
             </ComplexType>
             <EntityContainer Name="Container">
-                <EntitySet Name="ZC_SESSIONS2" EntityType="com.sap.gateway.srvd_a2x.zapi_sessions2_o4.v0001.ZC_SESSIONS2Type"/>
+                <EntitySet Name="ZC_SESSIONSV3" EntityType="com.sap.gateway.srvd_a2x.zapi_sessionsv3_o4.v0001.ZC_SESSIONSV3Type"/>
             </EntityContainer>
-            <Annotations Target="SAP__self.ZC_SESSIONS2Type/Sessionid">
-                <Annotation Term="SAP__core.Immutable"/>
+            <Annotations Target="SAP__self.ZC_SESSIONSV3Type/Internalid">
+                <Annotation Term="SAP__core.Computed"/>
+                <Annotation Term="SAP__common.Label" String="UUID"/>
+                <Annotation Term="SAP__common.QuickInfo" String="16 Byte UUID in 16 Bytes (Raw Format)"/>
             </Annotations>
-            <Annotations Target="SAP__self.ZC_SESSIONS2Type/Racesecond">
-                <Annotation Term="SAP__core.Immutable"/>
-            </Annotations>
-            <Annotations Target="SAP__self.ZC_SESSIONS2Type">
+            <Annotations Target="SAP__self.ZC_SESSIONSV3Type">
                 <Annotation Term="SAP__common.Label" String="###GENERATED Core Data Service Entity"/>
                 <Annotation Term="SAP__common.Messages" Path="SAP__Messages"/>
             </Annotations>
-            <Annotations Target="SAP__self.Container/ZC_SESSIONS2">
+            <Annotations Target="SAP__self.Container/ZC_SESSIONSV3">
                 <Annotation Term="SAP__capabilities.SearchRestrictions">
                     <Record>
                         <PropertyValue Property="Searchable" Bool="false"/>
-                    </Record>
-                </Annotation>
-                <Annotation Term="SAP__capabilities.InsertRestrictions">
-                    <Record>
-                        <PropertyValue Property="RequiredProperties">
-                            <Collection>
-                                <PropertyPath>Sessionid</PropertyPath>
-                                <PropertyPath>Racesecond</PropertyPath>
-                            </Collection>
-                        </PropertyValue>
                     </Record>
                 </Annotation>
                 <Annotation Term="SAP__capabilities.UpdateRestrictions">

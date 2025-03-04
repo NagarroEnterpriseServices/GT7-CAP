@@ -65,18 +65,18 @@
                 <Property Name="Car" Type="Edm.Int32" Nullable="false"/>
                 <Property Name="Lapcount" Type="Edm.Int16" Nullable="false"/>
                 <Property Name="Racetimeinms" Type="Edm.Int64" Nullable="false"/>
-                <Property Name="Speedinkmh" Type="Edm.Decimal" Nullable="false" Precision="18" Scale="14"/>
+                <Property Name="Speedinkmh" Type="Edm.Decimal" Nullable="false" Precision="18" Scale="3"/>
                 <Property Name="Gear" Type="Edm.Byte" Nullable="false"/>
-                <Property Name="Distanceinkmh" Type="Edm.Decimal" Nullable="false" Precision="18" Scale="14"/>
+                <Property Name="Distanceinkmh" Type="Edm.Decimal" Nullable="false" Precision="18" Scale="5"/>
                 <Property Name="Laptimeinms" Type="Edm.Int64" Nullable="false"/>
                 <Property Name="Raceposition" Type="Edm.Byte" Nullable="false"/>
-                <Property Name="Throttlepressureinpercent" Type="Edm.Decimal" Nullable="false" Precision="18" Scale="14"/>
-                <Property Name="Breakpressureinpercent" Type="Edm.Decimal" Nullable="false" Precision="18" Scale="14"/>
-                <Property Name="Clutchdisengageinpercent" Type="Edm.Decimal" Nullable="false" Precision="18" Scale="14"/>
-                <Property Name="Offtrackinpercent" Type="Edm.Decimal" Nullable="false" Precision="18" Scale="14"/>
-                <Property Name="Handbreakinpercent" Type="Edm.Decimal" Nullable="false" Precision="18" Scale="14"/>
-                <Property Name="Asminpercent" Type="Edm.Decimal" Nullable="false" Precision="18" Scale="14"/>
-                <Property Name="Tcsinpercent" Type="Edm.Decimal" Nullable="false" Precision="18" Scale="14"/>
+                <Property Name="Throttlepressureinpercent" Type="Edm.Decimal" Nullable="false" Precision="11" Scale="6"/>
+                <Property Name="Breakpressureinpercent" Type="Edm.Decimal" Nullable="false" Precision="11" Scale="6"/>
+                <Property Name="Clutchdisengageinpercent" Type="Edm.Decimal" Nullable="false" Precision="11" Scale="6"/>
+                <Property Name="Offtrackinpercent" Type="Edm.Decimal" Nullable="false" Precision="11" Scale="6"/>
+                <Property Name="Handbreakinpercent" Type="Edm.Decimal" Nullable="false" Precision="11" Scale="6"/>
+                <Property Name="Asminpercent" Type="Edm.Decimal" Nullable="false" Precision="11" Scale="6"/>
+                <Property Name="Tcsinpercent" Type="Edm.Decimal" Nullable="false" Precision="11" Scale="6"/>
                 <Property Name="SAP__Messages" Type="Collection(com.sap.gateway.srvd_a2x.zapi_sessionsv3_o4.v0001.SAP__Message)" Nullable="false"/>
             </EntityType>
             <ComplexType Name="SAP__Message">

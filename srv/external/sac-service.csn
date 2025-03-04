@@ -139,7 +139,7 @@
     "Speedinkmh": {
      "type": "cds.Decimal",
      "precision": 18,
-     "scale": 14,
+     "scale": 3,
      "notNull": true
     },
     "Gear": {
@@ -150,7 +150,7 @@
     "Distanceinkmh": {
      "type": "cds.Decimal",
      "precision": 18,
-     "scale": 14,
+     "scale": 5,
      "notNull": true
     },
     "Laptimeinms": {
@@ -164,44 +164,44 @@
     },
     "Throttlepressureinpercent": {
      "type": "cds.Decimal",
-     "precision": 18,
-     "scale": 14,
+     "precision": 11,
+     "scale": 6,
      "notNull": true
     },
     "Breakpressureinpercent": {
      "type": "cds.Decimal",
-     "precision": 18,
-     "scale": 14,
+     "precision": 11,
+     "scale": 6,
      "notNull": true
     },
     "Clutchdisengageinpercent": {
      "type": "cds.Decimal",
-     "precision": 18,
-     "scale": 14,
+     "precision": 11,
+     "scale": 6,
      "notNull": true
     },
     "Offtrackinpercent": {
      "type": "cds.Decimal",
-     "precision": 18,
-     "scale": 14,
+     "precision": 11,
+     "scale": 6,
      "notNull": true
     },
     "Handbreakinpercent": {
      "type": "cds.Decimal",
-     "precision": 18,
-     "scale": 14,
+     "precision": 11,
+     "scale": 6,
      "notNull": true
     },
     "Asminpercent": {
      "type": "cds.Decimal",
-     "precision": 18,
-     "scale": 14,
+     "precision": 11,
+     "scale": 6,
      "notNull": true
     },
     "Tcsinpercent": {
      "type": "cds.Decimal",
-     "precision": 18,
-     "scale": 14,
+     "precision": 11,
+     "scale": 6,
      "notNull": true
     },
     "SAP__Messages": {
