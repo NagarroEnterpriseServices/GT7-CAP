@@ -1,7 +1,7 @@
 import * as cds from '@sap/cds'
 import { ApplicationService, log } from '@sap/cds'
 import { generateFioriMetrics } from './lib/FioriExporter'
-import { getTrackCoordinates, getColorFromData } from './lib/SqliteExporter'
+import { getTrackCoordinates, getColorFromData, updateSession } from './lib/SqliteExporter'
 
 const LOG = log('gt7-service')
 const { Laps, Session, SimulatorInterfacePackets } = require('#cds-models/GT7Service')
@@ -15,14 +15,6 @@ module.exports = class GT7Service extends ApplicationService {
 
             await generateFioriMetrics(sessionID)
         })
-
-        /* replaced by auto simulation
-        this.on("playSimulation", Session, async (req) => {
-            const sessionID = req.params[0] as string
-            const otSrv = await cds.connect.to('OpenTelemetryService')
-            otSrv.emit("playSimulation", { sessionID: sessionID })
-        })
-        */
 
         // bound functions
 
@@ -50,9 +42,10 @@ module.exports = class GT7Service extends ApplicationService {
             const sessionID = req.params[0] as string
             const svg = await getLapSVG(sessionID)
             // @ts-ignore
-            req._.res.set('Content-Type', 'image/svg+xml');
+            // req._.res.set('Content-Type', 'image/svg+xml');
             // @ts-ignore
-            req._.res.end(svg);
+            // req._.res.end(svg);
+            return next();
         })
 
         this.on("READ", Session, async (req, next) => {
@@ -72,7 +65,8 @@ module.exports = class GT7Service extends ApplicationService {
                     return {
                         //value: Readable.from([svg]),
                         value: svg, // seems to be auto handled
-                        $mediaContentType: columns[1]?.val // image/svg+xml
+                        // $mediaContentType: columns[1]?.val // image/svg+xml
+                        $mediaContentType: 'image/svg+xml'
                     }
                 } else if (lap) {
                     LOG.info("getCompareLapsSVG")
@@ -81,7 +75,8 @@ module.exports = class GT7Service extends ApplicationService {
                     return {
                         //value: Readable.from([svg]),
                         value: svg, // seems to be auto handled
-                        $mediaContentType: columns[1]?.val // image/svg+xml
+                        // $mediaContentType: columns[1]?.val // image/svg+xml
+                        $mediaContentType: 'image/svg+xml'
                     }
                 } else {
                 // const lap = req.query.SELECT.where[2].val
@@ -90,7 +85,8 @@ module.exports = class GT7Service extends ApplicationService {
                 return {
                     //value: Readable.from([svg]),
                     value: svg, // seems to be auto handled
-                    $mediaContentType: columns[1]?.val // image/svg+xml
+                    // $mediaContentType: columns[1]?.val // image/svg+xml
+                    $mediaContentType: 'image/svg+xml'
                 }
             }
             }

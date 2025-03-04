@@ -13,7 +13,9 @@ const SessionMetric_measure = {
 type SessionMetric_measure = 1 | 2 | 3 | 4
 
 /**
-* Common.ValueList (ValueHelps)
+* Aspect for entities with canonical universal IDs
+* 
+* See https://cap.cloud.sap/docs/cds/common#aspect-cuid
 */
 export function _SessionAspect<TBase extends new (...args: any[]) => object>(Base: TBase) {
   return class Session extends Base {
@@ -305,3 +307,5 @@ Object.defineProperty(Trophy, 'name', { value: 'GT7Service.Trophies' })
 Object.defineProperty(Trophy, 'is_singular', { value: true })
 export class Trophies extends Array<Trophy> {$count?: number}
 Object.defineProperty(Trophies, 'name', { value: 'GT7Service.Trophies' })
+
+export declare const test: { (): void | null, __parameters: Record<never, never>, __returns: void | null, kind: 'action'};

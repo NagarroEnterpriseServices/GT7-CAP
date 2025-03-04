@@ -11,10 +11,7 @@ type Recording = {
 }
 
 const LOG = log('sipgt7-service')
-const { sqlite, otlp, simulation, simulationSession } = cds.env?.services
 //const environment = process.env.NODE_ENV || 'development';
-const _in_sqlite = cds.env.env  === 'sqlite'
-const _in_development = !_in_sqlite
 const bindPort: number =    process.env.GT_VERSION == 'GTS' ? 33340 :
                             process.env.GT_VERSION == 'GT7' ? 33740 : 33340;
 const receivePort: number = process.env.GT_VERSION == 'GTS' ? 33339 :
@@ -29,6 +26,7 @@ module.exports = class SIPGT7Service extends Service {
     sessionId: string = null
     packetCount = 0
     lastLapRecorded = false
+    driver: string = null
     lastLap = -1
     distance = 0
     startTimeOfDayProgression: number
@@ -45,6 +43,10 @@ module.exports = class SIPGT7Service extends Service {
             this.onRecording(msg.data as Recording, wsSrv)
         })
 
+        this.on("driverAssigned", async (msg) => {
+            this.driver = msg.data.driver
+        })
+
         socket.on('message', (data: Buffer, rinfo: RemoteInfo) => {
             if (data.length === 0x128) {
                 const packet: Buffer = decrypt(data)
@@ -57,6 +59,7 @@ module.exports = class SIPGT7Service extends Service {
                 } else {
                     const message = gt7parser.parse(packet) as SimulatorInterfacePacket
                     this.onMessage(message, wsSrv)
+                    // console.log("message recieved")
                 }
             }
         })
@@ -73,39 +76,9 @@ module.exports = class SIPGT7Service extends Service {
             socket.close()
         })
 
-        if (simulation && _in_development) {
-            const sips: typeof SimulatorInterfacePackets = await SELECT
-                .from(SimulatorInterfacePackets)
-                .where({ session_ID: simulationSession })
-                .orderBy("packetId")
-
-            if (sips.length == 0) {
-                LOG._error && LOG.error(`Simulation with session ID '${simulationSession}' not available!`)
-                return
-            }
-
-            // play simulation
-            let pos = 0
-            setInterval(() => {
-                //this.onMessage(getMockData(), wsSrv, otlpSrv)
-                if (pos < sips.length) {
-                    const dbSip = sips[pos++]
-                    // map db fields to sip
-                    dbSip.carCode = dbSip.car_ID
-                    dbSip.tireSurfaceTemperature = {
-                        FrontLeft: dbSip.tireSurfaceTemperature_fl,
-                        FrontRight: dbSip.tireSurfaceTemperature_fr,
-                        RearLeft: dbSip.tireSurfaceTemperature_rl,
-                        RearRight: dbSip.tireSurfaceTemperature_rr
-                    }
-                    //dbSip.flags = SimulatorFlags.CarOnTrack | SimulatorFlags.ASMActive
-                    this.onMessage(dbSip, wsSrv)
-                }
-            }, 17) // 60/sec = 16,67ms 
-        } else {
-            // use GT7
-            socket.bind(bindPort)
-        }
+        
+        socket.bind(bindPort)
+        
 
         return super.init()
     }
@@ -136,8 +109,8 @@ module.exports = class SIPGT7Service extends Service {
 
         // record if is in race (lapsInRace > 0) and if not in post-race (lapCount <= lapsInRace) and not in replay 
         if (message.lapsInRace > 0 && message.lapCount <= message.lapsInRace && !this.recording && message.lapCount > 0) {
-            console.log('recording')
-            console.log(message)
+            //console.log('recording')
+            //console.log(message)
             this.recording = true
         }
 
@@ -146,13 +119,19 @@ module.exports = class SIPGT7Service extends Service {
             this.packetCount = 0 // reset loop
         }
 
+        // fix throttle and brake to have a percentage
+        message.throttle = (message.throttle * 100 / 255).toFixed(0);
+        message.brake = (message.brake * 100 / 255).toFixed(0);
+
         // session handling
         if (this.recording && !this.sessionId) {
             // start new session
             this.sessionId = cds.utils.uuid()
             console.log('new session', this.sessionId)
             this.lastLapRecorded = false
-            logSession(this.sessionId, message)
+            logSession(this.sessionId, message, this.driver).catch((reason: any) => {
+                console.error("Error logging session: ", reason);
+            });            
         }
 
         // reset counter
@@ -177,10 +156,11 @@ module.exports = class SIPGT7Service extends Service {
 
         // calculate distance ontrack
         if (((message.flags & SimulatorFlags.Paused) !== SimulatorFlags.Paused)){
-            message.distance = this.distance += message.metersPerSecond / 60
+            message.distance = this.distance += message.metersPerSecond * 0.01667
+
         }
 
-        if (sqlite && this.recording && this.sessionId) {
+        if(this.recording && this.sessionId) {
             //const flags = message.flags as SimulatorFlags
             if ((message.flags & SimulatorFlags.CarOnTrack) === SimulatorFlags.CarOnTrack) {
                 if ((message.flags & SimulatorFlags.LoadingOrProcessing) !== SimulatorFlags.LoadingOrProcessing) {
@@ -190,15 +170,16 @@ module.exports = class SIPGT7Service extends Service {
                             if (message.lapCount <= message.lapsInRace) {
                                 await logSimulatorInterfacePacket(this.sessionId, message)
                             } else if (!this.lastLapRecorded) {
+                                this.lastLapRecorded = true
+                                this.recording = false
+                                wsSrv.emit("STOPRECORDING") // let the racedash know that the race is finished and resets the driver
+                                console.log('stop recording')
                                 // record one sip after last lap to get lastLapTime
                                 await logSimulatorInterfacePacket(this.sessionId, message)
                                 //updateSession(sessionId, true, message.bestLapTime, message.lapsInRace)
-                                await updateSession(this.sessionId, true, message)
-                                this.lastLapRecorded = true
-                                this.recording = false
+                                await updateSession(this.sessionId, this.driver, true, message)
+                                this.driver = null
                                 this.sessionId = null
-                                wsSrv.emit("STOPRECORDING")
-                                console.log('stop recording')
                             }
                         }
                     }

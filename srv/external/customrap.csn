@@ -1,0 +1,177 @@
+{
+ "meta": {
+  "creator": "cds-dk 7.9.2"
+ },
+ "$version": "2.0",
+ "definitions": {
+  "customrap.SAP__Message": {
+   "kind": "type",
+   "@cds.external": true,
+   "elements": {
+    "code": {
+     "type": "cds.LargeString",
+     "notNull": true
+    },
+    "message": {
+     "type": "cds.LargeString",
+     "notNull": true
+    },
+    "target": {
+     "type": "cds.LargeString"
+    },
+    "additionalTargets": {
+     "items": {
+      "type": "cds.LargeString",
+      "notNull": true
+     }
+    },
+    "transition": {
+     "type": "cds.Boolean",
+     "notNull": true
+    },
+    "numericSeverity": {
+     "type": "cds.Integer",
+     "@odata.Type": "Edm.Byte",
+     "notNull": true
+    },
+    "longtextUrl": {
+     "type": "cds.LargeString"
+    }
+   }
+  },
+  "customrap": {
+   "kind": "service",
+   "@cds.external": true,
+   "@Common.ApplyMultiUnitBehaviorForSortingAndFiltering": true,
+   "@Capabilities.FilterFunctions": [
+    "eq",
+    "ne",
+    "gt",
+    "ge",
+    "lt",
+    "le",
+    "and",
+    "or",
+    "contains",
+    "startswith",
+    "endswith",
+    "any",
+    "all"
+   ],
+   "@Capabilities.SupportedFormats": [
+    "application/json",
+    "application/pdf"
+   ],
+   "@PDF.Features": {
+    "DocumentDescriptionReference": "../../../../default/iwbep/common/0001/$metadata",
+    "DocumentDescriptionCollection": "MyDocumentDescriptions",
+    "ArchiveFormat": true,
+    "Border": true,
+    "CoverPage": true,
+    "FitToPage": true,
+    "FontName": true,
+    "FontSize": true,
+    "HeaderFooter": true,
+    "IANATimezoneFormat": true,
+    "Margin": true,
+    "Padding": true,
+    "ResultSizeDefault": 20000,
+    "ResultSizeMaximum": 20000,
+    "Signature": true,
+    "TextDirectionLayout": true,
+    "Treeview": true,
+    "UploadToFileShare": true
+   },
+   "@Capabilities.KeyAsSegmentSupported": true,
+   "@Capabilities.AsynchronousRequestsSupported": true
+  },
+  "customrap.ZC_SESSIONS": {
+   "kind": "entity",
+   "@cds.external": true,
+   "@cds.persistence.skip": true,
+   "elements": {
+    "Id": {
+     "key": true,
+     "type": "cds.String",
+     "length": 36,
+     "notNull": true,
+     "@Core.Immutable": true
+    },
+    "Createdat": {
+     "type": "cds.Timestamp",
+     "@odata.Precision": 7,
+     "@odata.Type": "Edm.DateTimeOffset"
+    },
+    "Driver": {
+     "type": "cds.String",
+     "length": 256,
+     "notNull": true
+    },
+    "CarId": {
+     "type": "cds.Integer",
+     "notNull": true
+    },
+    "Lapsinrace": {
+     "type": "cds.Integer",
+     "@odata.Type": "Edm.Byte",
+     "notNull": true
+    },
+    "Bestlap": {
+     "type": "cds.Integer",
+     "@odata.Type": "Edm.Byte",
+     "notNull": true
+    },
+    "Bestlaptime": {
+     "type": "cds.Integer64",
+     "notNull": true
+    },
+    "Finished": {
+     "type": "cds.Integer",
+     "@odata.Type": "Edm.Byte",
+     "notNull": true
+    },
+    "Timeofday": {
+     "type": "cds.Integer64",
+     "notNull": true
+    },
+    "Calculatedmaxspeed": {
+     "type": "cds.Integer",
+     "notNull": true
+    },
+    "Bodyheight": {
+     "type": "cds.Decimal",
+     "precision": 18,
+     "scale": 14,
+     "notNull": true
+    },
+    "SAP__Messages": {
+     "items": {
+      "type": "customrap.SAP__Message",
+      "notNull": true
+     }
+    }
+   },
+   "@Common.Label": "###GENERATED Core Data Service Entity",
+   "@Common.Messages": {
+    "=": "SAP__Messages"
+   },
+   "@Capabilities.SearchRestrictions.Searchable": false,
+   "@Capabilities.FilterRestrictions.Filterable": true,
+   "@Capabilities.FilterRestrictions.FilterExpressionRestrictions": [
+    {
+     "Property": {
+      "=": "Driver"
+     },
+     "AllowedExpressions": "SearchExpression"
+    }
+   ],
+   "@Capabilities.SortRestrictions.NonSortableProperties": [
+    "Driver"
+   ],
+   "@Capabilities.InsertRestrictions.RequiredProperties": [
+    "Id"
+   ],
+   "@Capabilities.UpdateRestrictions.QueryOptions.SelectSupported": true
+  }
+ }
+}

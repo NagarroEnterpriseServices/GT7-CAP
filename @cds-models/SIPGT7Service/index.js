@@ -4,4 +4,5 @@ const csn = cds.entities('SIPGT7Service')
 module.exports = { name: 'SIPGT7Service' }
 // events
 // actions
+module.exports.test = 'test'
 // enums

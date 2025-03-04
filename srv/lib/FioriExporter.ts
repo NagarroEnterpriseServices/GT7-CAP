@@ -112,14 +112,15 @@ async function writeLaps(sessionID: string, sips: [SimulatorInterfacePacket]) {
     const bestLapTime = Math.min(...laps.map(lap => lap.time))
     laps.forEach(lap => lap.best = lap.time === bestLapTime)
 
-    if (sips[0].lapsInRace < laps.length) {
+    if (sips?.length > 0 && sips[0].lapsInRace < laps.length) {
         laps.pop()
     }
 
 
     // insert laps
     for (let lap of laps) {
-        await INSERT.into(Laps).entries(lap)
+        try{await INSERT.into(Laps).entries(lap)}
+        catch(e){console.log('FioriExported::writeLaps')}
     }
 
 }

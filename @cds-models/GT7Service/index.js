@@ -32,5 +32,6 @@ module.exports.Trophy = { is_singular: true, __proto__: csn.Trophies }
 module.exports.Trophies = { is_singular: true, __proto__: csn.Trophies }
 // events
 // actions
+module.exports.test = 'test'
 // enums
 module.exports.SessionMetric.measure ??= { metersPerSecond: 1, brake: 2, throttle: 3, gear: 4 }

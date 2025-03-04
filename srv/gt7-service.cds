@@ -69,6 +69,9 @@ service GT7Service {
 
     @readonly
     entity Trophies                  as select from my.Trophies;
+
+
+    action test();
 }
 
 annotate GT7Service.SessionMetrics with @Aggregation.ApplySupported: {

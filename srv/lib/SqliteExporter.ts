@@ -1,21 +1,54 @@
 import { generateFioriMetrics } from "./FioriExporter"
 import LapCounter from "./utils/lapcounter"
+import cds from "@sap/cds"
+import { Client } from 'pg';
 
 const { Sessions, SimulatorInterfacePackets, Cars } = require('#cds-models/gt7')
 let cars: Array<string> = [] // car name cache
 
-export async function logSession(sessionId: string, sip: any) {
-    await INSERT.into(Sessions).entries({
+export async function logSession(sessionId: string, sip: any, driver: string) {
+
+    let payload = {
         ID: sessionId,
         createdAt: new Date(),
         lapsInRace: sip.lapsInRace,
         car_ID: sip.carCode,
         timeOfDay: sip.timeOfDayProgression,
-        bodyHeight: sip.bodyHeight
-    })
+        bodyHeight: sip.bodyHeight,
+        driver: driver
+    }
+    
+    await INSERT.into(Sessions).entries(payload)
+    
+    // new request for create session in another table
+    // const data =  {
+    //     Id: sessionId,
+    //     Createdat: new Date().toISOString(),
+    //     Lapsinrace: sip.lapsInRace,
+    //     CarId: sip.carCode,
+    //     Timeofday: sip.timeOfDayProgression,
+    //     Bodyheight:  parseFloat(sip.bodyHeight.toPrecision(10)),
+    //     Driver: driver == null ? "" : driver
+    // }
+
+    // console.log("logSession:data")
+    // console.log(data)
+
+    // const api = await cds.connect.to("customrap");
+ 
+    // try {
+    //     const result = await api.post('ZC_SESSIONS', data)
+    //     console.log("logSession:result")
+    //     console.log(result)
+    // }
+    // catch (error) {
+    //     console.error("logSession:error")
+    //     console.error(error)
+    // }
+
 }
 
-export async function updateSession(sessionId: string, finished: boolean, sip: any) {
+export async function updateSession(sessionId: string, driver: string, finished: boolean, sip: any) {
     const bestLap = await getBestLap(sessionId, sip.bestLapTime)
     await UPDATE(Sessions, sessionId).with({
         finished: finished,
@@ -25,6 +58,72 @@ export async function updateSession(sessionId: string, finished: boolean, sip: a
         calculatedMaxSpeed: sip.calculatedMaxSpeed
     })
     generateFioriMetrics(sessionId)
+
+    // new request for update session in another table
+    // const api = await cds.connect.to("customrap");
+
+    // const data =  {
+    //     Id: sessionId,
+    //     Createdat: new Date().toISOString(),
+    //     Lapsinrace: sip.lapsInRace,
+    //     CarId: sip.carCode,
+    //     Timeofday: sip.timeOfDayProgression,
+    //     Bodyheight:  parseFloat(sip.bodyHeight.toPrecision(10)),
+    //     Finished: finished,
+    //     Bestlap: bestLap,
+    //     Bestlaptime: sip.bestLapTime,
+    //     Calculatedmaxspeed: sip.calculatedMaxSpeed,
+    //     Driver: driver == null ? "" : driver
+    // }
+
+    // api.run(INSERT.into(Sessions).entries(data))
+
+    const api = await cds.connect.to("btp_service");
+
+    const client = new Client({
+        user: 'postgres',          // Replace with your PostgreSQL username
+        host: 'localhost',              // Replace with your PostgreSQL host
+        database: 'postgres', // Replace with your database name
+        password: 'postgres',      // Replace with your password
+        port: 5432,                     // Default PostgreSQL port
+      });
+
+    await client.connect();
+    const result = await client.query(`SELECT * FROM F_GT7PS5Agreg_V2('${sessionId}')`);
+    // console.log(result.rows);
+    
+    // in the api, insert all data gotten from the sql function
+    for (let row of result.rows) {
+        // insert via sql query
+        console.log("row")
+        console.log(row)
+        const data =  {
+            Sessionid: row.session_id,
+            Racesecond: row.racesecond,
+            Speedinkmh: parseFloat(row.speed_kmh.toFixed(2)),
+            Gear: row.gear,
+            Distanceinkmh: parseFloat(row.distance_km.toFixed(2)),
+            Laptimeinms: row.lapprecisetime_ms,
+            Raceposition: row.raceposition,
+            Throttlepressureinpercent: row.throttlepercent,
+            Breakpressureinpercent: row.breakpercent,
+            Clutchdisengageinpercent: row.clutchdisengagepercent,
+            Offtrackinpercent: row.offtrackpercent,
+            Handbreakinpercent: row.handbrakepercent,
+            Asminpercent: row.asmpercent,
+            Tcsinpercent: row.tcspercent,
+            Racetimeinms: row.raceprecisetime_ms,
+        }
+
+        console.log("data")
+        console.log(data)
+
+        const res = await api.post('ZC_SESSIONS2', data)
+
+        console.log("res")
+        console.log(res)
+    }
+    await client.end();
 }
 
 export async function getBestLap(sessionId: string, bestLapTime: number) {
@@ -38,6 +137,50 @@ export async function getBestLap(sessionId: string, bestLapTime: number) {
         .columns(["lapCount"])
         .orderBy("packetId desc")
     return (result?.lapCount) ? result.lapCount - 1 : null
+}
+
+export async function logSimulatorInterfacePacket(sessionId: string, sip: any) {
+    const sipEntity = sip
+    const map = typeof (sipEntity.session_ID) === 'undefined'
+    
+    sipEntity.session_ID = sessionId
+    
+    if (map) {
+        sipEntity.car_ID = sipEntity.carCode
+        // position
+        sipEntity.position_x = sipEntity.position.x
+        sipEntity.position_y = sipEntity.position.y
+        sipEntity.position_z = sipEntity.position.z
+        // velocity
+        sipEntity.velocity_x = sipEntity.velocity.x
+        sipEntity.velocity_y = sipEntity.velocity.y
+        sipEntity.velocity_z = sipEntity.velocity.z
+        // rotation
+        sipEntity.rotation_pitch = sipEntity.rotation.pitch
+        sipEntity.rotation_yaw = sipEntity.rotation.yaw
+        sipEntity.rotation_roll = sipEntity.rotation.roll
+        // angularVelocity
+        sipEntity.angularVelocity_x = sipEntity.angularVelocity.x
+        sipEntity.angularVelocity_y = sipEntity.angularVelocity.y
+        sipEntity.angularVelocity_z = sipEntity.angularVelocity.z
+        // tireSurfaceTemperature
+        sipEntity.tireSurfaceTemperature_fl = sipEntity.tireSurfaceTemperature.FrontLeft
+        sipEntity.tireSurfaceTemperature_fr = sipEntity.tireSurfaceTemperature.FrontRight
+        sipEntity.tireSurfaceTemperature_rl = sipEntity.tireSurfaceTemperature.RearLeft
+        sipEntity.tireSurfaceTemperature_rr = sipEntity.tireSurfaceTemperature.RearRight
+        // tireSuspensionHeight
+        sipEntity.tireSuspensionHeight_fl = sipEntity.tireSusHeight.FrontLeft
+        sipEntity.tireSuspensionHeight_fr = sipEntity.tireSusHeight.FrontRight
+        sipEntity.tireSuspensionHeight_rl = sipEntity.tireSusHeight.RearLeft
+        sipEntity.tireSuspensionHeight_rr = sipEntity.tireSusHeight.RearRight
+        // wheelRevPerSecond
+        sipEntity.wheelRevPerSecond_fl = sipEntity.wheelRevPerSecond.FrontLeft
+        sipEntity.wheelRevPerSecond_fr = sipEntity.wheelRevPerSecond.FrontRight
+        sipEntity.wheelRevPerSecond_rl = sipEntity.wheelRevPerSecond.RearLeft
+        sipEntity.wheelRevPerSecond_rr = sipEntity.wheelRevPerSecond.RearRight
+    }
+    
+    await INSERT.into(SimulatorInterfacePackets).entries(sipEntity)
 }
 
 export async function getCarName(carCode: number) {
@@ -169,48 +312,4 @@ export async function getTrackCoordinates(sessionID: string, sampleRate: number,
     coordinates.shift()
 
     return coordinates
-}
-
-export async function logSimulatorInterfacePacket(sessionId: string, sip: any) {
-    const sipEntity = sip
-    const map = typeof (sipEntity.session_ID) === 'undefined'
-
-    sipEntity.session_ID = sessionId
-
-    if (map) {
-        sipEntity.car_ID = sipEntity.carCode
-        // position
-        sipEntity.position_x = sipEntity.position.x
-        sipEntity.position_y = sipEntity.position.y
-        sipEntity.position_z = sipEntity.position.z
-        // velocity
-        sipEntity.velocity_x = sipEntity.velocity.x
-        sipEntity.velocity_y = sipEntity.velocity.y
-        sipEntity.velocity_z = sipEntity.velocity.z
-        // rotation
-        sipEntity.rotation_pitch = sipEntity.rotation.pitch
-        sipEntity.rotation_yaw = sipEntity.rotation.yaw
-        sipEntity.rotation_roll = sipEntity.rotation.roll
-        // angularVelocity
-        sipEntity.angularVelocity_x = sipEntity.angularVelocity.x
-        sipEntity.angularVelocity_y = sipEntity.angularVelocity.y
-        sipEntity.angularVelocity_z = sipEntity.angularVelocity.z
-        // tireSurfaceTemperature
-        sipEntity.tireSurfaceTemperature_fl = sipEntity.tireSurfaceTemperature.FrontLeft
-        sipEntity.tireSurfaceTemperature_fr = sipEntity.tireSurfaceTemperature.FrontRight
-        sipEntity.tireSurfaceTemperature_rl = sipEntity.tireSurfaceTemperature.RearLeft
-        sipEntity.tireSurfaceTemperature_rr = sipEntity.tireSurfaceTemperature.RearRight
-        // tireSuspensionHeight
-        sipEntity.tireSuspensionHeight_fl = sipEntity.tireSusHeight.FrontLeft
-        sipEntity.tireSuspensionHeight_fr = sipEntity.tireSusHeight.FrontRight
-        sipEntity.tireSuspensionHeight_rl = sipEntity.tireSusHeight.RearLeft
-        sipEntity.tireSuspensionHeight_rr = sipEntity.tireSusHeight.RearRight
-        // wheelRevPerSecond
-        sipEntity.wheelRevPerSecond_fl = sipEntity.wheelRevPerSecond.FrontLeft
-        sipEntity.wheelRevPerSecond_fr = sipEntity.wheelRevPerSecond.FrontRight
-        sipEntity.wheelRevPerSecond_rl = sipEntity.wheelRevPerSecond.RearLeft
-        sipEntity.wheelRevPerSecond_rr = sipEntity.wheelRevPerSecond.RearRight
-    }
-
-    await INSERT.into(SimulatorInterfacePackets).entries(sipEntity)
 }

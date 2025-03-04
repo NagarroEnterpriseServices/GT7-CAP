@@ -1,0 +1,197 @@
+{
+ "meta": {
+  "creator": "cds-dk 7.9.2"
+ },
+ "$version": "2.0",
+ "definitions": {
+  "btp_service.SAP__Message": {
+   "kind": "type",
+   "@cds.external": true,
+   "elements": {
+    "code": {
+     "type": "cds.LargeString",
+     "notNull": true
+    },
+    "message": {
+     "type": "cds.LargeString",
+     "notNull": true
+    },
+    "target": {
+     "type": "cds.LargeString"
+    },
+    "additionalTargets": {
+     "items": {
+      "type": "cds.LargeString",
+      "notNull": true
+     }
+    },
+    "transition": {
+     "type": "cds.Boolean",
+     "notNull": true
+    },
+    "numericSeverity": {
+     "type": "cds.Integer",
+     "@odata.Type": "Edm.Byte",
+     "notNull": true
+    },
+    "longtextUrl": {
+     "type": "cds.LargeString"
+    }
+   }
+  },
+  "btp_service": {
+   "kind": "service",
+   "@cds.external": true,
+   "@Common.ApplyMultiUnitBehaviorForSortingAndFiltering": true,
+   "@Capabilities.FilterFunctions": [
+    "eq",
+    "ne",
+    "gt",
+    "ge",
+    "lt",
+    "le",
+    "and",
+    "or",
+    "contains",
+    "startswith",
+    "endswith",
+    "any",
+    "all"
+   ],
+   "@Capabilities.SupportedFormats": [
+    "application/json",
+    "application/pdf"
+   ],
+   "@PDF.Features": {
+    "DocumentDescriptionReference": "../../../../default/iwbep/common/0001/$metadata",
+    "DocumentDescriptionCollection": "MyDocumentDescriptions",
+    "ArchiveFormat": true,
+    "Border": true,
+    "CoverPage": true,
+    "FitToPage": true,
+    "FontName": true,
+    "FontSize": true,
+    "HeaderFooter": true,
+    "IANATimezoneFormat": true,
+    "Margin": true,
+    "Padding": true,
+    "ResultSizeDefault": 20000,
+    "ResultSizeMaximum": 20000,
+    "Signature": true,
+    "TextDirectionLayout": true,
+    "Treeview": true,
+    "UploadToFileShare": true
+   },
+   "@Capabilities.KeyAsSegmentSupported": true,
+   "@Capabilities.AsynchronousRequestsSupported": true
+  },
+  "btp_service.ZC_SESSIONS2": {
+   "kind": "entity",
+   "@cds.external": true,
+   "@cds.persistence.skip": true,
+   "elements": {
+    "Sessionid": {
+     "key": true,
+     "type": "cds.String",
+     "length": 36,
+     "notNull": true,
+     "@Core.Immutable": true
+    },
+    "Racesecond": {
+     "key": true,
+     "type": "cds.Integer64",
+     "notNull": true,
+     "@Core.Immutable": true
+    },
+    "Speedinkmh": {
+     "type": "cds.Decimal",
+     "precision": 3,
+     "scale": 2,
+     "notNull": true
+    },
+    "Gear": {
+     "type": "cds.Integer",
+     "@odata.Type": "Edm.Byte",
+     "notNull": true
+    },
+    "Distanceinkmh": {
+     "type": "cds.Decimal",
+     "precision": 3,
+     "scale": 2,
+     "notNull": true
+    },
+    "Laptimeinms": {
+     "type": "cds.Integer64",
+     "notNull": true
+    },
+    "Raceposition": {
+     "type": "cds.Integer",
+     "@odata.Type": "Edm.Byte",
+     "notNull": true
+    },
+    "Throttlepressureinpercent": {
+     "type": "cds.Decimal",
+     "precision": 3,
+     "scale": 2,
+     "notNull": true
+    },
+    "Breakpressureinpercent": {
+     "type": "cds.Decimal",
+     "precision": 3,
+     "scale": 2,
+     "notNull": true
+    },
+    "Clutchdisengageinpercent": {
+     "type": "cds.Decimal",
+     "precision": 3,
+     "scale": 2,
+     "notNull": true
+    },
+    "Offtrackinpercent": {
+     "type": "cds.Decimal",
+     "precision": 3,
+     "scale": 2,
+     "notNull": true
+    },
+    "Handbreakinpercent": {
+     "type": "cds.Decimal",
+     "precision": 3,
+     "scale": 2,
+     "notNull": true
+    },
+    "Asminpercent": {
+     "type": "cds.Decimal",
+     "precision": 3,
+     "scale": 2,
+     "notNull": true
+    },
+    "Tcsinpercent": {
+     "type": "cds.Decimal",
+     "precision": 3,
+     "scale": 2,
+     "notNull": true
+    },
+    "Racetimeinms": {
+     "type": "cds.Integer64",
+     "notNull": true
+    },
+    "SAP__Messages": {
+     "items": {
+      "type": "btp_service.SAP__Message",
+      "notNull": true
+     }
+    }
+   },
+   "@Common.Label": "###GENERATED Core Data Service Entity",
+   "@Common.Messages": {
+    "=": "SAP__Messages"
+   },
+   "@Capabilities.SearchRestrictions.Searchable": false,
+   "@Capabilities.InsertRestrictions.RequiredProperties": [
+    "Sessionid",
+    "Racesecond"
+   ],
+   "@Capabilities.UpdateRestrictions.QueryOptions.SelectSupported": true
+  }
+ }
+}
