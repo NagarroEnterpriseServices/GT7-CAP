@@ -78,7 +78,7 @@ export async function updateSession(sessionId: string, driver: string, finished:
 
     // api.run(INSERT.into(Sessions).entries(data))
 
-    const api = await cds.connect.to("btp_service");
+    const api = await cds.connect.to("sac_service");
 
     const client = new Client({
         user: 'postgres',          // Replace with your PostgreSQL username
@@ -91,6 +91,10 @@ export async function updateSession(sessionId: string, driver: string, finished:
     await client.connect();
     const result = await client.query(`SELECT * FROM F_GT7PS5Agreg_V2('${sessionId}')`);
     // console.log(result.rows);
+
+    let entries = []
+    let rows = []
+
     
     // in the api, insert all data gotten from the sql function
     for (let row of result.rows) {
@@ -100,29 +104,78 @@ export async function updateSession(sessionId: string, driver: string, finished:
         const data =  {
             Sessionid: row.session_id,
             Racesecond: row.racesecond,
-            Speedinkmh: parseFloat(row.speed_kmh.toFixed(2)),
+            Speedinkmh: row.speed_kmh,
             Gear: row.gear,
-            Distanceinkmh: parseFloat(row.distance_km.toFixed(2)),
+            Sessiondate: row.sessiondate,
+            Distanceinkmh: row.distance_km,
             Laptimeinms: row.lapprecisetime_ms,
             Raceposition: row.raceposition,
-            Throttlepressureinpercent: row.throttlepercent,
-            Breakpressureinpercent: row.breakpercent,
-            Clutchdisengageinpercent: row.clutchdisengagepercent,
-            Offtrackinpercent: row.offtrackpercent,
-            Handbreakinpercent: row.handbrakepercent,
-            Asminpercent: row.asmpercent,
-            Tcsinpercent: row.tcspercent,
+            Throttlepressureinpercent: parseFloat(row.throttlepercent),
+            Breakpressureinpercent: parseFloat(row.brakepercent),
+            Clutchdisengageinpercent: parseFloat(row.clutchdisengagepercent),
+            Offtrackinpercent: parseFloat(row.offtrackpercent),
+            Handbreakinpercent: parseFloat(row.handbrakepercent),
+            Asminpercent: parseFloat(row.asmpercent),
+            Tcsinpercent: parseFloat(row.tcspercent),
             Racetimeinms: row.raceprecisetime_ms,
+            Drivername: driver ?? "",
         }
 
-        console.log("data")
-        console.log(data)
+        entries.push(data)
 
-        const res = await api.post('ZC_SESSIONS2', data)
+        rows.push([
+            data.Sessionid,
+            data.Racesecond,
+            data.Speedinkmh,
+            data.Gear,
+            data.Sessiondate,
+            data.Distanceinkmh,
+            data.Laptimeinms,
+            data.Raceposition,
+            data.Throttlepressureinpercent,
+            data.Breakpressureinpercent,
+            data.Clutchdisengageinpercent,
+            data.Offtrackinpercent,
+            data.Handbreakinpercent,
+            data.Asminpercent,
+            data.Tcsinpercent,
+            data.Racetimeinms,
+            data.Drivername
+        ])
+        // const res = await api.post('ZC_SESSIONSV3', data)
 
-        console.log("res")
-        console.log(res)
+        const res = await api.run(INSERT.into('ZC_SESSIONSV3').entries(
+            data
+        ))
+        
     }
+    console.log("data")
+    console.log(rows)
+
+    // const res = await api.run(INSERT.into('ZC_SESSIONSV3').columns(
+    //     'Sessionid',
+    //     'Racesecond',
+    //     'Speedinkmh',
+    //     'Gear',
+    //     'Sessiondate',
+    //     'Distanceinkmh',
+    //     'Laptimeinms',
+    //     'Raceposition',
+    //     'Throttlepressureinpercent',
+    //     'Breakpressureinpercent',
+    //     'Clutchdisengageinpercent',
+    //     'Offtrackinpercent',
+    //     'Handbreakinpercent',
+    //     'Asminpercent',
+    //     'Tcsinpercent',
+    //     'Racetimeinms',
+    //     'Drivername'
+    // ).rows(rows))
+
+    // const res = api.run(INSERT.into('ZC_SESSIONSV3').entries(
+    //     entries
+    // ))
+
     await client.end();
 }
 

@@ -13,9 +13,7 @@ const SessionMetric_measure = {
 type SessionMetric_measure = 1 | 2 | 3 | 4
 
 /**
-* Aspect for entities with canonical universal IDs
-* 
-* See https://cap.cloud.sap/docs/cds/common#aspect-cuid
+* Common.ValueList (ValueHelps)
 */
 export function _SessionAspect<TBase extends new (...args: any[]) => object>(Base: TBase) {
   return class Session extends Base {

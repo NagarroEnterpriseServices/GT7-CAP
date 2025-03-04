@@ -4,7 +4,7 @@
  },
  "$version": "2.0",
  "definitions": {
-  "customrap.SAP__Message": {
+  "sac_service.SAP__Message": {
    "kind": "type",
    "@cds.external": true,
    "elements": {
@@ -39,7 +39,7 @@
     }
    }
   },
-  "customrap": {
+  "sac_service": {
    "kind": "service",
    "@cds.external": true,
    "@Common.ApplyMultiUnitBehaviorForSortingAndFiltering": true,
@@ -85,60 +85,120 @@
    "@Capabilities.KeyAsSegmentSupported": true,
    "@Capabilities.AsynchronousRequestsSupported": true
   },
-  "customrap.ZC_SESSIONS": {
+  "sac_service.ZC_SESSIONSV3": {
    "kind": "entity",
    "@cds.external": true,
    "@cds.persistence.skip": true,
    "elements": {
-    "Id": {
+    "Internalid": {
      "key": true,
+     "type": "cds.UUID",
+     "notNull": true,
+     "@Core.Computed": true,
+     "@Common.Label": "UUID",
+     "@Common.QuickInfo": "16 Byte UUID in 16 Bytes (Raw Format)"
+    },
+    "Sessionid": {
      "type": "cds.String",
      "length": 36,
-     "notNull": true,
-     "@Core.Immutable": true
+     "notNull": true
     },
-    "Createdat": {
-     "type": "cds.Timestamp",
-     "@odata.Precision": 7,
-     "@odata.Type": "Edm.DateTimeOffset"
+    "Racesecond": {
+     "type": "cds.Integer64",
+     "notNull": true
     },
-    "Driver": {
+    "Sessiontimestamp": {
      "type": "cds.String",
-     "length": 256,
+     "length": 40,
      "notNull": true
     },
-    "CarId": {
+    "Sessiondate": {
+     "type": "cds.Date"
+    },
+    "Sessiontime": {
+     "type": "cds.Time",
+     "notNull": true
+    },
+    "Drivername": {
+     "type": "cds.String",
+     "length": 30,
+     "notNull": true
+    },
+    "Car": {
      "type": "cds.Integer",
      "notNull": true
     },
-    "Lapsinrace": {
+    "Lapcount": {
      "type": "cds.Integer",
-     "@odata.Type": "Edm.Byte",
      "notNull": true
     },
-    "Bestlap": {
-     "type": "cds.Integer",
-     "@odata.Type": "Edm.Byte",
-     "notNull": true
-    },
-    "Bestlaptime": {
+    "Racetimeinms": {
      "type": "cds.Integer64",
      "notNull": true
     },
-    "Finished": {
+    "Speedinkmh": {
+     "type": "cds.Decimal",
+     "precision": 18,
+     "scale": 14,
+     "notNull": true
+    },
+    "Gear": {
      "type": "cds.Integer",
      "@odata.Type": "Edm.Byte",
      "notNull": true
     },
-    "Timeofday": {
+    "Distanceinkmh": {
+     "type": "cds.Decimal",
+     "precision": 18,
+     "scale": 14,
+     "notNull": true
+    },
+    "Laptimeinms": {
      "type": "cds.Integer64",
      "notNull": true
     },
-    "Calculatedmaxspeed": {
+    "Raceposition": {
      "type": "cds.Integer",
+     "@odata.Type": "Edm.Byte",
      "notNull": true
     },
-    "Bodyheight": {
+    "Throttlepressureinpercent": {
+     "type": "cds.Decimal",
+     "precision": 18,
+     "scale": 14,
+     "notNull": true
+    },
+    "Breakpressureinpercent": {
+     "type": "cds.Decimal",
+     "precision": 18,
+     "scale": 14,
+     "notNull": true
+    },
+    "Clutchdisengageinpercent": {
+     "type": "cds.Decimal",
+     "precision": 18,
+     "scale": 14,
+     "notNull": true
+    },
+    "Offtrackinpercent": {
+     "type": "cds.Decimal",
+     "precision": 18,
+     "scale": 14,
+     "notNull": true
+    },
+    "Handbreakinpercent": {
+     "type": "cds.Decimal",
+     "precision": 18,
+     "scale": 14,
+     "notNull": true
+    },
+    "Asminpercent": {
+     "type": "cds.Decimal",
+     "precision": 18,
+     "scale": 14,
+     "notNull": true
+    },
+    "Tcsinpercent": {
      "type": "cds.Decimal",
      "precision": 18,
      "scale": 14,
@@ -146,7 +206,7 @@
     },
     "SAP__Messages": {
      "items": {
-      "type": "customrap.SAP__Message",
+      "type": "sac_service.SAP__Message",
       "notNull": true
      }
     }
@@ -156,21 +216,6 @@
     "=": "SAP__Messages"
    },
    "@Capabilities.SearchRestrictions.Searchable": false,
-   "@Capabilities.FilterRestrictions.Filterable": true,
-   "@Capabilities.FilterRestrictions.FilterExpressionRestrictions": [
-    {
-     "Property": {
-      "=": "Driver"
-     },
-     "AllowedExpressions": "SearchExpression"
-    }
-   ],
-   "@Capabilities.SortRestrictions.NonSortableProperties": [
-    "Driver"
-   ],
-   "@Capabilities.InsertRestrictions.RequiredProperties": [
-    "Id"
-   ],
    "@Capabilities.UpdateRestrictions.QueryOptions.SelectSupported": true
   }
  }

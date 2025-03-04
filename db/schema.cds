@@ -59,8 +59,8 @@ entity Laps {
     key session_ID : Sessions:ID;
     key lap        : Int16;
         time       : Int32;
-        maxSpeed   : Int32;
-        avgSpeed   : Int32;
+        maxSpeed   : Decimal;
+        avgSpeed   : Decimal;
         best       : Boolean
 }
 
@@ -73,7 +73,7 @@ entity SessionMetrics {
             throttle        = 3;
             gear            = 4;
         };
-        value          : Int32;
+        value          : Decimal;
 
         @description: 'Current lap count'
         lapCount       : Int16                   @title: 'Lap';
