@@ -59,24 +59,7 @@ export async function updateSession(sessionId: string, driver: string, finished:
     })
     generateFioriMetrics(sessionId)
 
-    // new request for update session in another table
-    // const api = await cds.connect.to("customrap");
-
-    // const data =  {
-    //     Id: sessionId,
-    //     Createdat: new Date().toISOString(),
-    //     Lapsinrace: sip.lapsInRace,
-    //     CarId: sip.carCode,
-    //     Timeofday: sip.timeOfDayProgression,
-    //     Bodyheight:  parseFloat(sip.bodyHeight.toPrecision(10)),
-    //     Finished: finished,
-    //     Bestlap: bestLap,
-    //     Bestlaptime: sip.bestLapTime,
-    //     Calculatedmaxspeed: sip.calculatedMaxSpeed,
-    //     Driver: driver == null ? "" : driver
-    // }
-
-    // api.run(INSERT.into(Sessions).entries(data))
+    if (driver === null || driver === "" || driver === undefined) return;
 
     const api = await cds.connect.to("sac_service");
 
@@ -90,12 +73,6 @@ export async function updateSession(sessionId: string, driver: string, finished:
 
     await client.connect();
     const result = await client.query(`SELECT * FROM F_GT7PS5Agreg_V2('${sessionId}')`);
-    // console.log(result.rows);
-
-    let entries = []
-    let rows = []
-
-    
     // in the api, insert all data gotten from the sql function
     for (let row of result.rows) {
         // insert via sql query
@@ -124,63 +101,9 @@ export async function updateSession(sessionId: string, driver: string, finished:
             Racetimeinms: row.raceprecisetime_ms,
             Drivername: driver ?? "",
         }
-        // console.log("data")
-        // console.log(data)
 
-        // entries.push(data)
-
-        // rows.push([
-        //     data.Sessionid,
-        //     data.Racesecond,
-        //     data.Speedinkmh,
-        //     data.Gear,
-        //     data.Sessiondate,
-        //     data.Distanceinkmh,
-        //     data.Laptimeinms,
-        //     data.Raceposition,
-        //     data.Throttlepressureinpercent,
-        //     data.Breakpressureinpercent,
-        //     data.Clutchdisengageinpercent,
-        //     data.Offtrackinpercent,
-        //     data.Handbreakinpercent,
-        //     data.Asminpercent,
-        //     data.Tcsinpercent,
-        //     data.Racetimeinms,
-        //     data.Drivername
-        // ])
         const res = await api.post('ZC_SESSIONSV4', data)
-
-        // const res = await api.run(INSERT.into('ZC_SESSIONSV3').entries(
-        //     data
-        // ))
-        
     }
-    // console.log("data")
-    // console.log(rows)
-
-    // const res = await api.run(INSERT.into('ZC_SESSIONSV3').columns(
-    //     'Sessionid',
-    //     'Racesecond',
-    //     'Speedinkmh',
-    //     'Gear',
-    //     'Sessiondate',
-    //     'Distanceinkmh',
-    //     'Laptimeinms',
-    //     'Raceposition',
-    //     'Throttlepressureinpercent',
-    //     'Breakpressureinpercent',
-    //     'Clutchdisengageinpercent',
-    //     'Offtrackinpercent',
-    //     'Handbreakinpercent',
-    //     'Asminpercent',
-    //     'Tcsinpercent',
-    //     'Racetimeinms',
-    //     'Drivername'
-    // ).rows(rows))
-
-    // const res = api.run(INSERT.into('ZC_SESSIONSV3').entries(
-    //     entries
-    // ))
 
     await client.end();
 }
