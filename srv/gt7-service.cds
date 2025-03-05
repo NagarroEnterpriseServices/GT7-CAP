@@ -31,7 +31,7 @@ service GT7Service {
 
     @readonly
     @Capabilities.SearchRestrictions.Searchable: false
-    entity SessionMetrics            as select from my.SessionMetrics;
+    entity SessionMetrics            as select from my.SessionMetrics order by currentLapTime;
 
     @readonly
     entity Laps                      as select from my.Laps;

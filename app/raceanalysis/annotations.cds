@@ -180,30 +180,6 @@ annotate service.SessionMetrics with @(
     }
 );
 
-annotate service.SessionMetrics with @(UI.Chart #chartSectionGears: {
-    $Type              : 'UI.ChartDefinitionType',
-    ChartType          : #Line,
-    Dimensions         : [
-        currentLapTime,
-        lapCount
-    ],
-    DimensionAttributes: [
-        {
-            $Type    : 'UI.ChartDimensionAttributeType',
-            Dimension: currentLapTime,
-            Role     : #Category,
-        },
-        {
-            $Type    : 'UI.ChartDimensionAttributeType',
-            Dimension: lapCount,
-            Role     : #Series,
-        },
-    ],
-    DynamicMeasures    : ['@Analytics.AggregatedProperty#value_average'],
-    Title              : 'Gears analysis',
-});
-
-
 
 // annotate service.SessionMetrics with @(UI.Chart #chartSection2: {
 //     $Type              : 'UI.ChartDefinitionType',

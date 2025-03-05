@@ -34,7 +34,11 @@ entity Sessions : cuid {
     timeOfDay          : Int32;
     calculatedMaxSpeed : Int16;
     bodyHeight         : Decimal;
-    virtual trackUrl   : String  @Core.IsURL  @Core.MediaType: 'image/svg+xml';
+    virtual trackUrl   : String  @Core.IsURL  @Core.MediaType: 'image/svg+xml' @Core.AcceptableMediaTypes : [
+        'image/svg+xml',
+        'image/png',
+        'application/json'
+    ] ;
     Laps               : Association to many Laps
                              on Laps.session_ID = ID;
     Packets            : Composition of many SimulatorInterfacePackets

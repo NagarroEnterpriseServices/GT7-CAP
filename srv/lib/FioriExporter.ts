@@ -120,7 +120,7 @@ async function writeLaps(sessionID: string, sips: [SimulatorInterfacePacket]) {
     // insert laps
     for (let lap of laps) {
         try{await INSERT.into(Laps).entries(lap)}
-        catch(e){console.log('FioriExported::writeLaps')}
+        catch(e){console.log('FioriExported::writeLaps ' + e)}
     }
 
 }
@@ -144,23 +144,29 @@ async function writePacket(sessionID: string, sip: SimulatorInterfacePacket, met
         metrics.throttle = undefined
     }
 
-    // metersPerSecond
-    metrics.metersPerSecond = sip.metersPerSecond
-    sm.measure = SessionMetric.measure.metersPerSecond
-    sm.value = ~~(metrics.metersPerSecond * 3.6) // kmh
-    await INSERT.into(SessionMetrics).entries(sm)
+    try {
 
-    // brake
-    metrics.brake = sip.brake
-    sm.measure = SessionMetric.measure.brake
-    sm.value = getBytePercent(metrics.brake)
-    await INSERT.into(SessionMetrics).entries(sm)
+        // metersPerSecond
+        metrics.metersPerSecond = sip.metersPerSecond
+        sm.measure = SessionMetric.measure.metersPerSecond
+        sm.value = ~~(metrics.metersPerSecond * 3.6) // kmh
+        await INSERT.into(SessionMetrics).entries(sm)
 
-    // throttle
-    metrics.throttle = sip.throttle
-    sm.measure = SessionMetric.measure.throttle
-    sm.value = getBytePercent(metrics.throttle)
-    await INSERT.into(SessionMetrics).entries(sm)
+        // brake
+        metrics.brake = sip.brake
+        sm.measure = SessionMetric.measure.brake
+        sm.value = getBytePercent(metrics.brake)
+        await INSERT.into(SessionMetrics).entries(sm)
+
+        // throttle
+        metrics.throttle = sip.throttle
+        sm.measure = SessionMetric.measure.throttle
+        sm.value = getBytePercent(metrics.throttle)
+        await INSERT.into(SessionMetrics).entries(sm)
+
+    } catch (e) {
+        console.log('FioriExporter::writePacket ' + e)
+    }
 }
 
 function getBytePercent(value: number): number {

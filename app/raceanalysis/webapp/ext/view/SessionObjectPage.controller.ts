@@ -26,6 +26,19 @@ export default class SessionObjectPage extends Controller {
     public onInit(): void {
         super.onInit();
 
+        // let url = window.location.href + "/trackUrl";
+        // url = url.substring(url.indexOf("/Sessions"));
+        // url = window.location.origin + "/odata/v4/gt7" + url;
+        // const oModel = new JSONModel(sap.ui.require.toUrl(url) );
+      
+        //   // Set the model to the view
+        //   const oView = this.getView();
+
+        //   if (oView instanceof View) {
+        //     oView.setModel(oModel, "trackurl");
+        //   }
+
+
         this.onGenerateMetricsPress();
         // this.loadLapData();
     }
@@ -64,24 +77,24 @@ export default class SessionObjectPage extends Controller {
         grid.rerender();
     }
 
-    private async loadLapSVG(): Promise<void> {
-        await new Promise(resolve => setTimeout(resolve, 35000));
+    // private async loadLapSVG(): Promise<void> {
+    //     await new Promise(resolve => setTimeout(resolve, 10000));
 
-        const trackMap = this.byId("trackTrajectoryImage") as Image;
+    //     const trackMap = this.byId("trackTrajectoryImage") as Image;
 
-        let url = window.location.href + "/trackUrl?lap=0";
-        url = url.substring(url.indexOf("/Sessions"));
-        url = window.location.origin + "/odata/v4/gt7" + url;
+    //     let url = window.location.href + "/trackUrl?lap=0";
+    //     url = url.substring(url.indexOf("/Sessions"));
+    //     url = window.location.origin + "/odata/v4/gt7" + url;
 
-        trackMap.setSrc(url);
+    //     trackMap.setSrc(url);
 
-        const imageObject = this.byId("trackImage") as Image;
-        url = window.location.href + "/trackUrl?lap=1&raceData=velocity";
-        url = url.substring(url.indexOf("/Sessions"));
-        url = window.location.origin + "/odata/v4/gt7" + url;
+    //     const imageObject = this.byId("trackImage") as Image;
+    //     url = window.location.href + "/trackUrl?lap=1&raceData=velocity";
+    //     url = url.substring(url.indexOf("/Sessions"));
+    //     url = window.location.origin + "/odata/v4/gt7" + url;
 
-        imageObject.setSrc(url);
-    }
+    //     imageObject.setSrc(url);
+    // }
 
     /**
      * Similar to onAfterRendering, but this hook is invoked before the controller's View is re-rendered
@@ -134,7 +147,7 @@ export default class SessionObjectPage extends Controller {
         }).then(response => {
             if (response.ok) {
                 this.loadLapData();
-                this.loadLapSVG();
+                // this.loadLapSVG();
                 // MessageToast.show("Metrics generated successfully");
             } else {
                 // MessageToast.show("Failed to generate metrics");

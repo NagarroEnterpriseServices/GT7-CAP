@@ -148,7 +148,7 @@ export async function updateSession(sessionId: string, driver: string, finished:
         //     data.Racetimeinms,
         //     data.Drivername
         // ])
-        const res = await api.post('ZC_SESSIONSV3', data)
+        const res = await api.post('ZC_SESSIONSV4', data)
 
         // const res = await api.run(INSERT.into('ZC_SESSIONSV3').entries(
         //     data

@@ -14,6 +14,9 @@ module.exports = class GT7Service extends ApplicationService {
             const sessionID = req.params[0] as string
 
             await generateFioriMetrics(sessionID)
+            console.log("generateFioriMetrics", sessionID)
+
+            return {}
         })
 
         // bound functions

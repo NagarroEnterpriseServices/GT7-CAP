@@ -119,10 +119,6 @@ module.exports = class SIPGT7Service extends Service {
             this.packetCount = 0 // reset loop
         }
 
-        // fix throttle and brake to have a percentage
-        message.throttle = (message.throttle * 100 / 255).toFixed(0);
-        message.brake = (message.brake * 100 / 255).toFixed(0);
-
         // session handling
         if (this.recording && !this.sessionId) {
             // start new session
