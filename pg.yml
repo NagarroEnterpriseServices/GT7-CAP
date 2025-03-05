@@ -1,6 +1,13 @@
+version: '3.7'
+
 services:
   db:
     image: postgres:alpine
-    environment: { POSTGRES_PASSWORD: postgres }
-    ports: [ '5432:5432' ]
+    container_name: gt7-cap-db
+    environment:
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
     restart: always
+    volumes:
+      - ./init.sql:/tmp/init.sql:ro  # Mount the SQL file inside the container
