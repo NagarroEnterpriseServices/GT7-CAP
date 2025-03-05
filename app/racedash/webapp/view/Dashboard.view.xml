@@ -11,11 +11,13 @@
                 <ToolbarSpacer/>
                 <Title class="title" titleStyle="H4" text="{ws>/sip/carName}"/>
                 <ToolbarSpacer/>
+                <Button visible="{ws>/connected}" text="{= (${ws>/driver} === null || ${ws>/driver} === undefined)? 'Assign Driver' : ${ws>/driver} + ' is racing' }" press=".handleDriver"/>
                 <!-- <Button type="{= ${ws>/recording} ? 'Negative' : 'Emphasized'}"
                     visible="{ws>/connected}"
                     icon="{= ${ws>/recording} ? 'sap-icon://stop' : 'sap-icon://record'}" 
                     text="{= ${ws>/recording} ? 'Stop' : 'Record'}" 
                     press=".handleRecord"/> -->
+                
             </Toolbar>
         </customHeader>
         <HBox class="sapUiTinyMarginBeginEnd" renderType="Bare">                  
@@ -161,14 +163,14 @@
                 </f:SimpleForm>
             </VBox>                    
         </HBox>
-        <!--
-        <footer>
-            <Toolbar design="Transparent" style="Clear">
-                <ToolbarSpacer/>
-                <Image src="{app>/path}/mime/fanatec-white.svg" height="14px"/>
-                <ToolbarSpacer/>
-            </Toolbar>
-        </footer>
-        -->
+        <!-- Add a text to say powered by sap CAP -->
+        <HBox justifyContent="End" alignItems="Center">
+            <Image src="{app>/path}/mime/nagarro.svg" height="5rem" class="poweredByImage"/>
+            <Text text="Powered by " class="poweredBy" />
+            <Image src="{app>/path}/mime/sap.png" height="0.75rem" class="poweredByImage"/>
+            <Text text=" Cloud Application Programming Model" class="poweredBy"/>
+        </HBox>
+        <!-- <Text text="Powered by SAP Cloud Application Programming Model" textAlign="right" class="poweredBy"/> -->
+       
     </Page>
 </mvc:View>

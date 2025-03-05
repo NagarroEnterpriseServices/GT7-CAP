@@ -81,6 +81,8 @@ module.exports = class WebSocketService extends Service {
                         LOG._debug && LOG.debug("racedash.event.driver", driver)
                         const sipgt7Srv = await cds.connect.to('SIPGT7Service')
                         sipgt7Srv.emit("driverAssigned", { driver: driver })
+
+                        
                         // broadcast to all clients
                         // wss.clients.forEach(function each(client) {
                         //     if (client.readyState === WebSocket.OPEN) {

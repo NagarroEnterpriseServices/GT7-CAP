@@ -37,6 +37,7 @@ export default class WebSocketService extends Object {
         this.model = new JSONModel({
             connected: false,
             recording: false,
+            driver: null,
             sip: {
                 packetId: 1,
                 lapCount: 2,
@@ -88,6 +89,7 @@ export default class WebSocketService extends Object {
                 //console.log("data", event, event.data.recording);
                 if (event.type === "racedash.event.recording") {
                     this.model.setProperty("/recording", event.data.recording);
+                    this.model.setProperty("/driver", null);
                 } else if (event.type === "racedash.event.sip") {
                     //this.model.setData(event);
                     this.model.setProperty("/sip", event.data);
