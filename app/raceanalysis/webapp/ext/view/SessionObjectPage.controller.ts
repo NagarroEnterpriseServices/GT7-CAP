@@ -39,7 +39,7 @@ export default class SessionObjectPage extends Controller {
         //   }
 
 
-        this.onGenerateMetricsPress();
+        // this.onGenerateMetricsPress();
         // this.loadLapData();
     }
 
