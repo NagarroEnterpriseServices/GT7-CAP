@@ -55,58 +55,84 @@ export async function updateSession(sessionId: string, driver: string, finished:
         lapsInRace: sip.lapsInRace,
         bestLap: bestLap,
         bestLapTime: sip.bestLapTime,
+        raceTime: sip.raceTime,
         calculatedMaxSpeed: sip.calculatedMaxSpeed
     })
-    generateFioriMetrics(sessionId)
+    await generateFioriMetrics(sessionId)
 
-    if (driver === null || driver === "" || driver === undefined) return;
-
-    const api = await cds.connect.to("sac_service");
-
-    const client = new Client({
-        user: 'postgres',          // Replace with your PostgreSQL username
-        host: 'localhost',              // Replace with your PostgreSQL host
-        database: 'postgres', // Replace with your database name
-        password: 'postgres',      // Replace with your password
-        port: 5432,                     // Default PostgreSQL port
-      });
-
-    await client.connect();
-    const result = await client.query(`SELECT * FROM F_GT7PS5Agreg_V2('${sessionId}')`);
-    // in the api, insert all data gotten from the sql function
-    for (let row of result.rows) {
-        // insert via sql query
-        console.log("row")
-        // console.log(row)
-        const data =  {
-            Sessionid: row.session_id,
-            Racesecond: row.racesecond,
-            Speedinkmh: parseFloat(row.speed_kmh.toPrecision(3)),
-            Gear: row.gear,
-            Sessiontimestamp: row.sessiontimestamp,
-            Sessiondate: row.sessiondate,
-            Sessiontime: row.sessiontime,
-            Lapcount: row.lapcount,
-            Car: row.car,
-            Distanceinkmh: parseFloat(row.distance_km.toPrecision(3)),
-            Laptimeinms: row.lapprecisetime_ms,
-            Raceposition: row.raceposition,
-            Throttlepressureinpercent: parseFloat(row.throttlepercent),
-            Breakpressureinpercent: parseFloat(row.brakepercent),
-            Clutchdisengageinpercent: parseFloat(row.clutchdisengagepercent),
-            Offtrackinpercent: parseFloat(row.offtrackpercent),
-            Handbreakinpercent: parseFloat(row.handbrakepercent),
-            Asminpercent: parseFloat(row.asmpercent),
-            Tcsinpercent: parseFloat(row.tcspercent),
-            Racetimeinms: row.raceprecisetime_ms,
-            Drivername: driver ?? "",
-        }
-
-        const res = await api.post('ZC_SESSIONSV4', data)
+    if (finished == false) {
+        await deleteUnfinishedSessions(sessionId)
+        return;
     }
 
-    await client.end();
+    if (cds.env.profiles.includes('sac')) {
+        if (driver === null || driver === "" || driver === undefined) return;
+        
+        const api = await cds.connect.to("sac_service");
+
+        const client = new Client({
+            user: 'postgres',
+            host: 'localhost',
+            database: 'postgres',
+            password: 'postgres',
+            port: 5432,
+        });
+
+        await client.connect();
+        const result = await client.query(`SELECT * FROM F_GT7PS5Agreg_V2('${sessionId}')`);
+        // in the api, insert all data gotten from the sql function
+        for (let row of result.rows) {
+            // insert via sql query
+            const data =  {
+                Sessionid: row.session_id,
+                Racesecond: row.racesecond,
+                Speedinkmh: parseFloat(row.speed_kmh.toPrecision(3)),
+                Gear: row.gear,
+                Sessiontimestamp: row.sessiontimestamp,
+                Sessiondate: row.sessiondate,
+                Sessiontime: row.sessiontime,
+                Lapcount: row.lapcount,
+                Car: row.car,
+                Distanceinkmh: parseFloat(row.distance_km.toPrecision(3)),
+                Laptimeinms: row.lapprecisetime_ms,
+                Raceposition: row.raceposition,
+                Throttlepressureinpercent: parseFloat(row.throttlepercent),
+                Breakpressureinpercent: parseFloat(row.brakepercent),
+                Clutchdisengageinpercent: parseFloat(row.clutchdisengagepercent),
+                Offtrackinpercent: parseFloat(row.offtrackpercent),
+                Handbreakinpercent: parseFloat(row.handbrakepercent),
+                Asminpercent: parseFloat(row.asmpercent),
+                Tcsinpercent: parseFloat(row.tcspercent),
+                Racetimeinms: row.raceprecisetime_ms,
+                Drivername: driver ?? "",
+            }
+
+            const res = await api.post('ZC_SESSIONSV4', data)
+        }
+
+        await client.end();
+    }
+    
 }
+
+export async function deleteUnfinishedSessions(id: string) {
+    const unfinishedSession = await SELECT.from(Sessions).where({ finished: false, ID: id });
+
+    if (unfinishedSession) {
+        await DELETE.from(Sessions).where({ finished: false, ID: id });
+        await DELETE.from(SimulatorInterfacePackets).where({ session_ID: id });
+    }
+}
+
+export async function deleteSessions(id: string) {
+    const session = await SELECT.from(Sessions).where({ ID: id });
+
+    if (session) {
+        await DELETE.from(Sessions).where({ ID: id });
+        await DELETE.from(SimulatorInterfacePackets).where({ session_ID: id });
+    }
+}
+
 
 export async function getBestLap(sessionId: string, bestLapTime: number) {
     const result = await SELECT

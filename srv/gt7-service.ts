@@ -1,7 +1,7 @@
 import * as cds from '@sap/cds'
 import { ApplicationService, log } from '@sap/cds'
 import { generateFioriMetrics } from './lib/FioriExporter'
-import { getTrackCoordinates, getColorFromData, updateSession } from './lib/SqliteExporter'
+import { getTrackCoordinates, getColorFromData, updateSession, deleteSessions } from './lib/SqliteExporter'
 
 const LOG = log('gt7-service')
 const { Laps, Session, SimulatorInterfacePackets } = require('#cds-models/GT7Service')
@@ -39,6 +39,23 @@ module.exports = class GT7Service extends ApplicationService {
             return { driver: driver };
         })
 
+        this.on("changeDriver", Session, async (req) => {
+            const { NewDriver } = req.data;
+            const sessionID = req.params[0] as string;
+
+            await cds.run(UPDATE(Session).set({ driver: NewDriver }).where({ ID: sessionID }));
+
+        })
+
+
+        this.on("deleteSession", Session, async (req) => {
+            const sessionID = req.params[0] as string;
+            
+
+            LOG.info(`deleteSession ${sessionID}`)
+            await deleteSessions(sessionID)
+        })
+
         // http://localhost:4004/odata/v4/gt7/Sessions(52983d4d-bea3-4d5a-9867-b35639167df1)/GT7Service.getLapSVG()
         // https://gt-engine.com/gt7/tracks/track-maps.html
         this.on("getLapSVG", Session, async (req) => {
@@ -49,6 +66,24 @@ module.exports = class GT7Service extends ApplicationService {
             // @ts-ignore
             // req._.res.end(svg);
             return next();
+        })
+
+        this.on("READ", SimulatorInterfacePackets, async (req, next) => {
+            if (req.query.SELECT && req.query.SELECT.limit && req.query.SELECT.limit.rows) {
+                req.query.SELECT.limit.rows.val = 100000; // or more
+              } else {
+                // forcibly inject if missing
+                req.query.SELECT.limit = { rows: { val: 100000 }, offset: { val: 0 } };
+              }
+              const data = await next();
+              const SAMPLING_RATE = 10;
+
+              if (!Array.isArray(data)) return data;
+            
+              const downsampled = data.filter((_, index) => index % SAMPLING_RATE === 0);
+              downsampled.sort((a, b) => a.currentLapTime - b.currentLapTime);
+            //   LOG.info(`Downsampled from ${data.length} to ${downsampled.length}`);
+              return downsampled;
         })
 
         this.on("READ", Session, async (req, next) => {

@@ -83,14 +83,14 @@
       }
     },
     "extends": {
-			"extensions": {
-				"sap.ui.controllerExtensions": {
-					"sap.fe.templates.ListReport.ListReportController": {
-						"controllerName": "raceanalysis.ext.controller.SessionList"
-					}
-				}
-			}
-		},
+      "extensions": {
+        "sap.ui.controllerExtensions": {
+          "sap.fe.templates.ListReport.ListReportController": {
+            "controllerName": "raceanalysis.ext.controller.SessionList"
+          }
+        }
+      }
+    },
     "contentDensities": {
       "compact": true,
       "cozy": true
@@ -157,7 +157,32 @@
                   }
                 }
               },
-              "initialLoad": "Enabled"
+              "initialLoad": "Enabled",
+              "controlConfiguration": {
+                "@com.sap.vocabularies.UI.v1.LineItem": {
+                  "tableSettings": {
+                    "enableExport": true,
+                    "selectAll": true,
+                    "selectionMode": "Multi",
+                    "type": "ResponsiveTable"
+                  },
+                  "actions": {
+                    "DataFieldForAction::GT7Service.deleteSession": {
+                      "enableOnSelect": "multi",
+                      "afterExecution": {
+                        "navigateToInstance": false
+                      }
+                    },
+                    "DataFieldForAction::GT7Service.changeDriver": {
+                      "enableOnSelect": "multi",
+                      "afterExecution": {
+                        "enableAutoScroll": true
+                      }
+                    }
+                  }
+                }
+              },
+              "defaultTemplateAnnotationPath": "com.sap.vocabularies.UI.v1.SelectionPresentationVariant#table"
             }
           }
         },

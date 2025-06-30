@@ -28,6 +28,7 @@ entity Sessions : cuid {
     driver             : String(200);
     car                : Association to Cars;
     lapsInRace         : Int16;
+    raceTime           : Int32;
     bestLap            : Int16;
     bestLapTime        : Int32;
     finished           : Boolean default false;

@@ -20,9 +20,9 @@
                         <HBox width="100%" height="80px" class="sapUiSmallMargin" justifyContent="Start">
                             <Image id="trackSplashImageImage" src="{path: 'trackUrl'}" height="100%"/>
                             <VBox height="100%" class="sapUiSmallMarginBegin" justifyContent="SpaceAround">
-                            <Text text="Best Lap: {bestLap} in {bestLapTime}"></Text>
+                            <Text text="Time: {raceTime} sec"></Text>
                             <Text text="Total Laps: {lapsInRace}"></Text>
-                            <Text text="Maximum speed attained {calculatedMaxSpeed}km/h on session {ID}"></Text>
+                            <Text text="Maximum theoretical speed {calculatedMaxSpeed}km/h"></Text>
                             </VBox>
                         </HBox>
                             <Button class="sapUiSmallMargin" text="Regenerate Metrics" press=".onGenerateMetricsPress"></Button>
@@ -34,7 +34,7 @@
                         <f2:GridContainerItemLayoutData rows="4" columns="10" />
                     </f2:layoutData>
                     <f2:content>
-                        <macros:Chart id="ChartSpeed" contextPath="/Sessions/Speed" metaPath="@com.sap.vocabularies.UI.v1.Chart#chartSectionSpeed" personalization="Item" selectionMode="Multiple"/>
+                        <macros:Chart id="ChartSpeed" contextPath="/Sessions/Packets" metaPath="@com.sap.vocabularies.UI.v1.Chart#chartSection" personalization="Item" selectionMode="Multiple"/>
                     </f2:content>
                 </f2:Card>
                 <f2:Card>

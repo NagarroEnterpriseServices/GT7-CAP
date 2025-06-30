@@ -6,12 +6,11 @@ import LapCounter from './lib/utils/lapcounter'
 import { SimulatorFlags, SimulatorInterfacePacket, getMockData, gt7parser } from './lib/utils/parser'
 import { logSession, updateSession, logSimulatorInterfacePacket, getCarName } from './lib/SqliteExporter'
 
-type Recording = {
-    recording: boolean,
-}
+
+if (!cds.env.profiles.includes('plc')) {
 
 const LOG = log('sipgt7-service')
-//const environment = process.env.NODE_ENV || 'development';
+
 const bindPort: number =    process.env.GT_VERSION == 'GTS' ? 33340 :
                             process.env.GT_VERSION == 'GT7' ? 33740 : 33340;
 const receivePort: number = process.env.GT_VERSION == 'GTS' ? 33339 :
@@ -38,11 +37,6 @@ module.exports = class SIPGT7Service extends Service {
         // cross service dependencies
         const wsSrv = await cds.connect.to('WebSocketService')
 
-        // web socket message to control recording
-        this.on("Recording", async (msg) => {
-            this.onRecording(msg.data as Recording, wsSrv)
-        })
-
         this.on("driverAssigned", async (msg) => {
             this.driver = msg.data.driver
         })
@@ -59,7 +53,6 @@ module.exports = class SIPGT7Service extends Service {
                 } else {
                     const message = gt7parser.parse(packet) as SimulatorInterfacePacket
                     this.onMessage(message, wsSrv)
-                    // console.log("message recieved")
                 }
             }
         })
@@ -75,11 +68,7 @@ module.exports = class SIPGT7Service extends Service {
             LOG._error && LOG.error(`server error:\n${err.stack}`)
             socket.close()
         })
-
-        
         socket.bind(bindPort)
-        
-
         return super.init()
     }
 
@@ -93,38 +82,25 @@ module.exports = class SIPGT7Service extends Service {
         })
     }
 
-    async onRecording(data: Recording, wsSrv: cds.Service) {
-        // change recording flag
-        this.recording = data.recording
-        if (this.recording) {
-            // reset
-            this.sessionId = null
-            this.lastLapRecorded = false
-        }        
-    }
-
     async onMessage(message: any, wsSrv: cds.Service) {
-        // use UDP headbeat as a gauge of liveness
-
-
-        // record if is in race (lapsInRace > 0) and if not in post-race (lapCount <= lapsInRace) and not in replay 
-        if (message.lapsInRace > 0 && message.lapCount <= message.lapsInRace && !this.recording && message.lapCount > 0) {
-            //console.log('recording')
-            //console.log(message)
-            this.recording = true
-        }
-
+        //send packet to PS5
         if (this.packetCount++ >= 200) {
             this.sendHeartbeat()
-            this.packetCount = 0 // reset loop
+            this.packetCount = 0
         }
 
-        // session handling
+        // record if is in race (lapsInRace > 0) and if not in post-race (lapCount <= lapsInRace) and not in replay 
+        if (message.lapsInRace > 0 && message.lapCount <= message.lapsInRace && message.lapCount > 0) {
+            this.recording = true
+        } else {
+            this.recording = false
+        }
+
+        // start new session
         if (this.recording && !this.sessionId) {
-            // start new session
             this.sessionId = cds.utils.uuid()
             console.log('new session', this.sessionId)
-            this.lastLapRecorded = false
+            this.distance = 0
             logSession(this.sessionId, message, this.driver).catch((reason: any) => {
                 console.error("Error logging session: ", reason);
             });            
@@ -137,51 +113,140 @@ module.exports = class SIPGT7Service extends Service {
             this.distance = 0
         }
 
-        // calculate currentLapTime from sip
+        // update lap infos
         this.lapCounter.update(
             message.lapCount,
             (message.flags & SimulatorFlags.Paused) === SimulatorFlags.Paused,
             message.packetId,
             message.lastLapTime
         )
-        message.currentLapTime = this.lapCounter.getLapTime()
-
         
-        // calculate currentLapTime2 from timeOfDayProgression
-        message.currentLapTime2 = message.timeOfDayProgression - this.startTimeOfDayProgression
-
+        // update lap time
+        message.currentLapTime = message.timeOfDayProgression - this.startTimeOfDayProgression
+        
         // calculate distance ontrack
-        if (((message.flags & SimulatorFlags.Paused) !== SimulatorFlags.Paused)){
+        if (((message.flags & SimulatorFlags.Paused) !== SimulatorFlags.Paused) && this.recording) {
             message.distance = this.distance += message.metersPerSecond * 0.01667
-
         }
 
+        // logging of packet
         if(this.recording && this.sessionId) {
-            //const flags = message.flags as SimulatorFlags
             if ((message.flags & SimulatorFlags.CarOnTrack) === SimulatorFlags.CarOnTrack) {
                 if ((message.flags & SimulatorFlags.LoadingOrProcessing) !== SimulatorFlags.LoadingOrProcessing) {
                     if ((message.flags & SimulatorFlags.Paused) !== SimulatorFlags.Paused) {
-                        if (message.lapCount > 0) {
-                            // check if post race (lapCount > lapsInRace)
-                            if (message.lapCount <= message.lapsInRace) {
-                                await logSimulatorInterfacePacket(this.sessionId, message)
-                            } else if (!this.lastLapRecorded) {
-                                this.lastLapRecorded = true
-                                this.recording = false
-                                wsSrv.emit("STOPRECORDING") // let the racedash know that the race is finished and resets the driver
-                                console.log('stop recording')
-                                // record one sip after last lap to get lastLapTime
-                                await logSimulatorInterfacePacket(this.sessionId, message)
-                                //updateSession(sessionId, true, message.bestLapTime, message.lapsInRace)
-                                await updateSession(this.sessionId, this.driver, true, message)
-                                this.driver = null
-                                this.sessionId = null
-                            }
-                        }
+                        await logSimulatorInterfacePacket(this.sessionId, message)
                     }
                 }
             }
         }
+
+        // session end handling
+        if (!this.recording && this.sessionId) {
+            wsSrv.emit("STOPRECORDING") // let the racedash know that the race is finished and resets the driver
+            LOG.info('stop recording')
+            if (message.lapCount > message.lapsInRace) {
+                await updateSession(this.sessionId, this.driver, true, message)
+                LOG.info('session finished')
+            }
+            this.driver = null
+            this.sessionId = null
+        }
+
+
+        // send message to websocket service
         wsSrv.emit("SIPGT7", message)
     }
+}
+
+    // async onRecording(data: Recording, wsSrv: cds.Service) {
+    //     // change recording flag
+    //     this.recording = data.recording
+    //     if (this.recording) {
+    //         // reset
+    //         this.sessionId = null
+    //         this.lastLapRecorded = false
+    //     }        
+    // }
+
+    // async onMessage(message: any, wsSrv: cds.Service) {
+    //     // use UDP headbeat as a gauge of liveness
+
+
+    //     // record if is in race (lapsInRace > 0) and if not in post-race (lapCount <= lapsInRace) and not in replay 
+    //     if (message.lapsInRace > 0 && message.lapCount <= message.lapsInRace && !this.recording && message.lapCount > 0) {
+    //         //console.log('recording')
+    //         //console.log(message)
+    //         this.recording = true
+    //     }
+
+    //     if (this.packetCount++ >= 200) {
+    //         this.sendHeartbeat()
+    //         this.packetCount = 0 // reset loop
+    //     }
+
+    //     // session handling
+    //     if (this.recording && !this.sessionId) {
+    //         // start new session
+    //         this.sessionId = cds.utils.uuid()
+    //         console.log('new session', this.sessionId)
+    //         this.lastLapRecorded = false
+    //         logSession(this.sessionId, message, this.driver).catch((reason: any) => {
+    //             console.error("Error logging session: ", reason);
+    //         });            
+    //     }
+
+    //     // reset counter
+    //     if (this.lastLap !== message.lapCount) {
+    //         this.lastLap = message.lapCount
+    //         this.startTimeOfDayProgression = message.timeOfDayProgression
+    //         this.distance = 0
+    //     }
+
+    //     // calculate currentLapTime from sip
+    //     this.lapCounter.update(
+    //         message.lapCount,
+    //         (message.flags & SimulatorFlags.Paused) === SimulatorFlags.Paused,
+    //         message.packetId,
+    //         message.lastLapTime
+    //     )
+    //     message.currentLapTime = this.lapCounter.getLapTime()
+
+        
+    //     // calculate currentLapTime2 from timeOfDayProgression
+    //     message.currentLapTime2 = message.timeOfDayProgression - this.startTimeOfDayProgression
+
+    //     // calculate distance ontrack
+    //     if (((message.flags & SimulatorFlags.Paused) !== SimulatorFlags.Paused)){
+    //         message.distance = this.distance += message.metersPerSecond * 0.01667
+
+    //     }
+
+    //     if(this.recording && this.sessionId) {
+    //         //const flags = message.flags as SimulatorFlags
+    //         if ((message.flags & SimulatorFlags.CarOnTrack) === SimulatorFlags.CarOnTrack) {
+    //             if ((message.flags & SimulatorFlags.LoadingOrProcessing) !== SimulatorFlags.LoadingOrProcessing) {
+    //                 if ((message.flags & SimulatorFlags.Paused) !== SimulatorFlags.Paused) {
+    //                     if (message.lapCount > 0) {
+    //                         // check if post race (lapCount > lapsInRace)
+    //                         if (message.lapCount <= message.lapsInRace) {
+    //                             await logSimulatorInterfacePacket(this.sessionId, message)
+    //                         } else if (!this.lastLapRecorded) {
+    //                             this.lastLapRecorded = true
+    //                             this.recording = false
+    //                             wsSrv.emit("STOPRECORDING") // let the racedash know that the race is finished and resets the driver
+    //                             console.log('stop recording')
+    //                             // record one sip after last lap to get lastLapTime
+    //                             await logSimulatorInterfacePacket(this.sessionId, message)
+    //                             //updateSession(sessionId, true, message.bestLapTime, message.lapsInRace)
+    //                             await updateSession(this.sessionId, this.driver, true, message)
+    //                             this.driver = null
+    //                             this.sessionId = null
+    //                         }
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //     }
+    //     wsSrv.emit("SIPGT7", message)
+    // }
 }

@@ -79,9 +79,13 @@ module.exports = class WebSocketService extends Service {
                     case "racedash.event.driver":
                         driver = event?.data?.driver
                         LOG._debug && LOG.debug("racedash.event.driver", driver)
+                        if (!cds.env.profiles.includes('plc')) {
                         const sipgt7Srv = await cds.connect.to('SIPGT7Service')
                         sipgt7Srv.emit("driverAssigned", { driver: driver })
-
+                        } else {
+                            const plcSrv = await cds.connect.to('PLCService')
+                            plcSrv.emit("driverAssigned", { driver: driver })
+                        }
                         
                         // broadcast to all clients
                         // wss.clients.forEach(function each(client) {

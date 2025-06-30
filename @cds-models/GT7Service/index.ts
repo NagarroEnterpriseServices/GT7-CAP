@@ -23,6 +23,7 @@ export function _SessionAspect<TBase extends new (...args: any[]) => object>(Bas
         car?: __.Association.to<Car> | null;
         car_ID?: number | null;
         lapsInRace?: number | null;
+        raceTime?: number | null;
         bestLap?: number | null;
         bestLapTime?: number | null;
         finished?: boolean | null;
@@ -39,6 +40,8 @@ export function _SessionAspect<TBase extends new (...args: any[]) => object>(Bas
         Gear?: __.Composition.of.many<SessionMetrics>;
       static readonly actions: {
         assignDriver: { (sessionID: string | null, driver: string | null): boolean, __parameters: {sessionID: string | null, driver: string | null}, __returns: boolean, kind: 'action'}
+        deleteSession: { (): boolean, __parameters: Record<never, never>, __returns: boolean, kind: 'action'}
+        changeDriver: { (NewDriver: string | null): boolean, __parameters: {NewDriver: string | null}, __returns: boolean, kind: 'action'}
         generateFioriMetrics: { (): boolean, __parameters: Record<never, never>, __returns: boolean, kind: 'function'}
         getLapTimes: { (): Array<_.LapTime>, __parameters: Record<never, never>, __returns: Array<_.LapTime>, kind: 'function'}
         getCompareLaps: { (): Array<_.LapTime>, __parameters: Record<never, never>, __returns: Array<_.LapTime>, kind: 'function'}

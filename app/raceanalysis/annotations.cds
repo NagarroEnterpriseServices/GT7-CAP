@@ -12,7 +12,17 @@ annotate service.Sessions with @(
             //Criticality      : #Positive,
             ![@UI.Importance]: #High
         },
-    ]
+    ],
+    UI.SelectionPresentationVariant #table : {
+        $Type : 'UI.SelectionPresentationVariantType',
+        PresentationVariant : ![@UI.PresentationVariant],
+        SelectionVariant : {
+            $Type : 'UI.SelectionVariantType',
+            SelectOptions : [
+            ],
+        },
+    },
+    
 );
 
 // UI.PresentationVariant (ListReport DefaultSort)
@@ -23,8 +33,16 @@ annotate service.Sessions with @(
                 Property    : createdAt,
                 Descending  : true,
             },
+            {
+                $Type : 'Common.SortOrderType',
+                Property : driver,
+                Descending : false,
+            },
         ],
         Visualizations  : ['@UI.LineItem'],
+        GroupBy : [
+            driver,
+        ],
     },
 );
 
@@ -52,6 +70,11 @@ annotate service.Sessions with @(UI.LineItem: [
         Value: car.name,
     },
     {
+        $Type : 'UI.DataField',
+        Value : raceTime,
+        Label : 'Time',
+    },
+    {
         $Type: 'UI.DataField',
         Label: 'Best Lap Time',
         Value: bestLapTime,
@@ -62,15 +85,16 @@ annotate service.Sessions with @(UI.LineItem: [
         Value: lapsInRace,
     },
     {
-        $Type: 'UI.DataField',
-        Label: 'Max Speed',
-        Value: calculatedMaxSpeed,
+        $Type : 'UI.DataFieldForAction',
+        Action : 'GT7Service.deleteSession',
+        Label : 'Delete',
+        Determining : false,
     },
     {
-        $Type: 'UI.DataField',
-        Label: 'Finished',
-        Value: finished,
-    }
+        $Type : 'UI.DataFieldForAction',
+        Action : 'GT7Service.changeDriver',
+        Label : 'Change Driver',
+    },
 ]);
 
 // UI.HeaderInfo (ObjectPage header info)
@@ -275,3 +299,68 @@ annotate service.Laps with @(UI.LineItem #LapSpeeds: [
     },
 ]);
 
+annotate service.Sessions with {
+    raceTime @Measures.Unit : 's'
+};
+
+annotate service.Sessions with {
+    bestLapTime @Measures.Unit : 's'
+};
+
+annotate service.Sessions with {
+    calculatedMaxSpeed @Measures.Unit : 'km/h'
+};
+annotate service.Sessions with {
+    driver @Common.Label : 'Driver'
+};
+
+
+
+annotate service.SimulatorInterfacePackets with @(
+    Analytics.AggregatedProperty #metersPerSecond_average : {
+        $Type : 'Analytics.AggregatedPropertyType',
+        Name : 'metersPerSecond_average',
+        AggregatableProperty : metersPerSecond,
+        AggregationMethod : 'average',
+        ![@Common.Label] : 'Speed (km/h)',
+    },
+    UI.Chart #chartSection : {
+        $Type : 'UI.ChartDefinitionType',
+        ChartType : #Line,
+        Dimensions : [
+            currentLapTime,
+        ],
+        DynamicMeasures : [
+            '@Analytics.AggregatedProperty#metersPerSecond_average',
+        ],
+        
+    },
+    UI.Chart #chartSection1 : {
+        $Type : 'UI.ChartDefinitionType',
+        ChartType : #Line,
+        Dimensions : [
+            lapCount,
+        ],
+        DynamicMeasures : [
+            '@Analytics.AggregatedProperty#metersPerSecond_average',
+        ],
+    },
+    UI.Chart #chartSection2 : {
+        $Type : 'UI.ChartDefinitionType',
+        ChartType : #Column,
+        Dimensions : [
+            lapCount,
+        ],
+        DynamicMeasures : [
+            '@Analytics.AggregatedProperty#metersPerSecond_average',
+        ],
+    },
+);
+
+annotate service.SimulatorInterfacePackets with {
+    lapCount @Common.Label : 'Lap'
+};
+
+annotate service.SimulatorInterfacePackets with {
+    currentLapTime @Common.Label : 'Time (ms)'
+};

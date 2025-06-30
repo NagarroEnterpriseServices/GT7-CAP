@@ -22,6 +22,11 @@ service GT7Service {
             )
 
             action   assignDriver(sessionID : UUID, driver : String) returns Boolean;
+            
+            action deleteSession() returns Boolean;
+            action changeDriver(NewDriver: String) returns Boolean;
+
+            
             function   generateFioriMetrics() returns Boolean;
             //action   playSimulation();
             function getLapTimes()    returns array of LapTime;
@@ -91,3 +96,68 @@ annotate GT7Service.SessionMetrics with @Analytics.AggregatedProperty #value_ave
     ![@Common.Label]    : 'Value',
 };
 
+
+
+
+annotate GT7Service.SimulatorInterfacePackets with @Aggregation.ApplySupported: {
+    Transformations       : [
+        'aggregate',
+        'topcount',
+        'bottomcount',
+        'identity',
+        'concat',
+        'groupby',
+        'filter',
+        'search'
+    ],
+    Rollup : #None,
+    PropertyRestrictions  : true,
+    GroupableProperties : [
+        currentLapTime,  // time is our dimension
+        lapCount,
+    ],
+    AggregatableProperties : [
+        {
+            Property : velocity,
+        },
+        {
+            Property : engineRPM
+        },
+        {
+            Property : throttle
+        },
+        {
+            Property : brake
+        },
+        {
+            Property : currentGear
+        },
+        {
+            Property : gasLevel
+        },
+        {
+            Property : gasCapacity
+        },
+        {
+            Property : metersPerSecond
+        },
+        {
+            Property : distance
+        },
+        {
+            Property : oilPressure
+        },
+        {
+            Property : waterTemperature
+        },
+        {
+            Property : oilTemperature
+        },
+        {
+            Property : turboBoost
+        },
+        {
+            Property : tireSurfaceTemperature
+        },
+    ]
+};

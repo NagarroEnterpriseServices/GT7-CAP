@@ -54,6 +54,7 @@ export function _SessionAspect<TBase extends new (...args: any[]) => object>(Bas
         car?: __.Association.to<Car> | null;
         car_ID?: number | null;
         lapsInRace?: number | null;
+        raceTime?: number | null;
         bestLap?: number | null;
         bestLapTime?: number | null;
         finished?: boolean | null;

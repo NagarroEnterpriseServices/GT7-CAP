@@ -44,14 +44,9 @@
     "watch:sqlite": "npx cds-ts watch --profile sqlite --open launchpad.html?sap-ui-xx-viewCache=false --livereload false",
     "start": "cds-ts serve",
     "start:sqlite": "cds-ts serve --profile sqlite",
+    "start:plc": "cds-ts serve --profile plc",
     "start:pg": "cds-ts serve --profile pg",
-    "watch-raceanalysis": "cds-ts watch --open raceanalysis/index.html?sap-ui-xx-viewCache=false --livereload false",
-    "db:create": "cds deploy srv --to sqlite",
-    "db:upgrade": "cds deploy --profile sqlite",
-    "db:deploy:model": "cds deploy --model-only --profile sqlite",
-    "db:schema:org": "cds deploy --dry --model-only > cds-model.csn",
-    "db:schema:delta": "cds deploy --dry --delta-from cds-model.csn > delta.sql",
-    "watch-gt7info": "cds watch --open gt7info/index.html?sap-ui-xx-viewCache=false --livereload false",
+    "start:sac": "cds-ts serve --profile sac",
     "postinstall": "npx @cap-js/cds-typer srv --outputDirectory @cds-models"
   },
   "imports": {
@@ -59,11 +54,20 @@
   },
   "cds": {
     "requires": {
+      "[plc]": {
+        "db": {
+          "kind": "sqlite",
+          "credentials": {
+            "url": "db.sqlite"
+          },
+          "schema_evolution": "auto"
+        }
+      },
       "[sqlite]": {
         "db": {
           "kind": "sqlite",
           "credentials": {
-            "database": "db.sqlite"
+            "url": "db.sqlite"
           },
           "schema_evolution": "auto"
         }
@@ -81,15 +85,28 @@
           "schema_evolution": "auto"
         }
       },
-      "sac_service": {
-        "kind": "odata",
-        "model": "srv/external/sac-service",
-        "csrf": true,
-        "credentials": {
-          "url": "https://c6b9a2cf-c3ca-491d-9fba-5e33e656aace.abap.eu10.hana.ondemand.com/sap/opu/odata4/sap/zapi_sessionsv4_o4/srvd_a2x/sap/zapi_sessionsv4_o4/0001",
-          "authentication": "BasicAuthentication",
-          "username": "BTPCAPGT7",
-          "password": "vijkZCxkiaCEsbXRcsdoJiTRjQMvbrCXi%2tWaFP"
+      "[sac]": {
+        "db": {
+          "impl": "@cap-js/postgres",
+          "kind": "postgres",
+          "dialect": "postgres",
+          "vcap": {
+            "label": "postgresql-db",
+            "host": "localhost",
+            "port": 5432
+          },
+          "schema_evolution": "auto"
+        },
+        "sac_service": {
+          "kind": "odata",
+          "model": "srv/external/sac-service",
+          "csrf": true,
+          "credentials": {
+            "url": "https://c6b9a2cf-c3ca-491d-9fba-5e33e656aace.abap.eu10.hana.ondemand.com/sap/opu/odata4/sap/zapi_sessionsv4_o4/srvd_a2x/sap/zapi_sessionsv4_o4/0001",
+            "authentication": "BasicAuthentication",
+            "username": "BTPCAPGT7",
+            "password": "vijkZCxkiaCEsbXRcsdoJiTRjQMvbrCXi%2tWaFP"
+          }
         }
       }
     },

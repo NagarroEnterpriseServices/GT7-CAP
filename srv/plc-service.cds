@@ -1,0 +1,3 @@
+@protocol: 'none'
+service PLCService {
+}
