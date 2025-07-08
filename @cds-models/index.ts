@@ -1,6 +1,6 @@
 // This is an automatically generated file. Please do not change its contents manually!
-import * as __ from './_';
 import * as _sap_common from './sap/common';
+import * as __ from './_';
 export type Language = __.Association.to<_sap_common.Language>;
 export type Currency = __.Association.to<_sap_common.Currency>;
 export type Country = __.Association.to<_sap_common.Country>;
@@ -48,14 +48,3 @@ export function _extensibleAspect<TBase extends new (...args: any[]) => object>(
   };
 }
 export class extensible extends _extensibleAspect(__.Entity) {}
-export function _LapTimeAspect<TBase extends new (...args: any[]) => object>(Base: TBase) {
-  return class LapTime extends Base {
-        lap?: number | null;
-        time?: number | null;
-        best?: boolean | null;
-      static readonly actions: Record<never, never>
-  };
-}
-export class LapTime extends _LapTimeAspect(__.Entity) {}
-Object.defineProperty(LapTime, 'name', { value: 'LapTime' })
-Object.defineProperty(LapTime, 'is_singular', { value: true })

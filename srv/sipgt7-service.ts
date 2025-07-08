@@ -4,7 +4,7 @@ import { Socket, createSocket, RemoteInfo } from 'node:dgram'
 import { decrypt } from './lib/utils/decoder'
 import LapCounter from './lib/utils/lapcounter'
 import { SimulatorFlags, SimulatorInterfacePacket, getMockData, gt7parser } from './lib/utils/parser'
-import { logSession, updateSession, logSimulatorInterfacePacket, getCarName } from './lib/SqliteExporter'
+import { logSession, updateSession, logSimulatorInterfacePacket, getCarName } from './lib/dbInterface'
 
 
 if (!cds.env.profiles.includes('plc')) {

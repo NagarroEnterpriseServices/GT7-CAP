@@ -1,10 +1,19 @@
-import { generateFioriMetrics } from "./FioriExporter"
-import LapCounter from "./utils/lapcounter"
 import cds from "@sap/cds"
 import { Client } from 'pg';
+import { SimulatorInterfacePacket } from "./utils/parser"
 
-const { Sessions, SimulatorInterfacePackets, Cars } = require('#cds-models/gt7')
+
+const { Sessions, SimulatorInterfacePackets, Cars, Laps } = require('#cds-models/gt7')
 let cars: Array<string> = [] // car name cache
+type Laps = {
+    session_ID: string,
+    lap: number,
+    time: number,
+    maxSpeed: number,
+    avgSpeed: number,
+    best: boolean
+}
+
 
 export async function logSession(sessionId: string, sip: any, driver: string) {
 
@@ -19,33 +28,6 @@ export async function logSession(sessionId: string, sip: any, driver: string) {
     }
     
     await INSERT.into(Sessions).entries(payload)
-    
-    // new request for create session in another table
-    // const data =  {
-    //     Id: sessionId,
-    //     Createdat: new Date().toISOString(),
-    //     Lapsinrace: sip.lapsInRace,
-    //     CarId: sip.carCode,
-    //     Timeofday: sip.timeOfDayProgression,
-    //     Bodyheight:  parseFloat(sip.bodyHeight.toPrecision(10)),
-    //     Driver: driver == null ? "" : driver
-    // }
-
-    // console.log("logSession:data")
-    // console.log(data)
-
-    // const api = await cds.connect.to("customrap");
- 
-    // try {
-    //     const result = await api.post('ZC_SESSIONS', data)
-    //     console.log("logSession:result")
-    //     console.log(result)
-    // }
-    // catch (error) {
-    //     console.error("logSession:error")
-    //     console.error(error)
-    // }
-
 }
 
 export async function updateSession(sessionId: string, driver: string, finished: boolean, sip: any) {
@@ -133,6 +115,68 @@ export async function deleteSessions(id: string) {
     }
 }
 
+export async function generateFioriMetrics(sessionID: string) {
+    // delete old data
+    await DELETE
+        .from(Laps)
+        .where({ session_ID: sessionID })
+
+    // get all session simulator packages 
+    const sips: [SimulatorInterfacePacket] = await SELECT
+        .from(SimulatorInterfacePackets)
+        .where({ session_ID: sessionID })
+        .columns(["packetId", "lapCount", "metersPerSecond", "brake", "throttle", "currentLapTime", "lapsInRace"])
+        .orderBy("packetId")
+
+    // write laps
+    await writeLaps(sessionID, sips)
+}
+
+async function writeLaps(sessionID: string, sips: [SimulatorInterfacePacket]) {
+    // insert each lap into Laps
+    let laps: Laps[] = []
+    let speeds: number[] = []
+
+    for (let sip of sips) {
+        if (sip.lapCount != laps.length) {
+            if (laps.length > 0) {
+                laps[laps.length - 1].avgSpeed = speeds.reduce((a, b) => a + b) / speeds.length
+            }
+            laps.push({
+                session_ID: sessionID,
+                lap: sip.lapCount,
+                time: sip.currentLapTime,
+                maxSpeed: sip.metersPerSecond * 3.6,
+                avgSpeed: 0,
+                best: false
+            })
+            speeds = [sip.metersPerSecond * 3.6]
+        } else {
+            laps[laps.length - 1].time = sip.currentLapTime
+            laps[laps.length - 1].maxSpeed = Math.max(laps[laps.length - 1].maxSpeed, sip.metersPerSecond  * 3.6)
+            speeds.push(sip.metersPerSecond * 3.6)
+        }
+    }
+
+    if (laps.length > 0 && speeds.length > 0) {
+        laps[laps.length - 1].avgSpeed = speeds.reduce((a, b) => a + b, 0) / speeds.length;
+    }
+
+    // get best lap
+    const bestLapTime = Math.min(...laps.map(lap => lap.time))
+    laps.forEach(lap => lap.best = lap.time === bestLapTime)
+
+    if (sips?.length > 0 && sips[0].lapsInRace < laps.length) {
+        laps.pop()
+    }
+
+
+    // insert laps
+    for (let lap of laps) {
+        try{await INSERT.into(Laps).entries(lap)}
+        catch(e){console.log('FioriExported::writeLaps ' + e)}
+    }
+}
 
 export async function getBestLap(sessionId: string, bestLapTime: number) {
     const result = await SELECT
@@ -206,9 +250,6 @@ export async function getColorFromData(sessionID: string, sampleRate: number, la
 
     let raceData: string[] = []
     switch (dataType) {
-        case "velocity":
-            raceData = ["velocity_x", "velocity_y", "velocity_z"]
-            break
         case "angularVelocity":
             raceData = ["angularVelocity_x", "angularVelocity_y", "angularVelocity_z"]
             break
@@ -272,23 +313,20 @@ export async function getColorFromData(sessionID: string, sampleRate: number, la
         frames.push(frame)
     }
 
-    // generate for each frames a color (rgb) with green for low values and red for high values and white for middle values
-    const colors: [number[]] = [[]]
+    const colors: number[][] = []
     let counter = sampleRate
     const min = Math.min(...frames)
     const max = Math.max(...frames)
     for (let frame of frames) {
         if (counter++ >= sampleRate) {
-            //map value to 0 - 255
             const value = (frame - min) / (max - min)
             const color = [0, 0, 0]
-
-            if (value < min + (max - min) / 2) {
-                color[1] = 255
-                color[0] = 255 * value
+            if (value < 0.5) {
+                color[1] = 255;
+                color[0] = 255 * (value * 2); // scale to 0..1 then 0..255
             } else {
-                color[0] = 255
-                color[1] = 255 - 255 * value
+                color[0] = 255;
+                color[1] = 255 * (2 - value * 2); // fade green down to 0
             }
             colors.push(color)
             counter = 0

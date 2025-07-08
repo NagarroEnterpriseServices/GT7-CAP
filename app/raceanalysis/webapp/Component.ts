@@ -3,6 +3,15 @@ import Control from "sap/ui/core/Control";
 import XMLView from "sap/ui/core/mvc/XMLView";
 import JSONModel from "sap/ui/model/json/JSONModel";
 
+export type AppManifest = {
+    "sap.app": {
+        id: string,
+        applicationVersion: {
+            version: string
+        }
+    }
+}
+
 /**
  * @namespace raceanalysis
  */
@@ -35,6 +44,13 @@ export default class Component extends BaseComponent {
                 return fnChartDelegateCreateInnerChartContent.call(this, oChart, fnCallbackDataLoaded);
             };
         });
+        
         super.init();
+
+        const appManifest = (this.getManifest() as AppManifest)["sap.app"];
+        const componentId = appManifest.id as string;
+        this.setModel(new JSONModel({
+            path: sap.ui.require.toUrl(componentId?.replace(/\./g, "/")),
+        }), "app");
 	}
 }

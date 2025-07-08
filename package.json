@@ -11,10 +11,7 @@
   "dependencies": {
     "@cap-js/postgres": "^1.11.1",
     "@cap-js/sqlite": "^1",
-    "@cap-js/telemetry": "^1.2.0",
     "@grpc/grpc-js": "^1.10.4",
-    "@opentelemetry/exporter-metrics-otlp-grpc": "^0.51.1",
-    "@opentelemetry/exporter-trace-otlp-grpc": "^0.51.1",
     "@sap-cloud-sdk/http-client": "^3.26.1",
     "@sap-cloud-sdk/resilience": "^3.26.1",
     "@sap/cds-dk": ">=7.6",

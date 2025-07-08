@@ -40,14 +40,14 @@ export default class SessionObjectPage extends Controller {
 
 
         // this.onGenerateMetricsPress();
-        // this.loadLapData();
+        this.loadLapData();
     }
 
     private async loadLapData(): Promise<void> {
         const lapSelect = this.byId("lapSelect") as Select;
-        const lapsTimesLayout = this.byId("lapTimesLayout") as GridContainerItemLayoutData;
-        const speedPerLapLayout = this.byId("speedPerLapLayout") as GridContainerItemLayoutData;
-        const grid = this.byId("gridContainer") as GridContainer;
+        // const lapsTimesLayout = this.byId("lapTimesLayout") as GridContainerItemLayoutData;
+        // const speedPerLapLayout = this.byId("speedPerLapLayout") as GridContainerItemLayoutData;
+        // const grid = this.byId("gridContainer") as GridContainer;
     
         let url = window.location.href + "/Laps";
         url = url.substring(url.indexOf("/Sessions"));
@@ -71,10 +71,10 @@ export default class SessionObjectPage extends Controller {
         }
         
         // set layout rows based on nb laps
-        lapsTimesLayout.setMinRows(data.value.length / 2);
-        speedPerLapLayout.setMinRows(data.value.length / 2);
+        // lapsTimesLayout.setMinRows(data.value.length / 2);
+        // speedPerLapLayout.setMinRows(data.value.length / 2);
 
-        grid.rerender();
+        // grid.rerender();
     }
 
     // private async loadLapSVG(): Promise<void> {

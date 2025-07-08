@@ -1,15 +1,6 @@
 // This is an automatically generated file. Please do not change its contents manually!
 import * as __ from './../_';
 import * as _ from './..';
-// enum
-const SessionMetric_measure = {
-  metersPerSecond: 1,
-  brake: 2,
-  throttle: 3,
-  gear: 4,
-} as const;
-type SessionMetric_measure = 1 | 2 | 3 | 4
-
 export function _Vector3Aspect<TBase extends new (...args: any[]) => object>(Base: TBase) {
   return class Vector3 extends Base {
         x?: number | null;
@@ -64,11 +55,6 @@ export function _SessionAspect<TBase extends new (...args: any[]) => object>(Bas
         trackUrl?: string | null;
         Laps?: __.Association.to.many<Laps>;
         Packets?: __.Composition.of.many<SimulatorInterfacePackets>;
-        Measures?: __.Composition.of.many<SessionMetrics>;
-        Speed?: __.Composition.of.many<SessionMetrics>;
-        Brake?: __.Composition.of.many<SessionMetrics>;
-        Throttle?: __.Composition.of.many<SessionMetrics>;
-        Gear?: __.Composition.of.many<SessionMetrics>;
       static readonly actions: Record<never, never>
   };
 }
@@ -94,25 +80,6 @@ Object.defineProperty(Lap, 'name', { value: 'gt7.Laps' })
 Object.defineProperty(Lap, 'is_singular', { value: true })
 export class Laps extends Array<Lap> {$count?: number}
 Object.defineProperty(Laps, 'name', { value: 'gt7.Laps' })
-
-export function _SessionMetricAspect<TBase extends new (...args: any[]) => object>(Base: TBase) {
-  return class SessionMetric extends Base {
-        session?: __.Association.to<Session>;
-        session_ID?: string;
-        packetId?: number;
-        measure?: SessionMetric_measure;
-        value?: number | null;
-        lapCount?: number | null;
-        currentLapTime?: number | null;
-      static measure = SessionMetric_measure
-      static readonly actions: Record<never, never>
-  };
-}
-export class SessionMetric extends _SessionMetricAspect(__.Entity) {}
-Object.defineProperty(SessionMetric, 'name', { value: 'gt7.SessionMetrics' })
-Object.defineProperty(SessionMetric, 'is_singular', { value: true })
-export class SessionMetrics extends Array<SessionMetric> {$count?: number}
-Object.defineProperty(SessionMetrics, 'name', { value: 'gt7.SessionMetrics' })
 
 export function _SimulatorInterfacePacketAspect<TBase extends new (...args: any[]) => object>(Base: TBase) {
   return class SimulatorInterfacePacket extends Base {

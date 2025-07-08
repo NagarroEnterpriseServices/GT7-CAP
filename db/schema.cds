@@ -1,7 +1,6 @@
 namespace gt7;
 
 using {cuid} from '@sap/cds/common';
-//const { SessionMetric } = require ('../@cds-models/GT7Service')
 
 type Vector3 {
     x : Decimal;
@@ -44,20 +43,6 @@ entity Sessions : cuid {
                              on Laps.session_ID = ID;
     Packets            : Composition of many SimulatorInterfacePackets
                              on Packets.session = $self;
-    Measures           : Composition of many SessionMetrics
-                             on Measures.session = $self;
-    Speed              : Composition of many SessionMetrics
-                             on  Speed.session = $self
-                             and Speed.measure = 1;
-    Brake              : Composition of many SessionMetrics
-                             on  Brake.session = $self
-                             and Brake.measure = 2;
-    Throttle           : Composition of many SessionMetrics
-                             on  Throttle.session = $self
-                             and Throttle.measure = 3;
-    Gear                : Composition of many SessionMetrics
-                             on Gear.session = $self
-                             and Gear.measure = 4;
 }
 
 entity Laps {
@@ -67,22 +52,6 @@ entity Laps {
         maxSpeed   : Decimal;
         avgSpeed   : Decimal;
         best       : Boolean
-}
-
-entity SessionMetrics {
-    key session        : Association to Sessions @UI.HiddenFilter;
-    key packetId       : Int32;
-    key measure        : Integer enum {
-            metersPerSecond = 1;
-            brake           = 2;
-            throttle        = 3;
-            gear            = 4;
-        };
-        value          : Decimal;
-
-        @description: 'Current lap count'
-        lapCount       : Int16                   @title: 'Lap';
-        currentLapTime : Int32                   @title: 'Time';
 }
 
 entity SimulatorInterfacePackets {

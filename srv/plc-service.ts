@@ -2,7 +2,7 @@ import * as cds from '@sap/cds'
 import { Service, log } from '@sap/cds'
 import WebSocket from 'ws'
 import LapCounter from './lib/utils/lapcounter'
-import { logSession, updateSession, logSimulatorInterfacePacket, getCarName } from './lib/SqliteExporter'
+import { logSession, updateSession, logSimulatorInterfacePacket, getCarName } from './lib/dbInterface'
 import { SimulatorFlags } from './lib/utils/parser'
 
 

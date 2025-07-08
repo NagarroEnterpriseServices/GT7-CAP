@@ -3,15 +3,6 @@ import * as __ from './../_';
 import * as _ from './..';
 import * as _gt7 from './../gt7';
 export default { name: 'GT7Service' }
-// enum
-const SessionMetric_measure = {
-  metersPerSecond: 1,
-  brake: 2,
-  throttle: 3,
-  gear: 4,
-} as const;
-type SessionMetric_measure = 1 | 2 | 3 | 4
-
 /**
 * Common.ValueList (ValueHelps)
 */
@@ -33,18 +24,11 @@ export function _SessionAspect<TBase extends new (...args: any[]) => object>(Bas
         trackUrl?: string | null;
         Laps?: __.Association.to.many<Laps>;
         Packets?: __.Composition.of.many<SimulatorInterfacePackets>;
-        Measures?: __.Composition.of.many<SessionMetrics>;
-        Speed?: __.Composition.of.many<SessionMetrics>;
-        Brake?: __.Composition.of.many<SessionMetrics>;
-        Throttle?: __.Composition.of.many<SessionMetrics>;
-        Gear?: __.Composition.of.many<SessionMetrics>;
       static readonly actions: {
         assignDriver: { (sessionID: string | null, driver: string | null): boolean, __parameters: {sessionID: string | null, driver: string | null}, __returns: boolean, kind: 'action'}
         deleteSession: { (): boolean, __parameters: Record<never, never>, __returns: boolean, kind: 'action'}
         changeDriver: { (NewDriver: string | null): boolean, __parameters: {NewDriver: string | null}, __returns: boolean, kind: 'action'}
         generateFioriMetrics: { (): boolean, __parameters: Record<never, never>, __returns: boolean, kind: 'function'}
-        getLapTimes: { (): Array<_.LapTime>, __parameters: Record<never, never>, __returns: Array<_.LapTime>, kind: 'function'}
-        getCompareLaps: { (): Array<_.LapTime>, __parameters: Record<never, never>, __returns: Array<_.LapTime>, kind: 'function'}
         getLapSVG: { (): string, __parameters: Record<never, never>, __returns: string, kind: 'function'}
       }
   };
@@ -54,25 +38,6 @@ Object.defineProperty(Session, 'name', { value: 'GT7Service.Sessions' })
 Object.defineProperty(Session, 'is_singular', { value: true })
 export class Sessions extends Array<Session> {$count?: number}
 Object.defineProperty(Sessions, 'name', { value: 'GT7Service.Sessions' })
-
-export function _SessionMetricAspect<TBase extends new (...args: any[]) => object>(Base: TBase) {
-  return class SessionMetric extends Base {
-        session?: __.Association.to<Session>;
-        session_ID?: string;
-        packetId?: number;
-        measure?: SessionMetric_measure;
-        value?: number | null;
-        lapCount?: number | null;
-        currentLapTime?: number | null;
-      static measure = SessionMetric_measure
-      static readonly actions: Record<never, never>
-  };
-}
-export class SessionMetric extends _SessionMetricAspect(__.Entity) {}
-Object.defineProperty(SessionMetric, 'name', { value: 'GT7Service.SessionMetrics' })
-Object.defineProperty(SessionMetric, 'is_singular', { value: true })
-export class SessionMetrics extends Array<SessionMetric> {$count?: number}
-Object.defineProperty(SessionMetrics, 'name', { value: 'GT7Service.SessionMetrics' })
 
 export function _LapAspect<TBase extends new (...args: any[]) => object>(Base: TBase) {
   return class Lap extends Base {

@@ -8,8 +8,6 @@ module.exports.Session = { is_singular: true, __proto__: csn.Sessions }
 module.exports.Sessions = { is_singular: true, __proto__: csn.Sessions }
 module.exports.Lap = { is_singular: true, __proto__: csn.Laps }
 module.exports.Laps = { is_singular: true, __proto__: csn.Laps }
-module.exports.SessionMetric = { is_singular: true, __proto__: csn.SessionMetrics }
-module.exports.SessionMetrics = { is_singular: true, __proto__: csn.SessionMetrics }
 module.exports.SimulatorInterfacePacket = { is_singular: true, __proto__: csn.SimulatorInterfacePackets }
 module.exports.SimulatorInterfacePackets = { is_singular: true, __proto__: csn.SimulatorInterfacePackets }
 module.exports.Car = { is_singular: true, __proto__: csn.Cars }
@@ -35,4 +33,3 @@ module.exports.Trophies = { is_singular: true, __proto__: csn.Trophies }
 // events
 // actions
 // enums
-module.exports.SessionMetric.measure ??= { metersPerSecond: 1, brake: 2, throttle: 3, gear: 4 }

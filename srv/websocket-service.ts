@@ -2,7 +2,7 @@ import WebSocket from 'ws'
 import * as cds from '@sap/cds'
 import { Service, log } from '@sap/cds'
 import { SimulatorInterfacePacket, getMockData } from './lib/utils/parser'
-import { getCarName } from './lib/SqliteExporter'
+import { getCarName } from './lib/dbInterface'
 
 export type CloudEvent = {
     id: string,

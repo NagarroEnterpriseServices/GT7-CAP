@@ -1,7 +1,6 @@
 import * as cds from '@sap/cds'
 import { ApplicationService, log } from '@sap/cds'
-import { generateFioriMetrics } from './lib/FioriExporter'
-import { getTrackCoordinates, getColorFromData, updateSession, deleteSessions } from './lib/SqliteExporter'
+import { getTrackCoordinates, getColorFromData, updateSession, deleteSessions, generateFioriMetrics } from './lib/dbInterface'
 
 const LOG = log('gt7-service')
 const { Laps, Session, SimulatorInterfacePackets } = require('#cds-models/GT7Service')
@@ -17,18 +16,6 @@ module.exports = class GT7Service extends ApplicationService {
             console.log("generateFioriMetrics", sessionID)
 
             return {}
-        })
-
-        // bound functions
-
-        this.on("getLapTimes", Session, async (req) => {
-            const sessionID = req.params[0] as string
-            return await getLapTimes(sessionID)
-        })
-
-        this.on("getCompareLaps", Session, async (req) => {
-            const sessionID = req.params[0] as string
-            return await getCompareLaps(sessionID)
         })
 
         this.on("assignDriver", Session, async (req) => {
@@ -56,7 +43,9 @@ module.exports = class GT7Service extends ApplicationService {
             await deleteSessions(sessionID)
         })
 
-        // http://localhost:4004/odata/v4/gt7/Sessions(52983d4d-bea3-4d5a-9867-b35639167df1)/GT7Service.getLapSVG()
+
+        //bound functions
+
         // https://gt-engine.com/gt7/tracks/track-maps.html
         this.on("getLapSVG", Session, async (req) => {
             const sessionID = req.params[0] as string
@@ -76,13 +65,18 @@ module.exports = class GT7Service extends ApplicationService {
                 req.query.SELECT.limit = { rows: { val: 100000 }, offset: { val: 0 } };
               }
               const data = await next();
-              const SAMPLING_RATE = 10;
+              const SAMPLING_RATE = 7;
 
               if (!Array.isArray(data)) return data;
+
+              data.map((dat) => {
+                dat.metersPerSecond_average *= 3.6;
+                dat.throttle_average /= 2.5;
+                dat.brake_average /= 2.5
+              })
             
               const downsampled = data.filter((_, index) => index % SAMPLING_RATE === 0);
               downsampled.sort((a, b) => a.currentLapTime - b.currentLapTime);
-            //   LOG.info(`Downsampled from ${data.length} to ${downsampled.length}`);
               return downsampled;
         })
 
@@ -147,151 +141,84 @@ module.exports = class GT7Service extends ApplicationService {
     }
 }
 
-async function getLapTimes(sessionID: string) {
-    const bestLapTime = await getBestLapTime(sessionID)
-
-    if (!bestLapTime) {
-        return []
-    }
-
-    const laps = await SELECT
-        .from(SimulatorInterfacePackets)
-        .where({ session_ID: sessionID })
-        .columns(["lapCount", "lastLapTime"])
-        .groupBy("lapCount", "lastLapTime")
-
-    let results = []
-    for (let lap of laps) {
-        if (lap.lastLapTime !== -1) {
-            results.push({
-                lap: lap.lapCount - 1,
-                time: lap.lastLapTime,
-                best: lap.lastLapTime === bestLapTime
-            })
-        }
-    }
-
-    return results
-}
-
-async function getCompareLaps(sessionID: string) {
-    const bestLapTime = await getBestLapTime(sessionID)
-
-    if (!bestLapTime) {
-        return []
-    }
-
-    const laps = await SELECT
-        .from(SimulatorInterfacePackets)
-        .where({ session_ID: sessionID })
-        .columns(["lapCount", "lastLapTime"])
-        .groupBy("lapCount", "lastLapTime")
-
-    let results = []
-    for (let lap of laps) {
-        if (lap.lastLapTime !== -1 && lap.lastLapTime !== bestLapTime) {
-            results.push({
-                lap: lap.lapCount - 1,
-                time: lap.lastLapTime
-            })
-        }
-    }
-
-    return results
-}
-
-async function getBestLapTime(sessionId: string) {
-    const result = await SELECT
-        .one
-        .from(SimulatorInterfacePackets)
-        .where({ session_ID: sessionId })
-        .columns(["bestLapTime"])
-        .orderBy("packetId desc")
-
-    return result?.bestLapTime
-}
-
 async function getLaps(sessionID: string) {
-    const bestLapTime = await getBestLapTime(sessionID)
-
-    if (!bestLapTime) {
-        return []
-    }
-
-    const sipLaps = await SELECT
-        .from(SimulatorInterfacePackets)
+    const laps = await SELECT
+        .from(Laps)
         .where({ session_ID: sessionID })
-        .columns(["lapCount", "lastLapTime"])
-        .groupBy("lapCount", "lastLapTime")
 
-    let laps: any = []
-    for (let lap of sipLaps) {
-        if (lap.lastLapTime !== -1) {
-            laps.push({
-                session_ID: sessionID,
-                lap: lap.lapCount - 1,
-                time: lap.lastLapTime,
-                best: lap.lastLapTime === bestLapTime
-            })
-        }
-    }
-    laps.$count = laps.length
-
+    LOG.info(laps)
     return laps
+    
 }
 
-async function getCompareLapsSVG(sessionID: string) {
-    if (!sessionID) {
-        return
+async function getCompareLapsSVG(sessionID: string): Promise<string | undefined> {
+    if (!sessionID) return;
+
+    const laps = await getLaps(sessionID);
+    if (laps.length === 0) return;
+
+    const baseCoords = await getTrackCoordinates(sessionID, 1, 1);
+
+    // Bounding box calc
+    let xMin = 100000, xMax = -100000, yMin = 100000, yMax = -100000;
+    for (const [x, y] of baseCoords) {
+        xMin = Math.min(xMin, x);
+        xMax = Math.max(xMax, x);
+        yMin = Math.min(yMin, y);
+        yMax = Math.max(yMax, y);
     }
-    const laps = await getLaps(sessionID)
-    const polyCoords = await getTrackCoordinates(sessionID, 1, 1)
 
-    if (laps.length === 0) {
-        return
+    yMin -= laps.length >= 3? 40 * laps.length : 40 * 3; // Adjust yMin based on number of laps
+    yMax += laps.length >= 3? 40 * laps.length : 40 * 3;
+
+    const lapColors = [
+        "red", "blue", "orange", "purple", "cyan", "magenta", "yellow", "pink", "brown", "gray"
+      ];
+
+    const pad = 10;
+    const viewBox = `${xMin - pad} ${yMin - pad} ${(xMax - xMin) + 2 * pad} ${(yMax - yMin) + 2 * pad}`;
+    let svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewBox}">`;
+
+    const maxRows = 3;
+    const columnWidth = 180;  // width reserved per column
+    const rowHeight = 40;     // vertical space per entry
+
+    svg += `<g font-size="36" font-family="Arial" fill="white">`;
+
+    laps.forEach((lap: { best: boolean; lap: number }, i: number) => {
+        const col = Math.floor(i / maxRows);
+        const row = i % maxRows;
+
+        const x = xMin + pad + col * columnWidth;
+        const y = yMin - pad + 10 + row * rowHeight;
+
+        const color = lap.best ? "limegreen" : lapColors[(lap.lap - 1) % lapColors.length];
+        const label = `Lap ${lap.lap}${lap.best ? " (Best)" : ""}`;
+
+        svg += `
+            <circle cx="${x}" cy="${y + 30}" r="10" fill="${color}" stroke="black" stroke-width="0.5"/>
+            <text x="${x + 20}" y="${y + 40}" fill="white">${label}</text>
+        `;
+    });
+
+    svg += `</g>`;
+
+
+    for (const lap of laps) {
+        const coords = await getTrackCoordinates(sessionID, 1, lap.lap);
+        const pathStr = coords.map(([x, y]) => `${x} ${y + (laps.length >= 3? 40 * laps.length : 40 * 3)}`).join(" ");
+          const color = lap.best ? "limegreen" : lapColors[(lap.lap - 1) % lapColors.length];
+        const start = coords[0];
+
+        svg += `<g>
+            <path d="M ${pathStr}" fill="none" stroke="${color}" stroke-width="4"/>
+            <title>Lap ${lap.lap}${lap.best ? " (Best Lap)" : ""}</title>
+            <text x="${start[0]}" y="${start[1]}" font-size="10" fill="${color}" text-anchor="middle" dy="-5">#${lap.lap}</text>
+        </g>`;
     }
 
-    let xMin = 100000, xMax = -100000, yMin = 100000, yMax = -100000
-        for (let coord of polyCoords) {
-            if (coord[0] < xMin) {
-                xMin = coord[0]
-            }
-            if (coord[0] > xMax) {
-                xMax = coord[0]
-            }
-            if (coord[1] < yMin) {
-                yMin = coord[1]
-            }
-            if (coord[1] > yMax) {
-                yMax = coord[1]
-            }
-        }
-
-        // some padding
-        const pad = 10
-        xMin -= pad
-        yMin -= pad
-        xMax += pad
-        yMax += pad
-
-        // distance
-        xMax = Math.abs(xMin) + Math.abs(xMax)
-        yMax = Math.abs(yMin) + Math.abs(yMax)
-
-    let svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${xMin} ${yMin} ${xMax} ${yMax}">`
-    for (let lap of laps) {
-        const path = await getTrackCoordinates(sessionID, 1, lap.lap)
-        const color = lap.best ? "green" : lap.lap === 1 ? "red" : lap.lap === 2 ? "blue" : lap.lap === 3 ? "yellow" : "white"
-        svg += `<path d="M ${path}" fill="none" stroke="${color}" stroke-width="4"/>`
-    }
-    // draw best lap on top
-    const bestLap = laps.find((lap: any) => lap.best)
-    if (bestLap) {
-        const path = await getTrackCoordinates(sessionID, 1, bestLap.lap)
-        svg += `<path d="M ${path}" fill="none" stroke="green" stroke-width="4"/>`
-    }
-    svg += "</svg>"
-    return svg
+    svg += "</svg>";
+    return svg;
 }
 
 async function getLapSVG(sessionID: string, lapCount: number = 1, data: string = null) {
@@ -333,18 +260,16 @@ async function getLapSVG(sessionID: string, lapCount: number = 1, data: string =
 
         // create SVG with pathcolor which is a list of rgb colors
         let svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${xMin} ${yMin} ${xMax} ${yMax}">`
+        svg += `<image href="{app>/path}/tracks/high-speed-ring.png" x="${xMin}" y="${yMin}" width="${xMax}" height="${yMax}" />`
         svg += `<path d="M ${path}" fill="none" stroke="white" stroke-width="4"/>`
         if (data !== null) {
             for (let i = 0; i < polyCoords.length; i++) {
                 const color = pathColor[i]
-                svg += `<circle cx="${polyCoords[i][0]}" cy="${polyCoords[i][1]}" r="6" fill="rgb(${color[0]},${color[1]},${color[2]})"/>`
+                svg += 
+                `<circle cx="${polyCoords[i][0]}" cy="${polyCoords[i][1]}" r="6" fill="rgb(${color[0]},${color[1]},${color[2]})" data-tooltip="${data}: TEST" class="track-data-point"/>`
             }
         }
         svg += "</svg>"
-
-
-
-
         return svg
     } else {
         return ''

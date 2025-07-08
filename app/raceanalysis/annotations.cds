@@ -179,86 +179,6 @@ annotate service.Sessions with {
     }
 };
 
-annotate service.SessionMetrics with @(
-    UI.Chart #chartSectionSpeed                     : {
-        $Type              : 'UI.ChartDefinitionType',
-        ChartType          : #Line,
-        Dimensions         : [
-            currentLapTime,
-            lapCount
-        ],
-        DimensionAttributes: [
-            {
-                $Type    : 'UI.ChartDimensionAttributeType',
-                Dimension: currentLapTime,
-                Role     : #Category,
-            },
-            {
-                $Type    : 'UI.ChartDimensionAttributeType',
-                Dimension: lapCount,
-                Role     : #Series,
-            },
-        ],
-        DynamicMeasures    : ['@Analytics.AggregatedProperty#value_average'],
-        Title              : 'Speed analysis',
-    }
-);
-
-
-// annotate service.SessionMetrics with @(UI.Chart #chartSection2: {
-//     $Type              : 'UI.ChartDefinitionType',
-//     ChartType          : #Line,
-//     Dimensions         : [
-//         currentLapTime,
-//         lapCount
-//     ],
-//     DimensionAttributes: [
-//         {
-//             $Type    : 'UI.ChartDimensionAttributeType',
-//             Dimension: currentLapTime,
-//             Role     : #Category,
-//         },
-//         {
-//             $Type    : 'UI.ChartDimensionAttributeType',
-//             Dimension: lapCount,
-//             Role     : #Series,
-//         },
-//     ],
-//     DynamicMeasures    : ['@Analytics.AggregatedProperty#value_average'],
-//     Title              : 'Brake analysis',
-// });
-
-annotate service.SessionMetrics with @(
-    UI.SelectionFields                        : [lapCount]
-){
-    @Common.ValueList: {
-            Label         : 'Value with Value Help',
-            CollectionPath: 'Laps',
-            Parameters    : [
-                {
-                    $Type : 'Common.ValueListParameterIn',
-                    LocalDataProperty : session.ID,
-                    ValueListProperty : 'session_ID',
-                },
-                {
-                    $Type : 'Common.ValueListParameterInOut',
-                    LocalDataProperty : lapCount,
-                    ValueListProperty : 'lap',
-                },
-                {
-                    $Type : 'Common.ValueListParameterDisplayOnly',
-                    ValueListProperty : 'time'
-                },
-                {
-                    $Type : 'Common.ValueListParameterDisplayOnly',
-                    ValueListProperty : 'best',
-                },
-            ]
-          }
-          @Common.ValueListWithFixedValues: true
-    lapCount;
-};
-
 annotate service.Laps with @(UI.LineItem #LapTimes: [
     {
         $Type: 'UI.DataField',
@@ -324,6 +244,27 @@ annotate service.SimulatorInterfacePackets with @(
         AggregationMethod : 'average',
         ![@Common.Label] : 'Speed (km/h)',
     },
+    Analytics.AggregatedProperty #throttle_average : {
+        $Type : 'Analytics.AggregatedPropertyType',
+        Name : 'throttle_average',
+        AggregatableProperty : throttle,
+        AggregationMethod : 'average',
+        ![@Common.Label] : 'Throttle (%)',
+    },
+    Analytics.AggregatedProperty #brake_average : {
+        $Type : 'Analytics.AggregatedPropertyType',
+        Name : 'brake_average',
+        AggregatableProperty : brake,
+        AggregationMethod : 'average',
+        ![@Common.Label] : 'Brake (%)',
+    },
+    Analytics.AggregatedProperty #engineRPM_average : {
+        $Type : 'Analytics.AggregatedPropertyType',
+        Name : 'engineRPM_average',
+        AggregatableProperty : engineRPM,
+        AggregationMethod : 'average',
+        ![@Common.Label] : 'Engine (rpm)'
+    },
     UI.Chart #chartSection : {
         $Type : 'UI.ChartDefinitionType',
         ChartType : #Line,
@@ -334,26 +275,6 @@ annotate service.SimulatorInterfacePackets with @(
             '@Analytics.AggregatedProperty#metersPerSecond_average',
         ],
         
-    },
-    UI.Chart #chartSection1 : {
-        $Type : 'UI.ChartDefinitionType',
-        ChartType : #Line,
-        Dimensions : [
-            lapCount,
-        ],
-        DynamicMeasures : [
-            '@Analytics.AggregatedProperty#metersPerSecond_average',
-        ],
-    },
-    UI.Chart #chartSection2 : {
-        $Type : 'UI.ChartDefinitionType',
-        ChartType : #Column,
-        Dimensions : [
-            lapCount,
-        ],
-        DynamicMeasures : [
-            '@Analytics.AggregatedProperty#metersPerSecond_average',
-        ],
     },
 );
 

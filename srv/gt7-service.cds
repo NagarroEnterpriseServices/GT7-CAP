@@ -1,42 +1,18 @@
 using {gt7 as my} from '../db/schema';
 
-type LapTime {
-    lap  : Int16;
-    time : Int32;
-    best : Boolean;
-}
-
 @protocol: 'odata'
 service GT7Service {
     @readonly
     entity Sessions                  as select from my.Sessions
         actions {
-            @(
-                //  Update the UI after action
-                cds.odata.bindingparameter.name: '_it',
-                Common.SideEffects             : {TargetEntities: [
-                    '_it/Speed',
-                    '_it/Throttle',
-                    '_it/Brake'
-                ]}
-            )
-
-            action   assignDriver(sessionID : UUID, driver : String) returns Boolean;
-            
+            action assignDriver(sessionID : UUID, driver : String) returns Boolean;
             action deleteSession() returns Boolean;
             action changeDriver(NewDriver: String) returns Boolean;
 
             
-            function   generateFioriMetrics() returns Boolean;
-            //action   playSimulation();
-            function getLapTimes()    returns array of LapTime;
-            function getCompareLaps() returns array of LapTime;
+            function generateFioriMetrics() returns Boolean;
             function getLapSVG()      returns String;
         };
-
-    @readonly
-    @Capabilities.SearchRestrictions.Searchable: false
-    entity SessionMetrics            as select from my.SessionMetrics order by currentLapTime;
 
     @readonly
     entity Laps                      as select from my.Laps;
@@ -78,25 +54,6 @@ service GT7Service {
 
     action test();
 }
-
-annotate GT7Service.SessionMetrics with @Aggregation.ApplySupported: {
-    AggregatableProperties: [{Property: value, }, ],
-    GroupableProperties   : [
-        currentLapTime,
-        lapCount
-    ],
-};
-
-
-annotate GT7Service.SessionMetrics with @Analytics.AggregatedProperty #value_average: {
-    $Type               : 'Analytics.AggregatedPropertyType',
-    Name                : 'value_average',
-    AggregatableProperty: value,
-    AggregationMethod   : 'average',
-    ![@Common.Label]    : 'Value',
-};
-
-
 
 
 annotate GT7Service.SimulatorInterfacePackets with @Aggregation.ApplySupported: {
