@@ -60,3 +60,7 @@ GET {{host}}{{path}}SimulatorInterfacePackets?$filter=lapCount eq 5&$orderby=pac
 
 
 ### insert test data
+POST http://localhost:4004/odata/v4/exposition/test
+Content-Type: application/json
+
+{}

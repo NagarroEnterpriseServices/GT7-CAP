@@ -867,6 +867,9 @@
         }
       }
     },
+    "ExpositionService.test": {
+      "kind": "action"
+    },
     "GT7Service": {
       "@source": "srv/gt7-service.cds",
       "kind": "service",

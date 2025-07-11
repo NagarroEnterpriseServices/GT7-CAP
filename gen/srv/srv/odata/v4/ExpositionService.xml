@@ -18,6 +18,7 @@
       </Annotation>
       <EntityContainer Name="EntityContainer">
         <EntitySet Name="TLT_PS5GT7_RawData" EntityType="ExpositionService.TLT_PS5GT7_RawData"/>
+        <ActionImport Name="test" Action="ExpositionService.test"/>
       </EntityContainer>
       <EntityType Name="TLT_PS5GT7_RawData">
         <Key>
@@ -45,6 +46,7 @@
         <Property Name="preRaceStartPositionOrQualiPos" Type="Edm.Int32"/>
         <Property Name="rowDate" Type="Edm.DateTimeOffset" DefaultValue="2025-07-10 14:51:37"/>
       </EntityType>
+      <Action Name="test" IsBound="false"/>
       <Annotations Target="ExpositionService.TLT_PS5GT7_RawData/session_ID">
         <Annotation Term="Core.ComputedDefaultValue" Bool="true"/>
       </Annotations>
