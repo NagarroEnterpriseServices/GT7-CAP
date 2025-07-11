@@ -264,13 +264,13 @@ entity Courses {
         noRain          : Boolean;
 }
 
-entity EngineSwaps {
+entity EngineSwaps : cuid{
     newCar      : Integer;
     originalCar : Integer;
     engineName  : String(200);
 }
 
-entity LotteryCars {
+entity LotteryCars : cuid{
     category : String(200);
     carID    : Integer;
 }
@@ -287,7 +287,35 @@ entity StockPerformances {
     key tyre : String(2);
 }
 
-entity Trophies {
+entity Trophies : cuid{
     name : String(200);
     car  : Association to Cars;
+}
+
+
+@cds.persistence.exists
+entity TLT_PS5GT7_RawData {
+  
+  key session_ID : UUID @EndUserText.label: 'session_ID';
+  key packetId   : Integer @EndUserText.label: 'packetId';
+
+  Source      : String(50)  default 'Nagarro_Stbg' @EndUserText.label: 'Source';
+  sessionDateTime : DateTime @EndUserText.label: 'Session_DateTime';
+  Driver      : String(100) default 'TEST' @EndUserText.label: 'Driver';
+  carID       : Integer     @EndUserText.label: 'Car ID';
+  engineRPM   : Integer     @EndUserText.label: 'engineRPM';
+  metersPerSecond : DecimalFloat @EndUserText.label: 'metersPerSecond';
+  lapCount    : Integer     @EndUserText.label: 'lapCount';
+  lapsInRace  : Integer     @EndUserText.label: 'lapsInRace';
+  currentLapTime2 : Integer @EndUserText.label: 'currentLapTime2';
+  lastLapTime : Integer     @EndUserText.label: 'lastLapTime';
+  timeOfDayProgression : Integer64 @EndUserText.label: 'timeOfDayProgression';
+  throttle    : Integer     @EndUserText.label: 'throttle';
+  brake       : Integer     @EndUserText.label: 'brake';
+  clutchPedal : Integer     @EndUserText.label: 'clutchPedal';
+  currentGear : Integer @EndUserText.label: 'currentGear';
+  flags       : Integer     @EndUserText.label: 'flags';
+  preRaceStartPositionOrQualiPos : Integer @EndUserText.label: 'preRaceStartPositionOrQualiPos'; 
+  rowDate     : DateTime default timestamp'2025-07-10 14:51:37' @EndUserText.label: 'RowDate';
+
 }

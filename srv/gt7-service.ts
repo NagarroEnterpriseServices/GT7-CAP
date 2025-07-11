@@ -93,7 +93,7 @@ module.exports = class GT7Service extends ApplicationService {
                 LOG.info("getLapSVG")
 
                 if (lap && data) {
-                    const svg = await getLapSVG(ID, parseInt(lap), data)
+                    const svg = await getLapSVG(ID, parseInt(String(lap)), String(data))
                     return {
                         //value: Readable.from([svg]),
                         value: svg, // seems to be auto handled

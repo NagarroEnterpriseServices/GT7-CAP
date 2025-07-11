@@ -1,0 +1,17 @@
+{
+	"GT7_btp_dwc": {
+		"object_owner": {
+			"roles": [],
+			"container_roles": [],
+			"object_privileges": [
+                {
+				  "type": "VIEW",
+				  "name": "TLT_PS5GT7_RAWDATA",
+				  "privileges_with_grant_option": [
+				    "SELECT"
+				  ]
+				}
+			]
+		}
+	}
+}

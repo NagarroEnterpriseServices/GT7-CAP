@@ -1,0 +1,2808 @@
+{
+  "namespace": "gt7",
+  "definitions": {
+    "gt7.Vector3": {
+      "kind": "type",
+      "elements": {
+        "x": {
+          "type": "cds.Decimal"
+        },
+        "y": {
+          "type": "cds.Decimal"
+        },
+        "z": {
+          "type": "cds.Decimal"
+        }
+      }
+    },
+    "gt7.Vector3Rotation": {
+      "kind": "type",
+      "elements": {
+        "pitch": {
+          "type": "cds.Decimal"
+        },
+        "yaw": {
+          "type": "cds.Decimal"
+        },
+        "roll": {
+          "type": "cds.Decimal"
+        }
+      }
+    },
+    "gt7.Wheel": {
+      "kind": "type",
+      "elements": {
+        "fl": {
+          "type": "cds.Decimal"
+        },
+        "fr": {
+          "type": "cds.Decimal"
+        },
+        "rl": {
+          "type": "cds.Decimal"
+        },
+        "rr": {
+          "type": "cds.Decimal"
+        }
+      }
+    },
+    "gt7.Sessions": {
+      "kind": "entity",
+      "includes": [
+        "cuid"
+      ],
+      "elements": {
+        "ID": {
+          "key": true,
+          "type": "cds.UUID"
+        },
+        "createdAt": {
+          "type": "cds.Timestamp"
+        },
+        "driver": {
+          "type": "cds.String",
+          "length": 200
+        },
+        "car": {
+          "type": "cds.Association",
+          "target": "gt7.Cars",
+          "keys": [
+            {
+              "ref": [
+                "ID"
+              ]
+            }
+          ]
+        },
+        "lapsInRace": {
+          "type": "cds.Int16"
+        },
+        "raceTime": {
+          "type": "cds.Int32"
+        },
+        "bestLap": {
+          "type": "cds.Int16"
+        },
+        "bestLapTime": {
+          "type": "cds.Int32"
+        },
+        "finished": {
+          "type": "cds.Boolean",
+          "default": {
+            "val": false
+          }
+        },
+        "timeOfDay": {
+          "type": "cds.Int32"
+        },
+        "calculatedMaxSpeed": {
+          "type": "cds.Int16"
+        },
+        "bodyHeight": {
+          "type": "cds.Decimal"
+        },
+        "trackUrl": {
+          "@Core.IsURL": true,
+          "@Core.MediaType": "image/svg+xml",
+          "@Core.AcceptableMediaTypes": [
+            "image/svg+xml",
+            "image/png",
+            "application/json"
+          ],
+          "@Core.Computed": true,
+          "virtual": true,
+          "type": "cds.String"
+        },
+        "Laps": {
+          "type": "cds.Association",
+          "cardinality": {
+            "max": "*"
+          },
+          "target": "gt7.Laps",
+          "on": [
+            {
+              "ref": [
+                "Laps",
+                "session_ID"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "ID"
+              ]
+            }
+          ]
+        },
+        "Packets": {
+          "type": "cds.Composition",
+          "cardinality": {
+            "max": "*"
+          },
+          "target": "gt7.SimulatorInterfacePackets",
+          "on": [
+            {
+              "ref": [
+                "Packets",
+                "session"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "$self"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "gt7.Laps": {
+      "kind": "entity",
+      "elements": {
+        "session_ID": {
+          "key": true,
+          "type": {
+            "ref": [
+              "gt7.Sessions",
+              "ID"
+            ]
+          }
+        },
+        "lap": {
+          "key": true,
+          "type": "cds.Int16"
+        },
+        "time": {
+          "type": "cds.Int32"
+        },
+        "maxSpeed": {
+          "type": "cds.Decimal"
+        },
+        "avgSpeed": {
+          "type": "cds.Decimal"
+        },
+        "best": {
+          "type": "cds.Boolean"
+        }
+      }
+    },
+    "gt7.SimulatorInterfacePackets": {
+      "kind": "entity",
+      "elements": {
+        "session": {
+          "@description": "Id of the session all packets belong to",
+          "key": true,
+          "type": "cds.Association",
+          "target": "gt7.Sessions",
+          "keys": [
+            {
+              "ref": [
+                "ID"
+              ]
+            }
+          ]
+        },
+        "packetId": {
+          "@description": "Id of the packet for proper ordering",
+          "key": true,
+          "type": "cds.Int32"
+        },
+        "car": {
+          "@description": "Internal code that identifies the car",
+          "type": "cds.Association",
+          "target": "gt7.Cars",
+          "keys": [
+            {
+              "ref": [
+                "ID"
+              ]
+            }
+          ]
+        },
+        "position": {
+          "@description": "Position on the track. Track units are in meters",
+          "type": "gt7.Vector3"
+        },
+        "velocity": {
+          "@description": "Velocity in track units (which are meters) for each axis",
+          "type": "gt7.Vector3"
+        },
+        "rotation": {
+          "@description": "Rotation (Pitch/Yaw/Roll) from -1 to 1",
+          "type": "gt7.Vector3Rotation"
+        },
+        "relativeOrientationToNorth": {
+          "@description": "Orientation to North. 1.0 is north, 0.0 is south",
+          "type": "cds.Decimal"
+        },
+        "angularVelocity": {
+          "@description": "How fast the car turns around axes. (In radians/second, -1 to 1)",
+          "type": "gt7.Vector3"
+        },
+        "bodyHeight": {
+          "@description": "Body height",
+          "type": "cds.Decimal"
+        },
+        "engineRPM": {
+          "@description": "Engine revolutions per minute",
+          "type": "cds.Decimal"
+        },
+        "gasLevel": {
+          "@description": "Gas level for the current car (in liters, from 0 to GasCapacity",
+          "type": "cds.Decimal"
+        },
+        "gasCapacity": {
+          "@description": "Max gas capacity for the current car",
+          "type": "cds.Decimal"
+        },
+        "metersPerSecond": {
+          "@description": "Current speed in meters per second. <see cref=\"MetersPerSecond * 3.6\"/> to get it in KPH",
+          "type": "cds.Decimal"
+        },
+        "distance": {
+          "@description": "Current distance on track in meter (metersPerSecond / lapTick)",
+          "type": "cds.Decimal"
+        },
+        "turboBoost": {
+          "@description": "Value below 1.0 is below 0 ingame, so 2.0 = 1 x 100kPa",
+          "type": "cds.Decimal"
+        },
+        "oilPressure": {
+          "@description": "Oil Pressure (in Bars)",
+          "type": "cds.Decimal"
+        },
+        "waterTemperature": {
+          "@description": "Games will always send 85 (in °C)",
+          "type": "cds.Decimal"
+        },
+        "oilTemperature": {
+          "@description": "Games will always send 110 (in °C)",
+          "type": "cds.Decimal"
+        },
+        "lapCount": {
+          "@description": "Current lap count",
+          "type": "cds.Int16"
+        },
+        "lapsInRace": {
+          "@description": "Laps to finish",
+          "type": "cds.Int16"
+        },
+        "currentLapTime": {
+          "@description": "Current Lap Time",
+          "type": "cds.Int32"
+        },
+        "currentLapTime2": {
+          "type": "cds.Int32"
+        },
+        "bestLapTime": {
+          "@description": "Best Lap Time",
+          "type": "cds.Int32"
+        },
+        "lastLapTime": {
+          "@description": "Last Lap Time",
+          "type": "cds.Int32"
+        },
+        "timeOfDayProgression": {
+          "@description": "Current time of day on the track",
+          "type": "cds.Int32"
+        },
+        "preRaceStartPositionOrQualiPos": {
+          "@description": "Position of the car before the race has started",
+          "type": "cds.Int16"
+        },
+        "numCarsAtPreRace": {
+          "@description": "Number of cars in the race before the race has started",
+          "type": "cds.Int16"
+        },
+        "minAlertRPM": {
+          "@description": "Minimum RPM to which the rev limiter shows an alert",
+          "type": "cds.Int16"
+        },
+        "maxAlertRPM": {
+          "@description": "Maximum RPM to the rev limiter alert",
+          "type": "cds.Int16"
+        },
+        "calculatedMaxSpeed": {
+          "@description": "Possible max speed achievable using the current transmission settings",
+          "type": "cds.Int16"
+        },
+        "flags": {
+          "@description": "Packet flags (see Flags.ts)",
+          "type": "cds.Int16"
+        },
+        "currentGear": {
+          "@description": "Current Gear for the car",
+          "type": "cds.Int16"
+        },
+        "suggestedGear": {
+          "@description": "(Assist) Suggested Gear to downshift to",
+          "type": "cds.Int16"
+        },
+        "throttle": {
+          "@description": "Throttle (0-255)",
+          "type": "cds.Int16"
+        },
+        "brake": {
+          "@description": "Brake Pedal (0-255)",
+          "type": "cds.Int16"
+        },
+        "roadPlane": {
+          "@description": "",
+          "type": "gt7.Vector3"
+        },
+        "roadPlaneDistance": {
+          "@description": "",
+          "type": "cds.Decimal"
+        },
+        "tireRadius": {
+          "@description": "Tire - Tire Radius (in Meters)",
+          "type": "gt7.Wheel"
+        },
+        "tireSuspensionHeight": {
+          "@description": "Tire - Suspension Height",
+          "type": "gt7.Wheel"
+        },
+        "tireSurfaceTemperature": {
+          "@description": "Tire - Surface Temperature (in °C)",
+          "type": "gt7.Wheel"
+        },
+        "wheelRevPerSecond": {
+          "@description": "Wheel - Revolutions Per Second (in Radians)",
+          "type": "gt7.Wheel"
+        },
+        "clutchPedal": {
+          "@description": "0.0 to 1.0",
+          "type": "cds.Decimal"
+        },
+        "clutchEngagement": {
+          "@description": "0.0 to 1.0",
+          "type": "cds.Decimal"
+        },
+        "rpmFromClutchToGearbox": {
+          "@description": "Basically same as engine rpm when in gear and the clutch pedal is not depressed",
+          "type": "cds.Decimal"
+        },
+        "transmissionTopSpeed": {
+          "@description": "Top Speed (as a Gear Ratio value)",
+          "type": "cds.Decimal"
+        }
+      }
+    },
+    "gt7.Cars": {
+      "kind": "entity",
+      "elements": {
+        "ID": {
+          "key": true,
+          "type": "cds.Integer"
+        },
+        "name": {
+          "type": "cds.String",
+          "length": 200
+        },
+        "maker": {
+          "type": "cds.Association",
+          "target": "gt7.Makers",
+          "keys": [
+            {
+              "ref": [
+                "ID"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "gt7.CarGroups": {
+      "kind": "entity",
+      "elements": {
+        "ID": {
+          "key": true,
+          "type": "cds.Integer"
+        },
+        "group": {
+          "type": "cds.String",
+          "length": 200
+        }
+      }
+    },
+    "gt7.Countries": {
+      "kind": "entity",
+      "elements": {
+        "ID": {
+          "key": true,
+          "type": "cds.Integer"
+        },
+        "name": {
+          "type": "cds.String",
+          "length": 200
+        },
+        "code": {
+          "type": "cds.String",
+          "length": 3
+        }
+      }
+    },
+    "gt7.CourseBases": {
+      "kind": "entity",
+      "elements": {
+        "ID": {
+          "key": true,
+          "type": "cds.Integer"
+        },
+        "name": {
+          "type": "cds.String",
+          "length": 200
+        },
+        "logoName": {
+          "type": "cds.String",
+          "length": 200
+        }
+      }
+    },
+    "gt7.Courses": {
+      "kind": "entity",
+      "elements": {
+        "ID": {
+          "key": true,
+          "type": "cds.Integer"
+        },
+        "name": {
+          "type": "cds.String",
+          "length": 200
+        },
+        "base": {
+          "type": "cds.Association",
+          "target": "gt7.CourseBases",
+          "keys": [
+            {
+              "ref": [
+                "ID"
+              ]
+            }
+          ]
+        },
+        "country": {
+          "type": "cds.Association",
+          "target": "gt7.Countries",
+          "keys": [
+            {
+              "ref": [
+                "ID"
+              ]
+            }
+          ]
+        },
+        "category": {
+          "type": "cds.String",
+          "length": 200
+        },
+        "length": {
+          "type": "cds.Integer"
+        },
+        "longestStraight": {
+          "type": "cds.Integer"
+        },
+        "elevationDiff": {
+          "type": "cds.Decimal"
+        },
+        "altitude": {
+          "type": "cds.Decimal"
+        },
+        "minTimeH": {
+          "type": "cds.Integer"
+        },
+        "minTimeM": {
+          "type": "cds.Integer"
+        },
+        "minTimeS": {
+          "type": "cds.Integer"
+        },
+        "maxTimeH": {
+          "type": "cds.Integer"
+        },
+        "maxTimeM": {
+          "type": "cds.Integer"
+        },
+        "maxTimeS": {
+          "type": "cds.Integer"
+        },
+        "layoutNumber": {
+          "type": "cds.Integer"
+        },
+        "isReverse": {
+          "type": "cds.Boolean"
+        },
+        "pitLaneDelta": {
+          "type": "cds.Decimal"
+        },
+        "isOval": {
+          "type": "cds.Boolean"
+        },
+        "numCorners": {
+          "type": "cds.Integer"
+        },
+        "noRain": {
+          "type": "cds.Boolean"
+        }
+      }
+    },
+    "gt7.EngineSwaps": {
+      "kind": "entity",
+      "includes": [
+        "cuid"
+      ],
+      "elements": {
+        "ID": {
+          "key": true,
+          "type": "cds.UUID"
+        },
+        "newCar": {
+          "type": "cds.Integer"
+        },
+        "originalCar": {
+          "type": "cds.Integer"
+        },
+        "engineName": {
+          "type": "cds.String",
+          "length": 200
+        }
+      }
+    },
+    "gt7.LotteryCars": {
+      "kind": "entity",
+      "includes": [
+        "cuid"
+      ],
+      "elements": {
+        "ID": {
+          "key": true,
+          "type": "cds.UUID"
+        },
+        "category": {
+          "type": "cds.String",
+          "length": 200
+        },
+        "carID": {
+          "type": "cds.Integer"
+        }
+      }
+    },
+    "gt7.Makers": {
+      "kind": "entity",
+      "elements": {
+        "ID": {
+          "key": true,
+          "type": "cds.Integer"
+        },
+        "name": {
+          "type": "cds.String",
+          "length": 200
+        },
+        "country": {
+          "type": "cds.Association",
+          "target": "gt7.Countries",
+          "keys": [
+            {
+              "ref": [
+                "ID"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "gt7.StockPerformances": {
+      "kind": "entity",
+      "elements": {
+        "ID": {
+          "key": true,
+          "type": "cds.Integer"
+        },
+        "pp": {
+          "key": true,
+          "type": "cds.Decimal"
+        },
+        "tyre": {
+          "key": true,
+          "type": "cds.String",
+          "length": 2
+        }
+      }
+    },
+    "gt7.Trophies": {
+      "kind": "entity",
+      "includes": [
+        "cuid"
+      ],
+      "elements": {
+        "ID": {
+          "key": true,
+          "type": "cds.UUID"
+        },
+        "name": {
+          "type": "cds.String",
+          "length": 200
+        },
+        "car": {
+          "type": "cds.Association",
+          "target": "gt7.Cars",
+          "keys": [
+            {
+              "ref": [
+                "ID"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "gt7.TLT_PS5GT7_RawData": {
+      "kind": "entity",
+      "@cds.persistence.exists": true,
+      "elements": {
+        "session_ID": {
+          "@EndUserText.label": "session_ID",
+          "key": true,
+          "type": "cds.UUID"
+        },
+        "packetId": {
+          "@EndUserText.label": "packetId",
+          "key": true,
+          "type": "cds.Integer"
+        },
+        "Source": {
+          "@EndUserText.label": "Source",
+          "type": "cds.String",
+          "length": 50,
+          "default": {
+            "val": "Nagarro_Stbg"
+          }
+        },
+        "sessionDateTime": {
+          "@EndUserText.label": "Session_DateTime",
+          "type": "cds.DateTime"
+        },
+        "Driver": {
+          "@EndUserText.label": "Driver",
+          "type": "cds.String",
+          "length": 100,
+          "default": {
+            "val": "TEST"
+          }
+        },
+        "carID": {
+          "@EndUserText.label": "Car ID",
+          "type": "cds.Integer"
+        },
+        "engineRPM": {
+          "@EndUserText.label": "engineRPM",
+          "type": "cds.Integer"
+        },
+        "metersPerSecond": {
+          "@EndUserText.label": "metersPerSecond",
+          "type": "cds.DecimalFloat"
+        },
+        "lapCount": {
+          "@EndUserText.label": "lapCount",
+          "type": "cds.Integer"
+        },
+        "lapsInRace": {
+          "@EndUserText.label": "lapsInRace",
+          "type": "cds.Integer"
+        },
+        "currentLapTime2": {
+          "@EndUserText.label": "currentLapTime2",
+          "type": "cds.Integer"
+        },
+        "lastLapTime": {
+          "@EndUserText.label": "lastLapTime",
+          "type": "cds.Integer"
+        },
+        "timeOfDayProgression": {
+          "@EndUserText.label": "timeOfDayProgression",
+          "type": "cds.Integer64"
+        },
+        "throttle": {
+          "@EndUserText.label": "throttle",
+          "type": "cds.Integer"
+        },
+        "brake": {
+          "@EndUserText.label": "brake",
+          "type": "cds.Integer"
+        },
+        "clutchPedal": {
+          "@EndUserText.label": "clutchPedal",
+          "type": "cds.Integer"
+        },
+        "currentGear": {
+          "@EndUserText.label": "currentGear",
+          "type": "cds.Integer"
+        },
+        "flags": {
+          "@EndUserText.label": "flags",
+          "type": "cds.Integer"
+        },
+        "preRaceStartPositionOrQualiPos": {
+          "@EndUserText.label": "preRaceStartPositionOrQualiPos",
+          "type": "cds.Integer"
+        },
+        "rowDate": {
+          "@EndUserText.label": "RowDate",
+          "type": "cds.DateTime",
+          "default": {
+            "val": "2025-07-10 14:51:37",
+            "literal": "timestamp"
+          }
+        }
+      }
+    },
+    "ExpositionService": {
+      "@source": "srv/cap-service.cds",
+      "kind": "service"
+    },
+    "ExpositionService.TLT_PS5GT7_RawData": {
+      "kind": "entity",
+      "projection": {
+        "from": {
+          "ref": [
+            "gt7.TLT_PS5GT7_RawData"
+          ]
+        }
+      },
+      "elements": {
+        "session_ID": {
+          "@EndUserText.label": "session_ID",
+          "key": true,
+          "type": "cds.UUID"
+        },
+        "packetId": {
+          "@EndUserText.label": "packetId",
+          "key": true,
+          "type": "cds.Integer"
+        },
+        "Source": {
+          "@EndUserText.label": "Source",
+          "type": "cds.String",
+          "length": 50,
+          "default": {
+            "val": "Nagarro_Stbg"
+          }
+        },
+        "sessionDateTime": {
+          "@EndUserText.label": "Session_DateTime",
+          "type": "cds.DateTime"
+        },
+        "Driver": {
+          "@EndUserText.label": "Driver",
+          "type": "cds.String",
+          "length": 100,
+          "default": {
+            "val": "TEST"
+          }
+        },
+        "carID": {
+          "@EndUserText.label": "Car ID",
+          "type": "cds.Integer"
+        },
+        "engineRPM": {
+          "@EndUserText.label": "engineRPM",
+          "type": "cds.Integer"
+        },
+        "metersPerSecond": {
+          "@EndUserText.label": "metersPerSecond",
+          "type": "cds.DecimalFloat"
+        },
+        "lapCount": {
+          "@EndUserText.label": "lapCount",
+          "type": "cds.Integer"
+        },
+        "lapsInRace": {
+          "@EndUserText.label": "lapsInRace",
+          "type": "cds.Integer"
+        },
+        "currentLapTime2": {
+          "@EndUserText.label": "currentLapTime2",
+          "type": "cds.Integer"
+        },
+        "lastLapTime": {
+          "@EndUserText.label": "lastLapTime",
+          "type": "cds.Integer"
+        },
+        "timeOfDayProgression": {
+          "@EndUserText.label": "timeOfDayProgression",
+          "type": "cds.Integer64"
+        },
+        "throttle": {
+          "@EndUserText.label": "throttle",
+          "type": "cds.Integer"
+        },
+        "brake": {
+          "@EndUserText.label": "brake",
+          "type": "cds.Integer"
+        },
+        "clutchPedal": {
+          "@EndUserText.label": "clutchPedal",
+          "type": "cds.Integer"
+        },
+        "currentGear": {
+          "@EndUserText.label": "currentGear",
+          "type": "cds.Integer"
+        },
+        "flags": {
+          "@EndUserText.label": "flags",
+          "type": "cds.Integer"
+        },
+        "preRaceStartPositionOrQualiPos": {
+          "@EndUserText.label": "preRaceStartPositionOrQualiPos",
+          "type": "cds.Integer"
+        },
+        "rowDate": {
+          "@EndUserText.label": "RowDate",
+          "type": "cds.DateTime",
+          "default": {
+            "val": "2025-07-10 14:51:37",
+            "literal": "timestamp"
+          }
+        }
+      }
+    },
+    "GT7Service": {
+      "@source": "srv/gt7-service.cds",
+      "kind": "service",
+      "@protocol": "odata"
+    },
+    "GT7Service.Sessions": {
+      "kind": "entity",
+      "@readonly": true,
+      "@Common.SemanticKey": [
+        {
+          "=": "ID"
+        }
+      ],
+      "@UI.Identification": [
+        {
+          "$Type": "UI.DataFieldForAction",
+          "Label": "{i18n>generateFioriMetrics}",
+          "Action": "GT7Service.generateFioriMetrics",
+          "@UI.Importance": {
+            "#": "High"
+          }
+        }
+      ],
+      "@UI.SelectionPresentationVariant#table.$Type": "UI.SelectionPresentationVariantType",
+      "@UI.SelectionPresentationVariant#table.PresentationVariant": {
+        "=": "@UI.PresentationVariant"
+      },
+      "@UI.SelectionPresentationVariant#table.SelectionVariant.$Type": "UI.SelectionVariantType",
+      "@UI.SelectionPresentationVariant#table.SelectionVariant.SelectOptions": [],
+      "@UI.PresentationVariant.SortOrder": [
+        {
+          "Property": {
+            "=": "createdAt"
+          },
+          "Descending": true
+        },
+        {
+          "$Type": "Common.SortOrderType",
+          "Property": {
+            "=": "driver"
+          },
+          "Descending": false
+        }
+      ],
+      "@UI.PresentationVariant.Visualizations": [
+        "@UI.LineItem"
+      ],
+      "@UI.PresentationVariant.GroupBy": [
+        {
+          "=": "driver"
+        }
+      ],
+      "@UI.LineItem": [
+        {
+          "$Type": "UI.DataField",
+          "Label": "Track",
+          "Value": {
+            "=": "trackUrl"
+          }
+        },
+        {
+          "$Type": "UI.DataField",
+          "Label": "Session",
+          "Value": {
+            "=": "createdAt"
+          }
+        },
+        {
+          "$Type": "UI.DataField",
+          "Label": "Driver",
+          "Value": {
+            "=": "driver"
+          },
+          "@UI.Importance": {
+            "#": "High"
+          }
+        },
+        {
+          "$Type": "UI.DataField",
+          "Label": "Car",
+          "Value": {
+            "=": "car.name"
+          }
+        },
+        {
+          "$Type": "UI.DataField",
+          "Value": {
+            "=": "raceTime"
+          },
+          "Label": "Time"
+        },
+        {
+          "$Type": "UI.DataField",
+          "Label": "Best Lap Time",
+          "Value": {
+            "=": "bestLapTime"
+          }
+        },
+        {
+          "$Type": "UI.DataField",
+          "Label": "Laps",
+          "Value": {
+            "=": "lapsInRace"
+          }
+        },
+        {
+          "$Type": "UI.DataFieldForAction",
+          "Action": "GT7Service.deleteSession",
+          "Label": "Delete",
+          "Determining": false
+        },
+        {
+          "$Type": "UI.DataFieldForAction",
+          "Action": "GT7Service.changeDriver",
+          "Label": "Change Driver"
+        }
+      ],
+      "@UI.HeaderInfo.TypeName": "{i18n>Session}",
+      "@UI.HeaderInfo.TypeNamePlural": "{i18n>Sessions}",
+      "@UI.HeaderInfo.Title.$Type": "UI.DataField",
+      "@UI.HeaderInfo.Title.Value": {
+        "=": "createdAt"
+      },
+      "@UI.HeaderInfo.Description.$Type": "UI.DataField",
+      "@UI.HeaderInfo.Description.Value": {
+        "=": "car.name"
+      },
+      "@UI.HeaderInfo.ImageUrl": {
+        "=": "trackUrl"
+      },
+      "@UI.HeaderFacets": [
+        {
+          "$Type": "UI.CollectionFacet",
+          "ID": "CollectionFacet",
+          "Facets": [
+            {
+              "$Type": "UI.ReferenceFacet",
+              "Target": "@UI.FieldGroup#LapData"
+            },
+            {
+              "$Type": "UI.ReferenceFacet",
+              "Target": "@UI.FieldGroup#RaceData"
+            }
+          ]
+        }
+      ],
+      "@UI.FieldGroup#LapData.Data": [
+        {
+          "Label": "{i18n>lapsInRace}",
+          "Value": {
+            "=": "lapsInRace"
+          }
+        },
+        {
+          "Label": "{i18n>bestLap}",
+          "Value": {
+            "=": "bestLap"
+          }
+        },
+        {
+          "Label": "{i18n>bestLapTime}",
+          "Value": {
+            "=": "bestLapTime"
+          }
+        }
+      ],
+      "@UI.FieldGroup#RaceData.Data": [
+        {
+          "Label": "{i18n>finished}",
+          "Value": {
+            "=": "finished"
+          }
+        }
+      ],
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "gt7.Sessions"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "ID": {
+          "key": true,
+          "type": "cds.UUID"
+        },
+        "createdAt": {
+          "type": "cds.Timestamp"
+        },
+        "driver": {
+          "@Common.Label": "Driver",
+          "type": "cds.String",
+          "length": 200
+        },
+        "car": {
+          "@Common.ValueList.$Type": "Common.ValueListType",
+          "@Common.ValueList.CollectionPath": "Cars",
+          "@Common.ValueList.Parameters": [
+            {
+              "$Type": "Common.ValueListParameterInOut",
+              "LocalDataProperty": {
+                "=": "car_ID"
+              },
+              "ValueListProperty": "ID"
+            },
+            {
+              "$Type": "Common.ValueListParameterDisplayOnly",
+              "ValueListProperty": "name"
+            },
+            {
+              "$Type": "Common.ValueListParameterDisplayOnly",
+              "ValueListProperty": "maker_ID"
+            }
+          ],
+          "type": "cds.Association",
+          "target": "GT7Service.Cars",
+          "keys": [
+            {
+              "ref": [
+                "ID"
+              ]
+            }
+          ]
+        },
+        "lapsInRace": {
+          "type": "cds.Int16"
+        },
+        "raceTime": {
+          "@Measures.Unit": "s",
+          "type": "cds.Int32"
+        },
+        "bestLap": {
+          "type": "cds.Int16"
+        },
+        "bestLapTime": {
+          "@Measures.Unit": "s",
+          "type": "cds.Int32"
+        },
+        "finished": {
+          "type": "cds.Boolean",
+          "default": {
+            "val": false
+          }
+        },
+        "timeOfDay": {
+          "type": "cds.Int32"
+        },
+        "calculatedMaxSpeed": {
+          "@Measures.Unit": "km/h",
+          "type": "cds.Int16"
+        },
+        "bodyHeight": {
+          "type": "cds.Decimal"
+        },
+        "trackUrl": {
+          "@Core.IsURL": true,
+          "@Core.MediaType": "image/svg+xml",
+          "@Core.AcceptableMediaTypes": [
+            "image/svg+xml",
+            "image/png",
+            "application/json"
+          ],
+          "@Core.Computed": true,
+          "virtual": true,
+          "type": "cds.String"
+        },
+        "Laps": {
+          "type": "cds.Association",
+          "cardinality": {
+            "max": "*"
+          },
+          "target": "GT7Service.Laps",
+          "on": [
+            {
+              "ref": [
+                "Laps",
+                "session_ID"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "ID"
+              ]
+            }
+          ]
+        },
+        "Packets": {
+          "type": "cds.Composition",
+          "cardinality": {
+            "max": "*"
+          },
+          "target": "GT7Service.SimulatorInterfacePackets",
+          "on": [
+            {
+              "ref": [
+                "Packets",
+                "session"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "$self"
+              ]
+            }
+          ]
+        }
+      },
+      "actions": {
+        "assignDriver": {
+          "kind": "action",
+          "params": {
+            "sessionID": {
+              "type": "cds.UUID"
+            },
+            "driver": {
+              "type": "cds.String"
+            }
+          },
+          "returns": {
+            "type": "cds.Boolean"
+          }
+        },
+        "deleteSession": {
+          "kind": "action",
+          "returns": {
+            "type": "cds.Boolean"
+          }
+        },
+        "changeDriver": {
+          "kind": "action",
+          "params": {
+            "NewDriver": {
+              "type": "cds.String"
+            }
+          },
+          "returns": {
+            "type": "cds.Boolean"
+          }
+        },
+        "generateFioriMetrics": {
+          "kind": "function",
+          "returns": {
+            "type": "cds.Boolean"
+          }
+        },
+        "getLapSVG": {
+          "kind": "function",
+          "returns": {
+            "type": "cds.String"
+          }
+        }
+      }
+    },
+    "GT7Service.Laps": {
+      "kind": "entity",
+      "@readonly": true,
+      "@UI.LineItem#LapTimes": [
+        {
+          "$Type": "UI.DataField",
+          "Value": {
+            "=": "lap"
+          },
+          "Label": "Lap",
+          "@HTML5.CssDefaults": {
+            "width": "4rem"
+          }
+        },
+        {
+          "$Type": "UI.DataField",
+          "Value": {
+            "=": "time"
+          },
+          "Label": "Time (s)",
+          "@HTML5.CssDefaults": {
+            "width": "19.4rem"
+          }
+        }
+      ],
+      "@UI.LineItem#LapSpeeds": [
+        {
+          "$Type": "UI.DataField",
+          "Value": {
+            "=": "lap"
+          },
+          "Label": "Lap",
+          "@HTML5.CssDefaults": {
+            "width": "4rem"
+          }
+        },
+        {
+          "$Type": "UI.DataField",
+          "Value": {
+            "=": "avgSpeed"
+          },
+          "Label": "Average Speed (km/h)",
+          "@HTML5.CssDefaults": {
+            "width": "10.7rem"
+          }
+        },
+        {
+          "$Type": "UI.DataField",
+          "Value": {
+            "=": "maxSpeed"
+          },
+          "Label": "Max Speed (km/h)",
+          "@HTML5.CssDefaults": {
+            "width": "8.7rem"
+          }
+        }
+      ],
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "gt7.Laps"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "session_ID": {
+          "key": true,
+          "type": {
+            "ref": [
+              "gt7.Sessions",
+              "ID"
+            ]
+          }
+        },
+        "lap": {
+          "key": true,
+          "type": "cds.Int16"
+        },
+        "time": {
+          "type": "cds.Int32"
+        },
+        "maxSpeed": {
+          "type": "cds.Decimal"
+        },
+        "avgSpeed": {
+          "type": "cds.Decimal"
+        },
+        "best": {
+          "type": "cds.Boolean"
+        }
+      }
+    },
+    "GT7Service.SimulatorInterfacePackets": {
+      "kind": "entity",
+      "@readonly": true,
+      "@Capabilities.SearchRestrictions.Searchable": false,
+      "@Aggregation.ApplySupported.Transformations": [
+        "aggregate",
+        "topcount",
+        "bottomcount",
+        "identity",
+        "concat",
+        "groupby",
+        "filter",
+        "search"
+      ],
+      "@Aggregation.ApplySupported.Rollup": {
+        "#": "None"
+      },
+      "@Aggregation.ApplySupported.PropertyRestrictions": true,
+      "@Aggregation.ApplySupported.GroupableProperties": [
+        {
+          "=": "currentLapTime"
+        },
+        {
+          "=": "lapCount"
+        }
+      ],
+      "@Aggregation.ApplySupported.AggregatableProperties": [
+        {
+          "Property": {
+            "=": "velocity"
+          }
+        },
+        {
+          "Property": {
+            "=": "engineRPM"
+          }
+        },
+        {
+          "Property": {
+            "=": "throttle"
+          }
+        },
+        {
+          "Property": {
+            "=": "brake"
+          }
+        },
+        {
+          "Property": {
+            "=": "currentGear"
+          }
+        },
+        {
+          "Property": {
+            "=": "gasLevel"
+          }
+        },
+        {
+          "Property": {
+            "=": "gasCapacity"
+          }
+        },
+        {
+          "Property": {
+            "=": "metersPerSecond"
+          }
+        },
+        {
+          "Property": {
+            "=": "distance"
+          }
+        },
+        {
+          "Property": {
+            "=": "oilPressure"
+          }
+        },
+        {
+          "Property": {
+            "=": "waterTemperature"
+          }
+        },
+        {
+          "Property": {
+            "=": "oilTemperature"
+          }
+        },
+        {
+          "Property": {
+            "=": "turboBoost"
+          }
+        },
+        {
+          "Property": {
+            "=": "tireSurfaceTemperature"
+          }
+        }
+      ],
+      "@Analytics.AggregatedProperty#metersPerSecond_average.$Type": "Analytics.AggregatedPropertyType",
+      "@Analytics.AggregatedProperty#metersPerSecond_average.Name": "metersPerSecond_average",
+      "@Analytics.AggregatedProperty#metersPerSecond_average.AggregatableProperty": {
+        "=": "metersPerSecond"
+      },
+      "@Analytics.AggregatedProperty#metersPerSecond_average.AggregationMethod": "average",
+      "@Analytics.AggregatedProperty#metersPerSecond_average.@Common.Label": "Speed (km/h)",
+      "@Analytics.AggregatedProperty#throttle_average.$Type": "Analytics.AggregatedPropertyType",
+      "@Analytics.AggregatedProperty#throttle_average.Name": "throttle_average",
+      "@Analytics.AggregatedProperty#throttle_average.AggregatableProperty": {
+        "=": "throttle"
+      },
+      "@Analytics.AggregatedProperty#throttle_average.AggregationMethod": "average",
+      "@Analytics.AggregatedProperty#throttle_average.@Common.Label": "Throttle (%)",
+      "@Analytics.AggregatedProperty#brake_average.$Type": "Analytics.AggregatedPropertyType",
+      "@Analytics.AggregatedProperty#brake_average.Name": "brake_average",
+      "@Analytics.AggregatedProperty#brake_average.AggregatableProperty": {
+        "=": "brake"
+      },
+      "@Analytics.AggregatedProperty#brake_average.AggregationMethod": "average",
+      "@Analytics.AggregatedProperty#brake_average.@Common.Label": "Brake (%)",
+      "@Analytics.AggregatedProperty#engineRPM_average.$Type": "Analytics.AggregatedPropertyType",
+      "@Analytics.AggregatedProperty#engineRPM_average.Name": "engineRPM_average",
+      "@Analytics.AggregatedProperty#engineRPM_average.AggregatableProperty": {
+        "=": "engineRPM"
+      },
+      "@Analytics.AggregatedProperty#engineRPM_average.AggregationMethod": "average",
+      "@Analytics.AggregatedProperty#engineRPM_average.@Common.Label": "Engine (rpm)",
+      "@UI.Chart#chartSection.$Type": "UI.ChartDefinitionType",
+      "@UI.Chart#chartSection.ChartType": {
+        "#": "Line"
+      },
+      "@UI.Chart#chartSection.Dimensions": [
+        {
+          "=": "currentLapTime"
+        }
+      ],
+      "@UI.Chart#chartSection.DynamicMeasures": [
+        "@Analytics.AggregatedProperty#metersPerSecond_average"
+      ],
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "gt7.SimulatorInterfacePackets"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "session": {
+          "@description": "Id of the session all packets belong to",
+          "key": true,
+          "type": "cds.Association",
+          "target": "GT7Service.Sessions",
+          "keys": [
+            {
+              "ref": [
+                "ID"
+              ]
+            }
+          ]
+        },
+        "packetId": {
+          "@description": "Id of the packet for proper ordering",
+          "key": true,
+          "type": "cds.Int32"
+        },
+        "car": {
+          "@description": "Internal code that identifies the car",
+          "type": "cds.Association",
+          "target": "GT7Service.Cars",
+          "keys": [
+            {
+              "ref": [
+                "ID"
+              ]
+            }
+          ]
+        },
+        "position": {
+          "@description": "Position on the track. Track units are in meters",
+          "type": "gt7.Vector3"
+        },
+        "velocity": {
+          "@description": "Velocity in track units (which are meters) for each axis",
+          "type": "gt7.Vector3"
+        },
+        "rotation": {
+          "@description": "Rotation (Pitch/Yaw/Roll) from -1 to 1",
+          "type": "gt7.Vector3Rotation"
+        },
+        "relativeOrientationToNorth": {
+          "@description": "Orientation to North. 1.0 is north, 0.0 is south",
+          "type": "cds.Decimal"
+        },
+        "angularVelocity": {
+          "@description": "How fast the car turns around axes. (In radians/second, -1 to 1)",
+          "type": "gt7.Vector3"
+        },
+        "bodyHeight": {
+          "@description": "Body height",
+          "type": "cds.Decimal"
+        },
+        "engineRPM": {
+          "@description": "Engine revolutions per minute",
+          "type": "cds.Decimal"
+        },
+        "gasLevel": {
+          "@description": "Gas level for the current car (in liters, from 0 to GasCapacity",
+          "type": "cds.Decimal"
+        },
+        "gasCapacity": {
+          "@description": "Max gas capacity for the current car",
+          "type": "cds.Decimal"
+        },
+        "metersPerSecond": {
+          "@description": "Current speed in meters per second. <see cref=\"MetersPerSecond * 3.6\"/> to get it in KPH",
+          "type": "cds.Decimal"
+        },
+        "distance": {
+          "@description": "Current distance on track in meter (metersPerSecond / lapTick)",
+          "type": "cds.Decimal"
+        },
+        "turboBoost": {
+          "@description": "Value below 1.0 is below 0 ingame, so 2.0 = 1 x 100kPa",
+          "type": "cds.Decimal"
+        },
+        "oilPressure": {
+          "@description": "Oil Pressure (in Bars)",
+          "type": "cds.Decimal"
+        },
+        "waterTemperature": {
+          "@description": "Games will always send 85 (in °C)",
+          "type": "cds.Decimal"
+        },
+        "oilTemperature": {
+          "@description": "Games will always send 110 (in °C)",
+          "type": "cds.Decimal"
+        },
+        "lapCount": {
+          "@Common.Label": "Lap",
+          "@description": "Current lap count",
+          "type": "cds.Int16"
+        },
+        "lapsInRace": {
+          "@description": "Laps to finish",
+          "type": "cds.Int16"
+        },
+        "currentLapTime": {
+          "@Common.Label": "Time (ms)",
+          "@description": "Current Lap Time",
+          "type": "cds.Int32"
+        },
+        "currentLapTime2": {
+          "type": "cds.Int32"
+        },
+        "bestLapTime": {
+          "@description": "Best Lap Time",
+          "type": "cds.Int32"
+        },
+        "lastLapTime": {
+          "@description": "Last Lap Time",
+          "type": "cds.Int32"
+        },
+        "timeOfDayProgression": {
+          "@description": "Current time of day on the track",
+          "type": "cds.Int32"
+        },
+        "preRaceStartPositionOrQualiPos": {
+          "@description": "Position of the car before the race has started",
+          "type": "cds.Int16"
+        },
+        "numCarsAtPreRace": {
+          "@description": "Number of cars in the race before the race has started",
+          "type": "cds.Int16"
+        },
+        "minAlertRPM": {
+          "@description": "Minimum RPM to which the rev limiter shows an alert",
+          "type": "cds.Int16"
+        },
+        "maxAlertRPM": {
+          "@description": "Maximum RPM to the rev limiter alert",
+          "type": "cds.Int16"
+        },
+        "calculatedMaxSpeed": {
+          "@description": "Possible max speed achievable using the current transmission settings",
+          "type": "cds.Int16"
+        },
+        "flags": {
+          "@description": "Packet flags (see Flags.ts)",
+          "type": "cds.Int16"
+        },
+        "currentGear": {
+          "@description": "Current Gear for the car",
+          "type": "cds.Int16"
+        },
+        "suggestedGear": {
+          "@description": "(Assist) Suggested Gear to downshift to",
+          "type": "cds.Int16"
+        },
+        "throttle": {
+          "@description": "Throttle (0-255)",
+          "type": "cds.Int16"
+        },
+        "brake": {
+          "@description": "Brake Pedal (0-255)",
+          "type": "cds.Int16"
+        },
+        "roadPlane": {
+          "@description": "",
+          "type": "gt7.Vector3"
+        },
+        "roadPlaneDistance": {
+          "@description": "",
+          "type": "cds.Decimal"
+        },
+        "tireRadius": {
+          "@description": "Tire - Tire Radius (in Meters)",
+          "type": "gt7.Wheel"
+        },
+        "tireSuspensionHeight": {
+          "@description": "Tire - Suspension Height",
+          "type": "gt7.Wheel"
+        },
+        "tireSurfaceTemperature": {
+          "@description": "Tire - Surface Temperature (in °C)",
+          "type": "gt7.Wheel"
+        },
+        "wheelRevPerSecond": {
+          "@description": "Wheel - Revolutions Per Second (in Radians)",
+          "type": "gt7.Wheel"
+        },
+        "clutchPedal": {
+          "@description": "0.0 to 1.0",
+          "type": "cds.Decimal"
+        },
+        "clutchEngagement": {
+          "@description": "0.0 to 1.0",
+          "type": "cds.Decimal"
+        },
+        "rpmFromClutchToGearbox": {
+          "@description": "Basically same as engine rpm when in gear and the clutch pedal is not depressed",
+          "type": "cds.Decimal"
+        },
+        "transmissionTopSpeed": {
+          "@description": "Top Speed (as a Gear Ratio value)",
+          "type": "cds.Decimal"
+        }
+      }
+    },
+    "GT7Service.Cars": {
+      "kind": "entity",
+      "@readonly": true,
+      "@UI.LineItem#CarTable": [
+        {
+          "$Type": "UI.DataField",
+          "Value": {
+            "=": "maker.name"
+          },
+          "Label": "Maker",
+          "@UI.Importance": {
+            "#": "Medium"
+          }
+        },
+        {
+          "$Type": "UI.DataField",
+          "Value": {
+            "=": "name"
+          },
+          "Label": "Car",
+          "@UI.Importance": {
+            "#": "High"
+          }
+        }
+      ],
+      "@UI.PresentationVariant#CarTable.SortOrder": [
+        {
+          "Property": {
+            "=": "maker.name"
+          },
+          "Descending": false
+        },
+        {
+          "Property": {
+            "=": "name"
+          },
+          "Descending": false
+        }
+      ],
+      "@UI.PresentationVariant#CarTable.GroupBy": [
+        {
+          "$value": {
+            "=": "maker.name"
+          }
+        }
+      ],
+      "@UI.PresentationVariant#CarTable.Visualizations": [
+        "@UI.LineItem#CarTable"
+      ],
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "gt7.Cars"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "ID": {
+          "key": true,
+          "type": "cds.Integer"
+        },
+        "name": {
+          "type": "cds.String",
+          "length": 200
+        },
+        "maker": {
+          "type": "cds.Association",
+          "target": "GT7Service.Makers",
+          "keys": [
+            {
+              "ref": [
+                "ID"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "GT7Service.CarGroups": {
+      "kind": "entity",
+      "@readonly": true,
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "gt7.CarGroups"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "ID": {
+          "key": true,
+          "type": "cds.Integer"
+        },
+        "group": {
+          "type": "cds.String",
+          "length": 200
+        }
+      }
+    },
+    "GT7Service.Countries": {
+      "kind": "entity",
+      "@readonly": true,
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "gt7.Countries"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "ID": {
+          "key": true,
+          "type": "cds.Integer"
+        },
+        "name": {
+          "type": "cds.String",
+          "length": 200
+        },
+        "code": {
+          "type": "cds.String",
+          "length": 3
+        }
+      }
+    },
+    "GT7Service.CourseBases": {
+      "kind": "entity",
+      "@readonly": true,
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "gt7.CourseBases"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "ID": {
+          "key": true,
+          "type": "cds.Integer"
+        },
+        "name": {
+          "type": "cds.String",
+          "length": 200
+        },
+        "logoName": {
+          "type": "cds.String",
+          "length": 200
+        }
+      }
+    },
+    "GT7Service.Courses": {
+      "kind": "entity",
+      "@readonly": true,
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "gt7.Courses"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "ID": {
+          "key": true,
+          "type": "cds.Integer"
+        },
+        "name": {
+          "type": "cds.String",
+          "length": 200
+        },
+        "base": {
+          "type": "cds.Association",
+          "target": "GT7Service.CourseBases",
+          "keys": [
+            {
+              "ref": [
+                "ID"
+              ]
+            }
+          ]
+        },
+        "country": {
+          "type": "cds.Association",
+          "target": "GT7Service.Countries",
+          "keys": [
+            {
+              "ref": [
+                "ID"
+              ]
+            }
+          ]
+        },
+        "category": {
+          "type": "cds.String",
+          "length": 200
+        },
+        "length": {
+          "type": "cds.Integer"
+        },
+        "longestStraight": {
+          "type": "cds.Integer"
+        },
+        "elevationDiff": {
+          "type": "cds.Decimal"
+        },
+        "altitude": {
+          "type": "cds.Decimal"
+        },
+        "minTimeH": {
+          "type": "cds.Integer"
+        },
+        "minTimeM": {
+          "type": "cds.Integer"
+        },
+        "minTimeS": {
+          "type": "cds.Integer"
+        },
+        "maxTimeH": {
+          "type": "cds.Integer"
+        },
+        "maxTimeM": {
+          "type": "cds.Integer"
+        },
+        "maxTimeS": {
+          "type": "cds.Integer"
+        },
+        "layoutNumber": {
+          "type": "cds.Integer"
+        },
+        "isReverse": {
+          "type": "cds.Boolean"
+        },
+        "pitLaneDelta": {
+          "type": "cds.Decimal"
+        },
+        "isOval": {
+          "type": "cds.Boolean"
+        },
+        "numCorners": {
+          "type": "cds.Integer"
+        },
+        "noRain": {
+          "type": "cds.Boolean"
+        }
+      }
+    },
+    "GT7Service.EngineSwaps": {
+      "kind": "entity",
+      "@readonly": true,
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "gt7.EngineSwaps"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "ID": {
+          "key": true,
+          "type": "cds.UUID"
+        },
+        "newCar": {
+          "type": "cds.Integer"
+        },
+        "originalCar": {
+          "type": "cds.Integer"
+        },
+        "engineName": {
+          "type": "cds.String",
+          "length": 200
+        }
+      }
+    },
+    "GT7Service.LotteryCars": {
+      "kind": "entity",
+      "@readonly": true,
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "gt7.LotteryCars"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "ID": {
+          "key": true,
+          "type": "cds.UUID"
+        },
+        "category": {
+          "type": "cds.String",
+          "length": 200
+        },
+        "carID": {
+          "type": "cds.Integer"
+        }
+      }
+    },
+    "GT7Service.Makers": {
+      "kind": "entity",
+      "@readonly": true,
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "gt7.Makers"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "ID": {
+          "key": true,
+          "type": "cds.Integer"
+        },
+        "name": {
+          "type": "cds.String",
+          "length": 200
+        },
+        "country": {
+          "type": "cds.Association",
+          "target": "GT7Service.Countries",
+          "keys": [
+            {
+              "ref": [
+                "ID"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "GT7Service.StockPerformances": {
+      "kind": "entity",
+      "@readonly": true,
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "gt7.StockPerformances"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "ID": {
+          "key": true,
+          "type": "cds.Integer"
+        },
+        "pp": {
+          "key": true,
+          "type": "cds.Decimal"
+        },
+        "tyre": {
+          "key": true,
+          "type": "cds.String",
+          "length": 2
+        }
+      }
+    },
+    "GT7Service.Trophies": {
+      "kind": "entity",
+      "@readonly": true,
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "gt7.Trophies"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "ID": {
+          "key": true,
+          "type": "cds.UUID"
+        },
+        "name": {
+          "type": "cds.String",
+          "length": 200
+        },
+        "car": {
+          "type": "cds.Association",
+          "target": "GT7Service.Cars",
+          "keys": [
+            {
+              "ref": [
+                "ID"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "GT7Service.test": {
+      "kind": "action"
+    },
+    "PLCService": {
+      "@source": "srv/plc-service.cds",
+      "kind": "service",
+      "@protocol": "none"
+    },
+    "SIPGT7Service": {
+      "@source": "srv/sipgt7-service.cds",
+      "kind": "service",
+      "@protocol": "none"
+    },
+    "SIPGT7Service.test": {
+      "kind": "action"
+    },
+    "WebSocketService": {
+      "@source": "srv/websocket-service.cds",
+      "kind": "service",
+      "@protocol": "none"
+    },
+    "Language": {
+      "kind": "type",
+      "@title": "{i18n>Language}",
+      "@description": "{i18n>LanguageCode.Description}",
+      "type": "cds.Association",
+      "target": "sap.common.Languages",
+      "keys": [
+        {
+          "ref": [
+            "code"
+          ]
+        }
+      ]
+    },
+    "Currency": {
+      "kind": "type",
+      "@title": "{i18n>Currency}",
+      "@description": "{i18n>CurrencyCode.Description}",
+      "type": "cds.Association",
+      "target": "sap.common.Currencies",
+      "keys": [
+        {
+          "ref": [
+            "code"
+          ]
+        }
+      ]
+    },
+    "Country": {
+      "kind": "type",
+      "@title": "{i18n>Country}",
+      "@description": "{i18n>CountryCode.Description}",
+      "type": "cds.Association",
+      "target": "sap.common.Countries",
+      "keys": [
+        {
+          "ref": [
+            "code"
+          ]
+        }
+      ]
+    },
+    "Timezone": {
+      "kind": "type",
+      "type": "cds.Association",
+      "target": "sap.common.Timezones",
+      "keys": [
+        {
+          "ref": [
+            "code"
+          ]
+        }
+      ]
+    },
+    "sap.common": {
+      "kind": "context"
+    },
+    "sap.common.Locale": {
+      "kind": "type",
+      "@title": "{i18n>LanguageCode}",
+      "type": "cds.String",
+      "length": 14
+    },
+    "sap.common.Languages": {
+      "kind": "entity",
+      "@cds.autoexpose": true,
+      "@cds.persistence.skip": "if-unused",
+      "@UI.Identification": [
+        {
+          "Value": {
+            "=": "name"
+          }
+        }
+      ],
+      "@cds.odata.valuelist": true,
+      "includes": [
+        "sap.common.CodeList"
+      ],
+      "elements": {
+        "name": {
+          "@title": "{i18n>Name}",
+          "localized": true,
+          "type": "cds.String",
+          "length": 255
+        },
+        "descr": {
+          "@title": "{i18n>Description}",
+          "localized": true,
+          "type": "cds.String",
+          "length": 1000
+        },
+        "code": {
+          "@Common.Text": {
+            "=": "name"
+          },
+          "@title": "{i18n>LanguageCode}",
+          "key": true,
+          "type": "sap.common.Locale",
+          "length": 14
+        },
+        "texts": {
+          "type": "cds.Composition",
+          "cardinality": {
+            "max": "*"
+          },
+          "target": "sap.common.Languages.texts",
+          "on": [
+            {
+              "ref": [
+                "texts",
+                "code"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "code"
+              ]
+            }
+          ]
+        },
+        "localized": {
+          "type": "cds.Association",
+          "target": "sap.common.Languages.texts",
+          "on": [
+            {
+              "ref": [
+                "localized",
+                "code"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "code"
+              ]
+            },
+            "and",
+            {
+              "ref": [
+                "localized",
+                "locale"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "$user",
+                "locale"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "sap.common.Countries": {
+      "kind": "entity",
+      "@cds.autoexpose": true,
+      "@cds.persistence.skip": "if-unused",
+      "@UI.Identification": [
+        {
+          "Value": {
+            "=": "name"
+          }
+        }
+      ],
+      "@cds.odata.valuelist": true,
+      "includes": [
+        "sap.common.CodeList"
+      ],
+      "elements": {
+        "name": {
+          "@title": "{i18n>Name}",
+          "localized": true,
+          "type": "cds.String",
+          "length": 255
+        },
+        "descr": {
+          "@title": "{i18n>Description}",
+          "localized": true,
+          "type": "cds.String",
+          "length": 1000
+        },
+        "code": {
+          "@title": "{i18n>CountryCode}",
+          "@Common.Text": {
+            "=": "name"
+          },
+          "key": true,
+          "type": "cds.String",
+          "length": 3
+        },
+        "texts": {
+          "type": "cds.Composition",
+          "cardinality": {
+            "max": "*"
+          },
+          "target": "sap.common.Countries.texts",
+          "on": [
+            {
+              "ref": [
+                "texts",
+                "code"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "code"
+              ]
+            }
+          ]
+        },
+        "localized": {
+          "type": "cds.Association",
+          "target": "sap.common.Countries.texts",
+          "on": [
+            {
+              "ref": [
+                "localized",
+                "code"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "code"
+              ]
+            },
+            "and",
+            {
+              "ref": [
+                "localized",
+                "locale"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "$user",
+                "locale"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "sap.common.Currencies": {
+      "kind": "entity",
+      "@cds.autoexpose": true,
+      "@cds.persistence.skip": "if-unused",
+      "@UI.Identification": [
+        {
+          "Value": {
+            "=": "name"
+          }
+        }
+      ],
+      "@cds.odata.valuelist": true,
+      "includes": [
+        "sap.common.CodeList"
+      ],
+      "elements": {
+        "name": {
+          "@title": "{i18n>Name}",
+          "localized": true,
+          "type": "cds.String",
+          "length": 255
+        },
+        "descr": {
+          "@title": "{i18n>Description}",
+          "localized": true,
+          "type": "cds.String",
+          "length": 1000
+        },
+        "code": {
+          "@title": "{i18n>CurrencyCode}",
+          "@Common.Text": {
+            "=": "name"
+          },
+          "key": true,
+          "type": "cds.String",
+          "length": 3
+        },
+        "symbol": {
+          "@title": "{i18n>CurrencySymbol}",
+          "type": "cds.String",
+          "length": 5
+        },
+        "minorUnit": {
+          "@title": "{i18n>CurrencyMinorUnit}",
+          "type": "cds.Int16"
+        },
+        "texts": {
+          "type": "cds.Composition",
+          "cardinality": {
+            "max": "*"
+          },
+          "target": "sap.common.Currencies.texts",
+          "on": [
+            {
+              "ref": [
+                "texts",
+                "code"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "code"
+              ]
+            }
+          ]
+        },
+        "localized": {
+          "type": "cds.Association",
+          "target": "sap.common.Currencies.texts",
+          "on": [
+            {
+              "ref": [
+                "localized",
+                "code"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "code"
+              ]
+            },
+            "and",
+            {
+              "ref": [
+                "localized",
+                "locale"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "$user",
+                "locale"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "sap.common.Timezones": {
+      "kind": "entity",
+      "@cds.autoexpose": true,
+      "@cds.persistence.skip": "if-unused",
+      "@UI.Identification": [
+        {
+          "Value": {
+            "=": "name"
+          }
+        }
+      ],
+      "@cds.odata.valuelist": true,
+      "includes": [
+        "sap.common.CodeList"
+      ],
+      "elements": {
+        "name": {
+          "@title": "{i18n>Name}",
+          "localized": true,
+          "type": "cds.String",
+          "length": 255
+        },
+        "descr": {
+          "@title": "{i18n>Description}",
+          "localized": true,
+          "type": "cds.String",
+          "length": 1000
+        },
+        "code": {
+          "@title": "{i18n>TimeZoneCode}",
+          "key": true,
+          "type": "cds.String",
+          "length": 100
+        },
+        "texts": {
+          "type": "cds.Composition",
+          "cardinality": {
+            "max": "*"
+          },
+          "target": "sap.common.Timezones.texts",
+          "on": [
+            {
+              "ref": [
+                "texts",
+                "code"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "code"
+              ]
+            }
+          ]
+        },
+        "localized": {
+          "type": "cds.Association",
+          "target": "sap.common.Timezones.texts",
+          "on": [
+            {
+              "ref": [
+                "localized",
+                "code"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "code"
+              ]
+            },
+            "and",
+            {
+              "ref": [
+                "localized",
+                "locale"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "$user",
+                "locale"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "sap.common.CodeList": {
+      "kind": "aspect",
+      "@cds.autoexpose": true,
+      "@cds.persistence.skip": "if-unused",
+      "@UI.Identification": [
+        {
+          "Value": {
+            "=": "name"
+          }
+        }
+      ],
+      "@cds.odata.valuelist": true,
+      "elements": {
+        "name": {
+          "@title": "{i18n>Name}",
+          "localized": true,
+          "type": "cds.String",
+          "length": 255
+        },
+        "descr": {
+          "@title": "{i18n>Description}",
+          "localized": true,
+          "type": "cds.String",
+          "length": 1000
+        }
+      }
+    },
+    "sap.common.TextsAspect": {
+      "kind": "aspect",
+      "elements": {
+        "locale": {
+          "@title": "{i18n>LanguageCode}",
+          "key": true,
+          "type": "sap.common.Locale",
+          "length": 14
+        }
+      }
+    },
+    "cuid": {
+      "kind": "aspect",
+      "elements": {
+        "ID": {
+          "key": true,
+          "type": "cds.UUID"
+        }
+      }
+    },
+    "managed": {
+      "kind": "aspect",
+      "elements": {
+        "createdAt": {
+          "@cds.on.insert": {
+            "=": "$now"
+          },
+          "@UI.HiddenFilter": true,
+          "@UI.ExcludeFromNavigationContext": true,
+          "@Core.Immutable": true,
+          "@title": "{i18n>CreatedAt}",
+          "@readonly": true,
+          "type": "cds.Timestamp"
+        },
+        "createdBy": {
+          "@cds.on.insert": {
+            "=": "$user"
+          },
+          "@UI.HiddenFilter": true,
+          "@UI.ExcludeFromNavigationContext": true,
+          "@Core.Immutable": true,
+          "@title": "{i18n>CreatedBy}",
+          "@readonly": true,
+          "@description": "{i18n>UserID.Description}",
+          "type": "User",
+          "length": 255
+        },
+        "modifiedAt": {
+          "@cds.on.insert": {
+            "=": "$now"
+          },
+          "@cds.on.update": {
+            "=": "$now"
+          },
+          "@UI.HiddenFilter": true,
+          "@UI.ExcludeFromNavigationContext": true,
+          "@title": "{i18n>ChangedAt}",
+          "@readonly": true,
+          "type": "cds.Timestamp"
+        },
+        "modifiedBy": {
+          "@cds.on.insert": {
+            "=": "$user"
+          },
+          "@cds.on.update": {
+            "=": "$user"
+          },
+          "@UI.HiddenFilter": true,
+          "@UI.ExcludeFromNavigationContext": true,
+          "@title": "{i18n>ChangedBy}",
+          "@readonly": true,
+          "@description": "{i18n>UserID.Description}",
+          "type": "User",
+          "length": 255
+        }
+      }
+    },
+    "temporal": {
+      "kind": "aspect",
+      "elements": {
+        "validFrom": {
+          "@cds.valid.from": true,
+          "type": "cds.Timestamp"
+        },
+        "validTo": {
+          "@cds.valid.to": true,
+          "type": "cds.Timestamp"
+        }
+      }
+    },
+    "User": {
+      "kind": "type",
+      "@title": "{i18n>UserID}",
+      "@description": "{i18n>UserID.Description}",
+      "type": "cds.String",
+      "length": 255
+    },
+    "sap.common.Languages.texts": {
+      "kind": "entity",
+      "@odata.draft.enabled": false,
+      "includes": [
+        "sap.common.TextsAspect"
+      ],
+      "elements": {
+        "locale": {
+          "@title": "{i18n>LanguageCode}",
+          "key": true,
+          "type": "sap.common.Locale",
+          "length": 14
+        },
+        "name": {
+          "@title": "{i18n>Name}",
+          "localized": null,
+          "type": "cds.String",
+          "length": 255
+        },
+        "descr": {
+          "@title": "{i18n>Description}",
+          "localized": null,
+          "type": "cds.String",
+          "length": 1000
+        },
+        "code": {
+          "@odata.containment.ignore": true,
+          "@Common.Text": {
+            "=": "name"
+          },
+          "@title": "{i18n>LanguageCode}",
+          "key": true,
+          "type": "sap.common.Locale",
+          "length": 14
+        }
+      }
+    },
+    "sap.common.Countries.texts": {
+      "kind": "entity",
+      "@odata.draft.enabled": false,
+      "includes": [
+        "sap.common.TextsAspect"
+      ],
+      "elements": {
+        "locale": {
+          "@title": "{i18n>LanguageCode}",
+          "key": true,
+          "type": "sap.common.Locale",
+          "length": 14
+        },
+        "name": {
+          "@title": "{i18n>Name}",
+          "localized": null,
+          "type": "cds.String",
+          "length": 255
+        },
+        "descr": {
+          "@title": "{i18n>Description}",
+          "localized": null,
+          "type": "cds.String",
+          "length": 1000
+        },
+        "code": {
+          "@odata.containment.ignore": true,
+          "@title": "{i18n>CountryCode}",
+          "@Common.Text": {
+            "=": "name"
+          },
+          "key": true,
+          "type": "cds.String",
+          "length": 3
+        }
+      }
+    },
+    "sap.common.Currencies.texts": {
+      "kind": "entity",
+      "@odata.draft.enabled": false,
+      "includes": [
+        "sap.common.TextsAspect"
+      ],
+      "elements": {
+        "locale": {
+          "@title": "{i18n>LanguageCode}",
+          "key": true,
+          "type": "sap.common.Locale",
+          "length": 14
+        },
+        "name": {
+          "@title": "{i18n>Name}",
+          "localized": null,
+          "type": "cds.String",
+          "length": 255
+        },
+        "descr": {
+          "@title": "{i18n>Description}",
+          "localized": null,
+          "type": "cds.String",
+          "length": 1000
+        },
+        "code": {
+          "@odata.containment.ignore": true,
+          "@title": "{i18n>CurrencyCode}",
+          "@Common.Text": {
+            "=": "name"
+          },
+          "key": true,
+          "type": "cds.String",
+          "length": 3
+        }
+      }
+    },
+    "sap.common.Timezones.texts": {
+      "kind": "entity",
+      "@odata.draft.enabled": false,
+      "includes": [
+        "sap.common.TextsAspect"
+      ],
+      "elements": {
+        "locale": {
+          "@title": "{i18n>LanguageCode}",
+          "key": true,
+          "type": "sap.common.Locale",
+          "length": 14
+        },
+        "name": {
+          "@title": "{i18n>Name}",
+          "localized": null,
+          "type": "cds.String",
+          "length": 255
+        },
+        "descr": {
+          "@title": "{i18n>Description}",
+          "localized": null,
+          "type": "cds.String",
+          "length": 1000
+        },
+        "code": {
+          "@odata.containment.ignore": true,
+          "@title": "{i18n>TimeZoneCode}",
+          "key": true,
+          "type": "cds.String",
+          "length": 100
+        }
+      }
+    }
+  },
+  "meta": {
+    "creator": "CDS Compiler v5.9.6",
+    "flavor": "inferred"
+  },
+  "$version": "2.0"
+}
