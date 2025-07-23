@@ -17,15 +17,15 @@ The project is built on SAP’s CAP framework and implemented in Node.js. It pro
 
 1. **Clone the repository:**
    Code block example:
-   -----------------------
+
    git clone https://github.com/koebelt/GT7-CAP.git
    cd GT7-CAP
-----------------------
+
 
 3. **Install npm dependencies:**
-   -----------------------
+
    npm install
-  -----------------------
+
    This command installs all required packages as declared in the package.json .
 
 4. **Postinstall step:**
@@ -62,26 +62,22 @@ In addition, environment variables (e.g., GT_VERSION) can affect UDP ports and W
 After installation, select the desired mode and start the application using one of the following commands:
 
 - **SQLite Mode:**  
-  -----------------------
   npm run start:sqlite
-  -----------------------  
+
   This mode uses a local SQLite database, ideal for quick testing and development.
 
 - **PLC Mode:**  
-  -----------------------
   npm run start:plc
-  -----------------------  
+ 
   Use this mode if you want the application to listen for and process telemetry data via PLC-specific endpoints. This mode provides a dedicated service to handle WebSocket connections to an external PLC telemetry source.
 
 - **SAC Mode:**  
-  -----------------------
   npm run start:sac
-  -----------------------  
+  
   Activates the SAC profile. This mode connects to an external SAC OData service to retrieve extended session information. The service details (including credentials) are configured within the CDS configuration.
 
 Once started, the CAP runtime serves the available services and Fiori launchpad. You can open the configured UI5 applications (such as GT7 Info or Race Dash) in your browser to view the live dashboards and session reports.
 
-────────────────────────────────────────────
 This README provides the necessary documentation to install, configure, and run the GT7-CAP project. Detailed configuration settings are embedded in the project files, and proper commands for each running mode are available so that you can quickly switch between local SQLite testing, a dedicated PLC mode, or integrate with SAC services.
 
 Enjoy using GT7-CAP, and happy racing!
