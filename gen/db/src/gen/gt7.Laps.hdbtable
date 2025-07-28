@@ -1,0 +1,9 @@
+COLUMN TABLE gt7_Laps (
+  session_ID NVARCHAR(36) NOT NULL,
+  lap SMALLINT NOT NULL,
+  "TIME" INTEGER,
+  maxSpeed DECIMAL,
+  avgSpeed DECIMAL,
+  best BOOLEAN,
+  PRIMARY KEY(session_ID, lap)
+)

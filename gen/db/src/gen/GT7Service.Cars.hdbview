@@ -1,0 +1,8 @@
+VIEW GT7Service_Cars AS SELECT
+  Cars_0.ID,
+  Cars_0.name,
+  Cars_0.maker_ID
+FROM gt7_Cars AS Cars_0
+WITH ASSOCIATIONS (
+  MANY TO ONE JOIN GT7Service_Makers AS maker ON (maker.ID = maker_ID)
+)

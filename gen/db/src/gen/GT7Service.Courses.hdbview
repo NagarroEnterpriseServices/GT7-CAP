@@ -1,0 +1,27 @@
+VIEW GT7Service_Courses AS SELECT
+  Courses_0.ID,
+  Courses_0.name,
+  Courses_0.base_ID,
+  Courses_0.country_ID,
+  Courses_0.category,
+  Courses_0."LENGTH",
+  Courses_0.longestStraight,
+  Courses_0.elevationDiff,
+  Courses_0.altitude,
+  Courses_0.minTimeH,
+  Courses_0.minTimeM,
+  Courses_0.minTimeS,
+  Courses_0.maxTimeH,
+  Courses_0.maxTimeM,
+  Courses_0.maxTimeS,
+  Courses_0.layoutNumber,
+  Courses_0.isReverse,
+  Courses_0.pitLaneDelta,
+  Courses_0.isOval,
+  Courses_0.numCorners,
+  Courses_0.noRain
+FROM gt7_Courses AS Courses_0
+WITH ASSOCIATIONS (
+  MANY TO ONE JOIN GT7Service_CourseBases AS base ON (base.ID = base_ID),
+  MANY TO ONE JOIN GT7Service_Countries AS country ON (country.ID = country_ID)
+)

@@ -84,14 +84,7 @@
     "requires": {
       "[datasphere]": {
         "db": {
-          "kind": "hana-cloud",
-          "credentials": {
-            "host": "api.cf.eu10-004.hana.ondemand.com",
-            "port": 443,
-            "user": "C_M_PS5GT7#TECH_USER",
-            "password": "WD;J-l8W2s@P3O9S7Ws?!<n7$GEZ0P)$",
-            "schema": "C_M_PS5GT7"
-          }
+          "kind": "hana-cloud"
         },
         "auth": {
           "kind": "basic"

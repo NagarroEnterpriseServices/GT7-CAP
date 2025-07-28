@@ -1,0 +1,5 @@
+VIEW GT7Service_StockPerformances AS SELECT
+  StockPerformances_0.ID,
+  StockPerformances_0.pp,
+  StockPerformances_0.tyre
+FROM gt7_StockPerformances AS StockPerformances_0

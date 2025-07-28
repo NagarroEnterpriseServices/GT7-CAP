@@ -410,8 +410,8 @@ Object.defineProperty(Trophy, 'is_singular', { value: true })
 export class Trophies extends Array<Trophy> {$count?: number}
 Object.defineProperty(Trophies, 'name', { value: 'gt7.Trophies' })
 
-export function _TLT_PS5GT7_RawDataAspect<TBase extends new (...args: any[]) => object>(Base: TBase) {
-  return class TLT_PS5GT7_RawData extends Base {
+export function _TLT_PS5GT7_RawDataLocalAspect<TBase extends new (...args: any[]) => object>(Base: TBase) {
+  return class TLT_PS5GT7_RawDataLocal extends Base {
     declare session_ID?: __.Key<string>
     declare packetId?: __.Key<number>
     declare Source?: string | null
@@ -433,13 +433,13 @@ export function _TLT_PS5GT7_RawDataAspect<TBase extends new (...args: any[]) => 
     declare preRaceStartPositionOrQualiPos?: number | null
     declare rowDate?: __.CdsDateTime | null
     static readonly kind: 'entity' | 'type' | 'aspect' = 'entity';
-    declare static readonly keys: __.KeysOf<TLT_PS5GT7_RawData>;
-    declare static readonly elements: __.ElementsOf<TLT_PS5GT7_RawData>;
+    declare static readonly keys: __.KeysOf<TLT_PS5GT7_RawDataLocal>;
+    declare static readonly elements: __.ElementsOf<TLT_PS5GT7_RawDataLocal>;
     declare static readonly actions: globalThis.Record<never, never>;
   };
 }
-export class TLT_PS5GT7_RawData extends _TLT_PS5GT7_RawDataAspect(__.Entity) {}
-Object.defineProperty(TLT_PS5GT7_RawData, 'name', { value: 'gt7.TLT_PS5GT7_RawData' })
-Object.defineProperty(TLT_PS5GT7_RawData, 'is_singular', { value: true })
-export class TLT_PS5GT7_RawData_ extends Array<TLT_PS5GT7_RawData> {$count?: number}
-Object.defineProperty(TLT_PS5GT7_RawData_, 'name', { value: 'gt7.TLT_PS5GT7_RawData' })
+export class TLT_PS5GT7_RawDataLocal extends _TLT_PS5GT7_RawDataLocalAspect(__.Entity) {}
+Object.defineProperty(TLT_PS5GT7_RawDataLocal, 'name', { value: 'gt7.TLT_PS5GT7_RawDataLocal' })
+Object.defineProperty(TLT_PS5GT7_RawDataLocal, 'is_singular', { value: true })
+export class TLT_PS5GT7_RawDataLocal_ extends Array<TLT_PS5GT7_RawDataLocal> {$count?: number}
+Object.defineProperty(TLT_PS5GT7_RawDataLocal_, 'name', { value: 'gt7.TLT_PS5GT7_RawDataLocal' })

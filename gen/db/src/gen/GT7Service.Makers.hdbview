@@ -1,0 +1,8 @@
+VIEW GT7Service_Makers AS SELECT
+  Makers_0.ID,
+  Makers_0.name,
+  Makers_0.country_ID
+FROM gt7_Makers AS Makers_0
+WITH ASSOCIATIONS (
+  MANY TO ONE JOIN GT7Service_Countries AS country ON (country.ID = country_ID)
+)

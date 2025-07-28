@@ -294,7 +294,7 @@ entity Trophies : cuid{
 
 
 @cds.persistence.exists
-entity TLT_PS5GT7_RawData {
+entity TLT_PS5GT7_RawDataLocal {
   
   key session_ID : UUID @EndUserText.label: 'session_ID';
   key packetId   : Integer @EndUserText.label: 'packetId';

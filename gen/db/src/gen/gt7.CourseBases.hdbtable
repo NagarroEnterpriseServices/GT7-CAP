@@ -1,0 +1,6 @@
+COLUMN TABLE gt7_CourseBases (
+  ID INTEGER NOT NULL,
+  name NVARCHAR(200),
+  logoName NVARCHAR(200),
+  PRIMARY KEY(ID)
+)

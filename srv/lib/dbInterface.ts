@@ -191,6 +191,60 @@ export async function getBestLap(sessionId: string, bestLapTime: number) {
     return (result?.lapCount) ? result.lapCount - 1 : null
 }
 
+
+
+var hana = require('@sap/hana-client');
+var conn = hana.createConnection();
+var conn_params = {
+  serverNode  : '8cf6e46c-2deb-4ded-8a35-dfe14b654268.hana.prod-eu10.hanacloud.ondemand.com:443',
+  uid: "C_M_PS5GT7#TECH_USER",
+  password: "", //put the password here
+  type: "procedure",
+  procedure_schema: "C_M_PS5GT7$TEC",
+  procedure: "HDI_GRANTOR_FOR_CUPS"
+};
+
+async function InsertIntoDatasphere(sip: any) { 
+  conn.connect(conn_params, async function(err: any) {
+      if (err) throw err;
+            const insertQuery = `
+            INSERT INTO TLT_PS5GT7_RAWDATA (
+                SOURCE, SESSION_ID, SESSION_DATETIME, PACKETID, DRIVER,
+                CARID, ENGINERPM, METERSPERSECOND, LAPCOUNT, LAPSINRACE,
+                CURRENTLAPTIME2, LASTLAPTIME, TIMEOFDAYPROGRESSION,THROTTLE,
+                BRAKE,CLUTCHPEDAL,CURRENTGEAR,FLAGS,PRERACESTARTPOSITIONORQUALIPOS,
+                ROWDATE
+            ) VALUES (
+                'temporary',
+                `+sip.session_ID+`,
+                CURRENT_TIMESTAMP,
+                `+sip.packetId+`,
+                undefined,
+                `+sip.car_ID+`,
+                `+sip.engineRPM+`,
+                `+sip.metersPerSecond+`,
+                `+sip.lapCount+`,
+                `+sip.lapsInRace+`,
+                `+sip.currentLapTime2+`,
+                `+sip.lastLapTime+`,
+                `+sip.timeOfDayProgression+`,
+                `+sip.throttle+`,
+                `+sip.brake+`,
+                `+sip.clutchPedal+`,
+                `+sip.currentGear+`,
+                `+sip.flags+`,
+                `+sip.preRaceStartPositionOrQualiPos+`,
+                CURRENT_TIMESTAMP
+            )
+        `;
+              await conn.exec(insertQuery, function (err: any, result: any) {
+                  if (err) throw err;
+                  console.log('Insert successful:', result);
+              });
+        conn.disconnect();
+        });
+};
+
 export async function logSimulatorInterfacePacket(sessionId: string, sip: any) {
     const sipEntity = sip
     const map = typeof (sipEntity.session_ID) === 'undefined'
@@ -233,6 +287,7 @@ export async function logSimulatorInterfacePacket(sessionId: string, sip: any) {
     }
     
     await INSERT.into(SimulatorInterfacePackets).entries(sipEntity)
+    await InsertIntoDatasphere(sipEntity);
 }
 
 export async function getCarName(carCode: number) {

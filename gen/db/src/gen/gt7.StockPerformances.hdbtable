@@ -1,0 +1,6 @@
+COLUMN TABLE gt7_StockPerformances (
+  ID INTEGER NOT NULL,
+  pp DECIMAL NOT NULL,
+  tyre NVARCHAR(2) NOT NULL,
+  PRIMARY KEY(ID, pp, tyre)
+)

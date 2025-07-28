@@ -1,0 +1,4 @@
+VIEW GT7Service_CarGroups AS SELECT
+  CarGroups_0.ID,
+  CarGroups_0."GROUP"
+FROM gt7_CarGroups AS CarGroups_0

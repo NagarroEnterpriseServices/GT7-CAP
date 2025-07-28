@@ -45,9 +45,9 @@ module.exports.StockPerformances = createEntityProxy(['gt7', 'StockPerformances'
 // Trophies
 module.exports.Trophy = createEntityProxy(['gt7', 'Trophies'], { target: { is_singular: true } })
 module.exports.Trophies = createEntityProxy(['gt7', 'Trophies'], { target: { is_singular: false }})
-// TLT_PS5GT7_RawData
-module.exports.TLT_PS5GT7_RawData = createEntityProxy(['gt7', 'TLT_PS5GT7_RawData'], { target: { is_singular: true } })
-module.exports.TLT_PS5GT7_RawData_ = createEntityProxy(['gt7', 'TLT_PS5GT7_RawData'], { target: { is_singular: false }})
+// TLT_PS5GT7_RawDataLocal
+module.exports.TLT_PS5GT7_RawDataLocal = createEntityProxy(['gt7', 'TLT_PS5GT7_RawDataLocal'], { target: { is_singular: true } })
+module.exports.TLT_PS5GT7_RawDataLocal_ = createEntityProxy(['gt7', 'TLT_PS5GT7_RawDataLocal'], { target: { is_singular: false }})
 // events
 // actions
 // enums
