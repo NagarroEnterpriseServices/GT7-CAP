@@ -1,84 +1,62 @@
 # GT7-CAP
 
-The GT7-CAP project is a Cloud Application Programming Model (CAP) application for managing race sessions and telemetry data as demonstrated during the reCAP 2024 session. The project collects race telemetry, aggregates lap and session data, and provides real‑time dashboards and Fiori applications to display results. It supports multiple operating profiles that affect how the application connects to databases or external services.
 
 ## Introduction
 
 The project is built on SAP’s CAP framework and implemented in Node.js. It provides several services for processing and displaying race-related data. Using a combination of WebSocket and UDP communications, the application listens for race telemetry, logs session data, assigns drivers, and calculates key performance indicators. The provided Fiori and UI5 applications enable dashboards for drivers and race officials. This repository is intended to demonstrate a real‑world CAP application where race telemetry data is processed and visualized.
 
-## Requirements
+### Prerequisites
+---
+- have a computer with no network firewall
+- be connected to the same network as the PS5 (preferably a network without firewall)
+- have either: 
+	- `docker` and `docker-compose`  for docker deployement
+	- or `nodejs 21` and `npm` installed on your computer
 
-- **Node.js:** Version 20 or higher is required (see the engines property in the package.json ).
-- **CAP Development Kit:** Ensure that you have the CAP development libraries, including @sap/cds-dk.
-- **Database:** The application supports several backend databases. When running in different profiles, it uses either SQLite or PostgreSQL (for example, in SAC mode) depending on the configuration.
-- **Other dependencies:** The repository includes dependencies such as @cap-js/postgres, @cap-js/sqlite, and WebSocket libraries.
-  
-## Installation
+### Steps
+---
 
-1. **Clone the repository:**
-   Code block example:
+#### Docker deployement
+- edit the `.env` file with the PLAYSTATION_IP address
+- run `docker-compose up -d` in a terminal
+- go to `localhost:1880` in a web browser
+- locate the `Get Token` node
+- edit the node with: 
+	- username: `sb-default-71ddf6f6-38e3-4dd4-bc72-cdb56e1fc39d-clone!b101064|xbem-service-broker-!b43`
+	- password: `24a4b20b-15ad-49ad-8184-e584faa70de2$Rn95N96K1itKQdKAa49-0bQVr1xOcLe5uYu6Ont5KEg=`
 
-   git clone https://github.com/koebelt/GT7-CAP.git
-   cd GT7-CAP
+#### Node developement
+- edit the `.env` file with the PLAYSTATION_IP address
+- run `npm install` in a terminal
+- run `npm install -g @sap/cds-dk@8` 
+- run `cds deploy --profile sqlite`
+- start the project using the `npm run start:sqlite` command
 
-
-3. **Install npm dependencies:**
-
-   npm install
-
-   This command installs all required packages as declared in the package.json .
-
-4. **Postinstall step:**
-   After installing dependencies, the project automatically generates CAP TypeScript definitions via the postinstall script.
 
 ## Configuration
+---
 
 The application is highly configurable. Key configuration details include running profiles and external service credentials. The configuration is defined inside the package.json and CDS configuration sections.
 
 **Profiles and Running Modes:**
 
-| **Mode**    | **Command**                    | **Description**                                                                                   |
-|-------------|--------------------------------|---------------------------------------------------------------------------------------------------|
-| sqlite      | npm run start:sqlite           | Uses an embedded SQLite database. Suitable for local testing.                                   |
-| plc         | npm run start:plc              | Starts the application with the PLC service (for receiving WebSocket telemetry data).             |
-| sac         | npm run start:sac              | Activates the SAC profile to connect to an external SAC OData service using provided credentials. |
+| **Mode**       | **Command**          | **Description**                                                                                   |
+| -------------- | -------------------- | ------------------------------------------------------------------------------------------------- |
+| sqlite         | npm run start:sqlite | Uses an embedded SQLite database. And relies on the app itself for data collection                |
+| plc            | npm run start:plc    | Also uses an embedded SQLite database. And relies on a `node-red` to collect data.                |
+| sac (OUTDATED) | npm run start:sac    | Activates the SAC profile to connect to an external SAC OData service using provided credentials. |
 
-The configuration files define the database connection parameters, credential URLs, and service endpoints. For example, the “sac” profile contains a configuration for an external OData service that provides additional information for session logging .
 
-In addition, environment variables (e.g., GT_VERSION) can affect UDP ports and WebSocket endpoints as seen in the service implementations.
+### URLs
 
-## Features
+- [Live Data Dashboard](http://localhost:4004/$launchpad#GT7RaceDash-display)
+- [Race Analysis](http://localhost:4004/$launchpad#SessionObject-display)
+- [GT7 info](http://localhost:4004/$launchpad#GT7Info-display) (Simple demo of external service exploitation)
 
-- **Real‑Time Race Telemetry:** Processes UDP packets and WebSocket messages representing live race telemetry data.
-- **Session Logging and Data Aggregation:** Automatically creates sessions, logs lap times, and calculates statistical metrics.
-- **Multiple Running Modes:** Supports different modes (sqlite, plc, and sac) to suit various deployment scenarios.
-- **Driver Assignment and Updates:** Allows assignment and update of drivers for sessions.
-- **Fiori and UI5 Dashboards:** Includes web applications (found under the app folder) such as GT7 Info and Race Dash that provide interactive user interfaces.
-- **Cloud Event Generation:** Implements cloud event messaging for real‑time communication across services.
-- **Modular Design:** Contains separate services for handling simulator data, PLC integration, and general race analytics (e.g., SIPGT7Service and GT7Service).
+### Usage warnings
 
-## Usage
-
-After installation, select the desired mode and start the application using one of the following commands:
-
-- **SQLite Mode:**  
-  npm run start:sqlite
-
-  This mode uses a local SQLite database, ideal for quick testing and development.
-
-- **PLC Mode:**  
-  npm run start:plc
- 
-  Use this mode if you want the application to listen for and process telemetry data via PLC-specific endpoints. This mode provides a dedicated service to handle WebSocket connections to an external PLC telemetry source.
-
-- **SAC Mode:**  
-  npm run start:sac
-  
-  Activates the SAC profile. This mode connects to an external SAC OData service to retrieve extended session information. The service details (including credentials) are configured within the CDS configuration.
-
-Once started, the CAP runtime serves the available services and Fiori launchpad. You can open the configured UI5 applications (such as GT7 Info or Race Dash) in your browser to view the live dashboards and session reports.
-
-This README provides the necessary documentation to install, configure, and run the GT7-CAP project. Detailed configuration settings are embedded in the project files, and proper commands for each running mode are available so that you can quickly switch between local SQLite testing, a dedicated PLC mode, or integrate with SAC services.
-
-Enjoy using GT7-CAP, and happy racing!
-
+- When finishing a race, **you need to skip the race replay as fast as possible**, if the replay runs for more than 3 seconds, it will create duplicates in the table and may cause problems, even crashes.
+- If the application crashes, go back to the [Seps](#steps) section
+- Setting the driver must be done before, or during the race via the [Live Data Dashboard](http://localhost:4004/$launchpad#GT7RaceDash-display)
+- Setting the driver in the analysis app does not update the driver in SAC
+- If for some reason the live dashboard does not receive data, restart the router, the ps5 and go back to the [Run](#steps) section
