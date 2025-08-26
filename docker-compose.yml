@@ -1,0 +1,26 @@
+services:
+  cap-app:
+    build:
+      context: .
+      dockerfile: Dockerfile.cap
+    container_name: cap-app
+    ports:
+      - "4004:4004"
+      - "33739:33739/udp"
+      - "33740:33740/udp"
+    restart: unless-stopped
+
+    environment:
+      - NODE_ENV=development
+      - PLAYSTATION_IP=192.168.1.2
+      - GT_VERSION=GT7
+
+  nodered:
+    build:
+      context: .
+      dockerfile: Dockerfile.nodered
+    container_name: node-red
+    ports:
+      - "1880:1880"
+    restart: unless-stopped
+
