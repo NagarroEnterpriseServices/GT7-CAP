@@ -4,6 +4,9 @@ FROM nodered/node-red:latest
 RUN npm install --unsafe-perm --no-update-notifier --no-fund --only=production \
     binary-parser \
     uuid
-
+    
 COPY flow.json /data/flows.json
 
+# expose UDP port 33740 and 33739 for GT7
+EXPOSE 33740/udp
+EXPOSE 33739/udp
