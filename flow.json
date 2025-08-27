@@ -95,7 +95,8 @@
         "y": 360,
         "wires": [
             [
-                "05df8cdbb78ede95"
+                "05df8cdbb78ede95",
+                "8ca1933ef393d4a2"
             ]
         ]
     },
@@ -164,6 +165,10 @@
         "authType": "basic",
         "senderr": false,
         "headers": [],
+        "credentials": {
+            "user": "sb-default-71ddf6f6-38e3-4dd4-bc72-cdb56e1fc39d-clone!b101064|xbem-service-broker-!b43",
+            "password": "24a4b20b-15ad-49ad-8184-e584faa70de2$Rn95N96K1itKQdKAa49-0bQVr1xOcLe5uYu6Ont5KEg="
+        },
         "x": 570,
         "y": 860,
         "wires": [
