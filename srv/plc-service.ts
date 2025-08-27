@@ -20,7 +20,7 @@ module.exports = class PLCService extends Service {
     raceStartTimeOfDayProgression!: number
 
     async init() {
-        const ws = new WebSocket('ws://192.168.1.10:1880/ws/plc');
+        const ws = new WebSocket(process.env.WSSERVER);
         const wsSrv = await cds.connect.to('WebSocketService')
 
         this.on("driverAssigned", async (msg) => {
