@@ -1,9 +1,7 @@
 FROM nodered/node-red:latest
 
 # Install additional npm packages
-RUN npm install --unsafe-perm --no-update-notifier --no-fund --only=production \
-    binary-parser \
-    uuid
+RUN npm install --unsafe-perm --no-update-notifier --no-fund --only=production  binary-parser node-red-contrib-uuid
     
 COPY flow.json /data/flows.json
 
