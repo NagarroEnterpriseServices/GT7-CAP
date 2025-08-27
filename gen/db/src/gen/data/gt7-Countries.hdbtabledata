@@ -1,0 +1,29 @@
+{
+  "format_version": 1,
+  "imports": [
+    {
+      "target_table": "GT7_COUNTRIES",
+      "source_data": {
+        "data_type": "CSV",
+        "file_name": "gt7-Countries.csv",
+        "has_header": true,
+        "type_config": {
+          "delimiter": ","
+        }
+      },
+      "import_settings": {
+        "import_columns": [
+          "ID",
+          "NAME",
+          "CODE"
+        ],
+        "include_filter": []
+      },
+      "column_mappings": {
+        "ID": "ID",
+        "NAME": "name",
+        "CODE": "code"
+      }
+    }
+  ]
+}

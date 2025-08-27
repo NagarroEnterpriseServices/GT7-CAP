@@ -1,0 +1,22 @@
+VIEW ExpositionService_TLT_PS5GT7_RawDataEntity AS SELECT
+  TLT_PS5GT7_RawDataLocal_0.session_ID,
+  TLT_PS5GT7_RawDataLocal_0.packetId,
+  TLT_PS5GT7_RawDataLocal_0.Source,
+  TLT_PS5GT7_RawDataLocal_0.sessionDateTime,
+  TLT_PS5GT7_RawDataLocal_0.Driver,
+  TLT_PS5GT7_RawDataLocal_0.carID,
+  TLT_PS5GT7_RawDataLocal_0.engineRPM,
+  TLT_PS5GT7_RawDataLocal_0.metersPerSecond,
+  TLT_PS5GT7_RawDataLocal_0.lapCount,
+  TLT_PS5GT7_RawDataLocal_0.lapsInRace,
+  TLT_PS5GT7_RawDataLocal_0.currentLapTime2,
+  TLT_PS5GT7_RawDataLocal_0.lastLapTime,
+  TLT_PS5GT7_RawDataLocal_0.timeOfDayProgression,
+  TLT_PS5GT7_RawDataLocal_0.throttle,
+  TLT_PS5GT7_RawDataLocal_0.brake,
+  TLT_PS5GT7_RawDataLocal_0.clutchPedal,
+  TLT_PS5GT7_RawDataLocal_0.currentGear,
+  TLT_PS5GT7_RawDataLocal_0.flags,
+  TLT_PS5GT7_RawDataLocal_0.preRaceStartPositionOrQualiPos,
+  TLT_PS5GT7_RawDataLocal_0.rowDate
+FROM gt7_TLT_PS5GT7_RawDataLocal AS TLT_PS5GT7_RawDataLocal_0

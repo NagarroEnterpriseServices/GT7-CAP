@@ -1,0 +1,19 @@
+COLUMN TABLE gt7_Sessions (
+  ID NVARCHAR(36) NOT NULL,
+  createdAt TIMESTAMP,
+  driver NVARCHAR(200),
+  car_ID INTEGER,
+  lapsInRace SMALLINT,
+  raceTime INTEGER,
+  bestLap SMALLINT,
+  bestLapTime INTEGER,
+  finished BOOLEAN DEFAULT FALSE,
+  timeOfDay INTEGER,
+  calculatedMaxSpeed SMALLINT,
+  bodyHeight DECIMAL,
+  PRIMARY KEY(ID)
+) WITH ASSOCIATIONS (
+  MANY TO ONE JOIN gt7_Cars AS car ON (car.ID = car_ID),
+  MANY TO MANY JOIN gt7_Laps AS Laps ON (Laps.session_ID = ID),
+  MANY TO MANY JOIN gt7_SimulatorInterfacePackets AS Packets ON (Packets.session_ID = ID)
+)

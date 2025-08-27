@@ -1,0 +1,6 @@
+COLUMN TABLE gt7_LotteryCars (
+  ID NVARCHAR(36) NOT NULL,
+  category NVARCHAR(200),
+  carID INTEGER,
+  PRIMARY KEY(ID)
+)

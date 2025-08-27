@@ -1,0 +1,8 @@
+VIEW GT7Service_Laps AS SELECT
+  Laps_0.session_ID,
+  Laps_0.lap,
+  Laps_0."TIME",
+  Laps_0.maxSpeed,
+  Laps_0.avgSpeed,
+  Laps_0.best
+FROM gt7_Laps AS Laps_0

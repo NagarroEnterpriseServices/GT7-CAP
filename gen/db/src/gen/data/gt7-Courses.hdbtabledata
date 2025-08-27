@@ -1,0 +1,65 @@
+{
+  "format_version": 1,
+  "imports": [
+    {
+      "target_table": "GT7_COURSES",
+      "source_data": {
+        "data_type": "CSV",
+        "file_name": "gt7-Courses.csv",
+        "has_header": true,
+        "type_config": {
+          "delimiter": ","
+        }
+      },
+      "import_settings": {
+        "import_columns": [
+          "ID",
+          "NAME",
+          "BASE_ID",
+          "COUNTRY_ID",
+          "CATEGORY",
+          "LENGTH",
+          "LONGESTSTRAIGHT",
+          "ELEVATIONDIFF",
+          "ALTITUDE",
+          "MINTIMEH",
+          "MINTIMEM",
+          "MINTIMES",
+          "MAXTIMEH",
+          "MAXTIMEM",
+          "MAXTIMES",
+          "LAYOUTNUMBER",
+          "ISREVERSE",
+          "PITLANEDELTA",
+          "ISOVAL",
+          "NUMCORNERS",
+          "NORAIN"
+        ],
+        "include_filter": []
+      },
+      "column_mappings": {
+        "ID": "ID",
+        "NAME": "name",
+        "BASE_ID": "base_ID",
+        "COUNTRY_ID": "country_ID",
+        "CATEGORY": "category",
+        "LENGTH": "length",
+        "LONGESTSTRAIGHT": "longestStraight",
+        "ELEVATIONDIFF": "elevationDiff",
+        "ALTITUDE": "altitude",
+        "MINTIMEH": "minTimeH",
+        "MINTIMEM": "minTimeM",
+        "MINTIMES": "minTimeS",
+        "MAXTIMEH": "maxTimeH",
+        "MAXTIMEM": "maxTimeM",
+        "MAXTIMES": "maxTimeS",
+        "LAYOUTNUMBER": "layoutNumber",
+        "ISREVERSE": "isReverse",
+        "PITLANEDELTA": "pitLaneDelta",
+        "ISOVAL": "isOval",
+        "NUMCORNERS": "numCorners",
+        "NORAIN": "noRain"
+      }
+    }
+  ]
+}

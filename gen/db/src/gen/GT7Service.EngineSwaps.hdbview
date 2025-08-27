@@ -1,0 +1,6 @@
+VIEW GT7Service_EngineSwaps AS SELECT
+  EngineSwaps_0.ID,
+  EngineSwaps_0.newCar,
+  EngineSwaps_0.originalCar,
+  EngineSwaps_0.engineName
+FROM gt7_EngineSwaps AS EngineSwaps_0

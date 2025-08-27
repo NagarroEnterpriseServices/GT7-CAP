@@ -11,7 +11,7 @@
         "moduleResolution": "node",
         "skipLibCheck": true,
         "preserveConstEnums": true,
-        "sourceMap": false,
+        "sourceMap": true,
         "allowJs": true,
         "strict": true,
         "strictNullChecks": false,
@@ -19,9 +19,11 @@
         "esModuleInterop": true,
         "paths": {
             "#cds-models/*": [
+                "./@cds-models/*",
                 "./@cds-models/*/index.ts"
             ]
-        }
+        },
+        "forceConsistentCasingInFileNames": true
     },
     "include": [
         "./srv/**/*",

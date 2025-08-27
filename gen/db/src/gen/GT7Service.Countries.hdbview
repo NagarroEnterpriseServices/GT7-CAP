@@ -1,0 +1,5 @@
+VIEW GT7Service_Countries AS SELECT
+  Countries_0.ID,
+  Countries_0.name,
+  Countries_0.code
+FROM gt7_Countries AS Countries_0

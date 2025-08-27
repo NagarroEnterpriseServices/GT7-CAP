@@ -1,0 +1,8 @@
+COLUMN TABLE gt7_Cars (
+  ID INTEGER NOT NULL,
+  name NVARCHAR(200),
+  maker_ID INTEGER,
+  PRIMARY KEY(ID)
+) WITH ASSOCIATIONS (
+  MANY TO ONE JOIN gt7_Makers AS maker ON (maker.ID = maker_ID)
+)

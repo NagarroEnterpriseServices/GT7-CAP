@@ -1,0 +1,54 @@
+_schema-version: 3.3.0
+ID: racecap
+version: 1.0.0
+description: "Race with CAP (as shown at reCAP 2024 session)"
+parameters:
+  enable-parallel-deployments: true
+build-parameters:
+  before-all:
+    - builder: custom
+      commands:
+        - npm ci
+        - npx cds build --production
+modules:
+  - name: racecap-srv
+    type: nodejs
+    path: gen/srv
+    parameters:
+      buildpack: nodejs_buildpack
+    build-parameters:
+      builder: npm-ci
+    provides:
+      - name: srv-api # required by consumers of CAP services (e.g. approuter)
+        properties:
+          srv-url: ${default-url}
+    requires:
+      - name: racecap-db
+      - name: GT7_btp_dwc-service
+
+  - name: racecap-db-deployer
+    type: nodejs
+    path: gen/db
+    parameters:
+      buildpack: nodejs_buildpack
+    requires:
+      - name: racecap-db
+      - name: GT7_btp_dwc-service
+
+resources:
+  - name: racecap-db
+    type: com.sap.xs.hdi-container
+    parameters:
+      service: hana
+      service-plan: hdi-shared
+      config:
+        database_id: 8cf6e46c-2deb-4ded-8a35-dfe14b654268
+        schema: C_M_PS5GT7
+    properties:
+      hdi-container-name: '${service-name}'
+  - name: GT7_btp_dwc-service
+    type: org.cloudfoundry.existing-service
+    parameters:
+      service-name: ups_btp_dwc
+    properties:
+      the-service-name: '${service-name}'

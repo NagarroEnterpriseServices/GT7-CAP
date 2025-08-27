@@ -1,0 +1,7 @@
+COLUMN TABLE gt7_EngineSwaps (
+  ID NVARCHAR(36) NOT NULL,
+  newCar INTEGER,
+  originalCar INTEGER,
+  engineName NVARCHAR(200),
+  PRIMARY KEY(ID)
+)

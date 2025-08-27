@@ -1,0 +1,27 @@
+{
+  "format_version": 1,
+  "imports": [
+    {
+      "target_table": "GT7_CARGROUPS",
+      "source_data": {
+        "data_type": "CSV",
+        "file_name": "gt7-CarGroups.csv",
+        "has_header": true,
+        "type_config": {
+          "delimiter": ","
+        }
+      },
+      "import_settings": {
+        "import_columns": [
+          "ID",
+          "GROUP"
+        ],
+        "include_filter": []
+      },
+      "column_mappings": {
+        "ID": "ID",
+        "GROUP": "group"
+      }
+    }
+  ]
+}

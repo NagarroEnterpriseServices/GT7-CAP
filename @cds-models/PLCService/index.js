@@ -1,7 +1,9 @@
 // This is an automatically generated file. Please do not change its contents manually!
-const cds = require('@sap/cds')
-const csn = cds.entities('PLCService')
-module.exports = { name: 'PLCService' }
+const { createEntityProxy } = require('./../_')
+// service
+const PLCService = { name: 'PLCService' }
+module.exports = PLCService
+module.exports.PLCService = PLCService
 // events
 // actions
 // enums

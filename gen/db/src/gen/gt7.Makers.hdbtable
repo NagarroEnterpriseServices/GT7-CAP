@@ -1,0 +1,8 @@
+COLUMN TABLE gt7_Makers (
+  ID INTEGER NOT NULL,
+  name NVARCHAR(200),
+  country_ID INTEGER,
+  PRIMARY KEY(ID)
+) WITH ASSOCIATIONS (
+  MANY TO ONE JOIN gt7_Countries AS country ON (country.ID = country_ID)
+)

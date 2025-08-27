@@ -1,0 +1,8 @@
+VIEW GT7Service_Trophies AS SELECT
+  Trophies_0.ID,
+  Trophies_0.name,
+  Trophies_0.car_ID
+FROM gt7_Trophies AS Trophies_0
+WITH ASSOCIATIONS (
+  MANY TO ONE JOIN GT7Service_Cars AS car ON (car.ID = car_ID)
+)
