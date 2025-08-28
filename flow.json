@@ -315,7 +315,7 @@
         "type": "function",
         "z": "abc5e162aa50b282",
         "name": "GT7 payload ",
-        "func": "// var payload = msg.payload;\nvar token = flow.get(\"access_token\");\n\nvar payload = {\n    sessionID: msg.payload.session_id,\n    locationID: \"ILAB-ENTZHEIM\",\n    packetID: msg.payload.packetId,\n    carID: msg.payload.carCode,\n    engineRPM: msg.payload.engineRPM,\n    velocity: msg.payload.metersPerSecond, // *3.6 to get kph\n    lapNb: msg.payload.lapCount,\n    lapsInRace: msg.payload.lapsInRace,\n    currentLapTime: msg.payload.currentLapTime,\n    lastLapTime: msg.payload.lastLapTime,\n    time: msg.payload.timeOfDayProgression,\n    throttle: msg.payload.throttle,\n    brake: msg.payload.brake,\n    clutchPedal: msg.payload.clutchPedal,\n    gearear: msg.payload.currentGear,\n    flags:  msg.payload.flagStates,\n    rank: msg.payload.preRaceStartPositionOrQualiPos,\n    position: msg.payload.position,\n    orientation: msg.payload.relativeOrientationToNorth,\n    tireTemperature: msg.payload.tireSurfaceTemperature,\n}\n\n// Créer un message pour vehicle/velocity\nvar message = {\n    token: token,\n    payload: {\n        \"specversion\": \"1.0\",\n        \"source\": \"sap/s4em1/1\",\n        \"type\": \"GT7\",\n        \"id\": \"test-\" + Date.now(),\n        \"time\": new Date().toISOString(),\n        \"datacontenttype\": \"application/json\",\n        \"data\": payload\n    },\n    headers: {\n        \"Content-Type\": \"application/cloudevents+json\",\n        \"Authorization\": \"Bearer \" + token\n    }\n};\n\n// Retourner uniquement le message pour vehicle/velocity\nreturn [message];\n",
+        "func": "// var payload = msg.payload;\nvar token = flow.get(\"access_token\");\n\nvar payload = {\n    sessionID: msg.payload.session_id,\n    locationID: \"ILAB-ENTZHEIM\",\n    packetID: msg.payload.packetId,\n    carID: msg.payload.carCode,\n    engineRPM: msg.payload.engineRPM,\n    velocity: msg.payload.metersPerSecond, // *3.6 to get kph\n    lapNb: msg.payload.lapCount,\n    lapsInRace: msg.payload.lapsInRace,\n    currentLapTime: msg.payload.currentLapTime,\n    lastLapTime: msg.payload.lastLapTime,\n    time: msg.payload.timeOfDayProgression,\n    throttle: msg.payload.throttle,\n    brake: msg.payload.brake,\n    clutchPedal: msg.payload.clutchPedal,\n    gearear: msg.payload.currentGear,\n    flagStates:  msg.payload.flagStates,\n    flags: msg.payload.flags,\n    rank: msg.payload.preRaceStartPositionOrQualiPos,\n    position: msg.payload.position,\n    orientation: msg.payload.relativeOrientationToNorth,\n    tireTemperature: msg.payload.tireSurfaceTemperature,\n}\n\n// Créer un message pour vehicle/velocity\nvar message = {\n    token: token,\n    payload: {\n        \"specversion\": \"1.0\",\n        \"source\": \"sap/s4em1/1\",\n        \"type\": \"GT7\",\n        \"id\": \"test-\" + Date.now(),\n        \"time\": new Date().toISOString(),\n        \"datacontenttype\": \"application/json\",\n        \"data\": payload\n    },\n    headers: {\n        \"Content-Type\": \"application/cloudevents+json\",\n        \"Authorization\": \"Bearer \" + token\n    }\n};\n\n// Retourner uniquement le message pour vehicle/velocity\nreturn [message];\n",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -744,5 +744,13 @@
         "type": "websocket-listener",
         "path": "/ws/plc",
         "wholemsg": "false"
+    },
+    {
+        "id": "c356305f5cb7bb69",
+        "type": "global-config",
+        "env": [],
+        "modules": {
+            "node-red-contrib-uuid": "0.0.4-rc-1"
+        }
     }
 ]
