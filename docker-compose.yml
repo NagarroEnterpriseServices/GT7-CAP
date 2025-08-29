@@ -6,14 +6,7 @@ services:
     container_name: cap-app
     ports:
       - "4004:4004"
-      # - "33739:33739/udp"
-      # - "33740:33740/udp"
     restart: unless-stopped
-
-    environment:
-      - NODE_ENV=development
-      - PLAYSTATION_IP=192.168.1.2
-      - GT_VERSION=GT7
 
   nodered:
     build:

@@ -16,6 +16,8 @@ The project is built on SAP’s CAP framework and implemented in Node.js. It pro
 ### Steps
 ---
 
+For all events, please use the Docker deployement.
+
 #### Docker deployement
 - edit the `.env` file with the PLAYSTATION_IP address
 - run `docker-compose up -d` in a terminal
@@ -24,6 +26,7 @@ The project is built on SAP’s CAP framework and implemented in Node.js. It pro
 - edit the node with: 
 	- username: `sb-default-71ddf6f6-38e3-4dd4-bc72-cdb56e1fc39d-clone!b101064|xbem-service-broker-!b43`
 	- password: `24a4b20b-15ad-49ad-8184-e584faa70de2$Rn95N96K1itKQdKAa49-0bQVr1xOcLe5uYu6Ont5KEg=`
+- Edit the Playstation IP address on the `GT7 Heartbeat` node
 
 #### Node developement
 - edit the `.env` file with the PLAYSTATION_IP address
