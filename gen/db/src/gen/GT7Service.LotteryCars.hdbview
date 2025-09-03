@@ -1,0 +1,5 @@
+VIEW GT7Service_LotteryCars AS SELECT
+  LotteryCars_0.ID,
+  LotteryCars_0.category,
+  LotteryCars_0.carID
+FROM gt7_LotteryCars AS LotteryCars_0

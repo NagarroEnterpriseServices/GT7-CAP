@@ -1,0 +1,8 @@
+{
+  "DWCMISSION_": {
+    "target": {
+        "schema": "C_M_PS5GT7",        
+        "object": "TLT_PS5GT7_RAWDATA"
+    }
+  }
+}

@@ -1,0 +1,8 @@
+COLUMN TABLE gt7_Trophies (
+  ID NVARCHAR(36) NOT NULL,
+  name NVARCHAR(200),
+  car_ID INTEGER,
+  PRIMARY KEY(ID)
+) WITH ASSOCIATIONS (
+  MANY TO ONE JOIN gt7_Cars AS car ON (car.ID = car_ID)
+)

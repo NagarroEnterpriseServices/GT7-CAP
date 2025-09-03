@@ -1,0 +1,27 @@
+COLUMN TABLE gt7_Courses (
+  ID INTEGER NOT NULL,
+  name NVARCHAR(200),
+  base_ID INTEGER,
+  country_ID INTEGER,
+  category NVARCHAR(200),
+  "LENGTH" INTEGER,
+  longestStraight INTEGER,
+  elevationDiff DECIMAL,
+  altitude DECIMAL,
+  minTimeH INTEGER,
+  minTimeM INTEGER,
+  minTimeS INTEGER,
+  maxTimeH INTEGER,
+  maxTimeM INTEGER,
+  maxTimeS INTEGER,
+  layoutNumber INTEGER,
+  isReverse BOOLEAN,
+  pitLaneDelta DECIMAL,
+  isOval BOOLEAN,
+  numCorners INTEGER,
+  noRain BOOLEAN,
+  PRIMARY KEY(ID)
+) WITH ASSOCIATIONS (
+  MANY TO ONE JOIN gt7_CourseBases AS base ON (base.ID = base_ID),
+  MANY TO ONE JOIN gt7_Countries AS country ON (country.ID = country_ID)
+)

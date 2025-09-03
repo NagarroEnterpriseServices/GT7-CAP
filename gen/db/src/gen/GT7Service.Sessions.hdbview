@@ -1,0 +1,19 @@
+VIEW GT7Service_Sessions AS SELECT
+  Sessions_0.ID,
+  Sessions_0.createdAt,
+  Sessions_0.driver,
+  Sessions_0.car_ID,
+  Sessions_0.lapsInRace,
+  Sessions_0.raceTime,
+  Sessions_0.bestLap,
+  Sessions_0.bestLapTime,
+  Sessions_0.finished,
+  Sessions_0.timeOfDay,
+  Sessions_0.calculatedMaxSpeed,
+  Sessions_0.bodyHeight
+FROM gt7_Sessions AS Sessions_0
+WITH ASSOCIATIONS (
+  MANY TO ONE JOIN GT7Service_Cars AS car ON (car.ID = car_ID),
+  MANY TO MANY JOIN GT7Service_Laps AS Laps ON (Laps.session_ID = ID),
+  MANY TO MANY JOIN GT7Service_SimulatorInterfacePackets AS Packets ON (Packets.session_ID = ID)
+)

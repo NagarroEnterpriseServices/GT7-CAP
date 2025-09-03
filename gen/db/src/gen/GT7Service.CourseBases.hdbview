@@ -1,0 +1,5 @@
+VIEW GT7Service_CourseBases AS SELECT
+  CourseBases_0.ID,
+  CourseBases_0.name,
+  CourseBases_0.logoName
+FROM gt7_CourseBases AS CourseBases_0

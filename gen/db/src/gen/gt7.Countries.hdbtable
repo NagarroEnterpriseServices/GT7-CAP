@@ -1,0 +1,6 @@
+COLUMN TABLE gt7_Countries (
+  ID INTEGER NOT NULL,
+  name NVARCHAR(200),
+  code NVARCHAR(3),
+  PRIMARY KEY(ID)
+)

@@ -1,35 +1,53 @@
 // This is an automatically generated file. Please do not change its contents manually!
-const cds = require('@sap/cds')
-const csn = cds.entities('gt7')
-module.exports.Vector3 = { is_singular: true, __proto__: csn.Vector3 }
-module.exports.Vector3Rotation = { is_singular: true, __proto__: csn.Vector3Rotation }
-module.exports.Wheel = { is_singular: true, __proto__: csn.Wheel }
-module.exports.Session = { is_singular: true, __proto__: csn.Sessions }
-module.exports.Sessions = { is_singular: true, __proto__: csn.Sessions }
-module.exports.Lap = { is_singular: true, __proto__: csn.Laps }
-module.exports.Laps = { is_singular: true, __proto__: csn.Laps }
-module.exports.SimulatorInterfacePacket = { is_singular: true, __proto__: csn.SimulatorInterfacePackets }
-module.exports.SimulatorInterfacePackets = { is_singular: true, __proto__: csn.SimulatorInterfacePackets }
-module.exports.Car = { is_singular: true, __proto__: csn.Cars }
-module.exports.Cars = { is_singular: true, __proto__: csn.Cars }
-module.exports.CarGroup = { is_singular: true, __proto__: csn.CarGroups }
-module.exports.CarGroups = { is_singular: true, __proto__: csn.CarGroups }
-module.exports.Country = { is_singular: true, __proto__: csn.Countries }
-module.exports.Countries = { is_singular: true, __proto__: csn.Countries }
-module.exports.CourseBas = { is_singular: true, __proto__: csn.CourseBases }
-module.exports.CourseBases = { is_singular: true, __proto__: csn.CourseBases }
-module.exports.Cours = { is_singular: true, __proto__: csn.Courses }
-module.exports.Courses = { is_singular: true, __proto__: csn.Courses }
-module.exports.EngineSwap = { is_singular: true, __proto__: csn.EngineSwaps }
-module.exports.EngineSwaps = { is_singular: true, __proto__: csn.EngineSwaps }
-module.exports.LotteryCar = { is_singular: true, __proto__: csn.LotteryCars }
-module.exports.LotteryCars = { is_singular: true, __proto__: csn.LotteryCars }
-module.exports.Maker = { is_singular: true, __proto__: csn.Makers }
-module.exports.Makers = { is_singular: true, __proto__: csn.Makers }
-module.exports.StockPerformance = { is_singular: true, __proto__: csn.StockPerformances }
-module.exports.StockPerformances = { is_singular: true, __proto__: csn.StockPerformances }
-module.exports.Trophy = { is_singular: true, __proto__: csn.Trophies }
-module.exports.Trophies = { is_singular: true, __proto__: csn.Trophies }
+const { createEntityProxy } = require('./../_')
+// Vector3
+module.exports.Vector3 = createEntityProxy(['gt7', 'Vector3'], { target: { is_singular: true } })
+// Vector3Rotation
+module.exports.Vector3Rotation = createEntityProxy(['gt7', 'Vector3Rotation'], { target: { is_singular: true } })
+// Wheel
+module.exports.Wheel = createEntityProxy(['gt7', 'Wheel'], { target: { is_singular: true } })
+// Sessions
+module.exports.Session = createEntityProxy(['gt7', 'Sessions'], { target: { is_singular: true } })
+module.exports.Sessions = createEntityProxy(['gt7', 'Sessions'], { target: { is_singular: false }})
+// Laps
+module.exports.Lap = createEntityProxy(['gt7', 'Laps'], { target: { is_singular: true } })
+module.exports.Laps = createEntityProxy(['gt7', 'Laps'], { target: { is_singular: false }})
+// SimulatorInterfacePackets
+module.exports.SimulatorInterfacePacket = createEntityProxy(['gt7', 'SimulatorInterfacePackets'], { target: { is_singular: true } })
+module.exports.SimulatorInterfacePackets = createEntityProxy(['gt7', 'SimulatorInterfacePackets'], { target: { is_singular: false }})
+// Cars
+module.exports.Car = createEntityProxy(['gt7', 'Cars'], { target: { is_singular: true } })
+module.exports.Cars = createEntityProxy(['gt7', 'Cars'], { target: { is_singular: false }})
+// CarGroups
+module.exports.CarGroup = createEntityProxy(['gt7', 'CarGroups'], { target: { is_singular: true } })
+module.exports.CarGroups = createEntityProxy(['gt7', 'CarGroups'], { target: { is_singular: false }})
+// Countries
+module.exports.Country = createEntityProxy(['gt7', 'Countries'], { target: { is_singular: true } })
+module.exports.Countries = createEntityProxy(['gt7', 'Countries'], { target: { is_singular: false }})
+// CourseBases
+module.exports.CourseBas = createEntityProxy(['gt7', 'CourseBases'], { target: { is_singular: true } })
+module.exports.CourseBases = createEntityProxy(['gt7', 'CourseBases'], { target: { is_singular: false }})
+// Courses
+module.exports.Cours = createEntityProxy(['gt7', 'Courses'], { target: { is_singular: true } })
+module.exports.Courses = createEntityProxy(['gt7', 'Courses'], { target: { is_singular: false }})
+// EngineSwaps
+module.exports.EngineSwap = createEntityProxy(['gt7', 'EngineSwaps'], { target: { is_singular: true } })
+module.exports.EngineSwaps = createEntityProxy(['gt7', 'EngineSwaps'], { target: { is_singular: false }})
+// LotteryCars
+module.exports.LotteryCar = createEntityProxy(['gt7', 'LotteryCars'], { target: { is_singular: true } })
+module.exports.LotteryCars = createEntityProxy(['gt7', 'LotteryCars'], { target: { is_singular: false }})
+// Makers
+module.exports.Maker = createEntityProxy(['gt7', 'Makers'], { target: { is_singular: true } })
+module.exports.Makers = createEntityProxy(['gt7', 'Makers'], { target: { is_singular: false }})
+// StockPerformances
+module.exports.StockPerformance = createEntityProxy(['gt7', 'StockPerformances'], { target: { is_singular: true } })
+module.exports.StockPerformances = createEntityProxy(['gt7', 'StockPerformances'], { target: { is_singular: false }})
+// Trophies
+module.exports.Trophy = createEntityProxy(['gt7', 'Trophies'], { target: { is_singular: true } })
+module.exports.Trophies = createEntityProxy(['gt7', 'Trophies'], { target: { is_singular: false }})
+// TLT_PS5GT7_RawDataLocal
+module.exports.TLT_PS5GT7_RawDataLocal = createEntityProxy(['gt7', 'TLT_PS5GT7_RawDataLocal'], { target: { is_singular: true } })
+module.exports.TLT_PS5GT7_RawDataLocal_ = createEntityProxy(['gt7', 'TLT_PS5GT7_RawDataLocal'], { target: { is_singular: false }})
 // events
 // actions
 // enums
